@@ -8,7 +8,7 @@ import App from "./App";
 import "./index.css";
 
 /* Create root render function */
-const renderApp = (Component) => {
+const renderApp = () => {
   render(
     <Provider value={supabase}>
       <BrowserRouter>
@@ -19,4 +19,4 @@ const renderApp = (Component) => {
   );
 };
 
-renderApp(App);
+renderApp();

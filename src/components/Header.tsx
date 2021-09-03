@@ -1,11 +1,11 @@
-import { FaCat, GiCat } from "react-icons/all";
+import { FaCat, FiFilm } from "react-icons/all";
 
 const Header = () => {
   return (
     <div>
+      <FiFilm className="inline" />
       Cinemang
-      <FaCat />
-      <GiCat />
+      <FaCat className="inline" />
     </div>
   );
 };
