@@ -1,6 +1,12 @@
-import React from "react";
+import React, { FC } from "react";
 
-const Button = ({ className, disabled, onClick, children }) => {
+interface Props {
+  className: string;
+  disabled?: boolean;
+  onClick?: () => {};
+}
+
+const Button: FC<Props> = ({ className, disabled, onClick, children }) => {
   return (
     <button
       disabled={disabled}

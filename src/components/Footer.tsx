@@ -1,18 +1,22 @@
-import React from "react";
+import React, { FC } from "react";
 
-const repoUrl = "https://www.github.com/hicks-team/arc/";
-const siteUrl = "https://ehicks.net";
+const REPO_URL = "https://www.github.com/hicks-team/arc/";
+const SITE_URL = "https://ehicks.net";
 
 const Footer = () => {
   return (
     <footer className="flex justify-end p-4 gap-4">
-      <Link href={repoUrl}>github</Link>
-      <Link href={siteUrl}>ehicks</Link>
+      <Link href={REPO_URL}>github</Link>
+      <Link href={SITE_URL}>ehicks</Link>
     </footer>
   );
 };
 
-const Link = ({ href, children }) => {
+interface Props {
+  href: string;
+}
+
+const Link: FC<Props> = ({ href, children }) => {
   return (
     <a
       href={href}

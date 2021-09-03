@@ -1,7 +1,12 @@
-import React from "react";
+import { FC } from "react";
 import Loader from "react-loader-spinner";
 
-const Loading = ({ loading, error }) => {
+interface Props {
+  loading: boolean;
+  error: any;
+}
+
+const Loading: FC<Props> = ({ loading, error }) => {
   if (loading) {
     return (
       <div className="flex items-center justify-center flex-grow">
@@ -13,6 +18,8 @@ const Loading = ({ loading, error }) => {
   if (error) {
     return <span>Error: {JSON.stringify(error, null, 2)}</span>;
   }
+
+  return null;
 };
 
 export default Loading;

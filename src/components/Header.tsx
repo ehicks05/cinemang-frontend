@@ -1,9 +1,9 @@
 import { FaCat, GiCat } from "react-icons/all";
 
-const Header = ({ title }) => {
+const Header = () => {
   return (
     <div>
-      {title}
+      Cinemang
       <FaCat />
       <GiCat />
     </div>
