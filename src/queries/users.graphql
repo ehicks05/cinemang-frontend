@@ -1,0 +1,45 @@
+query getUser($id: ID) {
+  getUser(id: $id) {
+    id
+    posts {
+      ...PostFragment
+    }
+    comments {
+      ...CommentFragment
+      post {
+        id
+        title
+        link
+        authorId
+      }
+    }
+  }
+}
+
+mutation createUserPostVote($input: createUserPostVoteInput!) {
+  createUserPostVote(input: $input) {
+    ...PostFragment
+  }
+}
+
+mutation deleteUserPostVote($postId: ID) {
+  deleteUserPostVote(postId: $postId) {
+    ...PostFragment
+  }
+}
+
+mutation createUserCommentVote($input: createUserCommentVoteInput!) {
+  createUserCommentVote(input: $input) {
+    ...CommentFragment
+  }
+}
+
+mutation deleteUserCommentVote($commentId: ID) {
+  deleteUserCommentVote(commentId: $commentId) {
+    ...CommentFragment
+  }
+}
+
+mutation setUsername($username: String) {
+  setUsername(username: $username)
+}
