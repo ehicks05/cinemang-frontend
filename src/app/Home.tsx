@@ -5,6 +5,7 @@ import { FaHeart, FaLanguage, FaStar, FaTheaterMasks } from "react-icons/fa";
 import { addMinutes, intervalToDuration } from "date-fns";
 import { IconType } from "react-icons";
 import { usePalette } from "react-palette";
+import { truncate } from "lodash";
 
 const Home: FC = () => {
   return (
@@ -66,7 +67,7 @@ const Films = () => {
   if (!films || films.length === 0) return <div>No films</div>;
 
   return (
-    <div className="grid lg:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 gap-4">
+    <div className="grid md:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 gap-4">
       {films.map((film) => {
         return <Film film={film} genres={genres} languages={languages} />;
       })}
@@ -114,7 +115,8 @@ const Film = ({
         </div>
         <div className="flex flex-col gap-1">
           <div>
-            <span className="font-bold text-lg">{film.title}</span> ({year})
+            <span className="font-bold text-lg">{film.title}</span>{" "}
+            <span className="text-sm">({year})</span>
           </div>
           <div>{`${runtime.hours}h ${runtime.minutes}m`}</div>
           <div>Director: {film.director} </div>
@@ -126,29 +128,34 @@ const Film = ({
           <FilmStat
             Icon={FaHeart}
             color={"text-red-600"}
-            bgColor={palette.darkMuted}
+            bgColor={palette.darkVibrant}
             stat={film.user_vote_average}
           />
           <FilmStat
             Icon={FaStar}
             color={"text-yellow-300"}
-            bgColor={palette.darkMuted}
+            bgColor={palette.darkVibrant}
             stat={voteCount}
           />
           <FilmStat
             Icon={FaLanguage}
             color={"text-green-500"}
-            bgColor={palette.darkMuted}
+            bgColor={palette.darkVibrant}
             stat={findLanguage(film.language_id).name}
           />
           <FilmStat
             Icon={FaTheaterMasks}
             color={"text-blue-500"}
-            bgColor={palette.darkMuted}
+            bgColor={palette.darkVibrant}
             stat={findGenre(film.film_genre?.[0].genre_id).name}
           />
         </div>
-        <div className="text-justify">{film.overview}</div>
+        <div className="text-justify">
+          {truncate(film.overview, {
+            length: 256,
+            separator: " ",
+          })}
+        </div>
       </div>
     </div>
   );
@@ -164,13 +171,13 @@ interface StatProps {
 const FilmStat: FC<StatProps> = ({ Icon, color, bgColor, stat }) => {
   return (
     <div
-      className="flex flex-col items-center px-4 py-2 rounded-lg bg-gray-700"
+      className="flex flex-col gap-1 items-center px-4 py-2 rounded-lg bg-gray-700"
       style={{ backgroundColor: bgColor }}
     >
       <div>
         <Icon className={color} />
       </div>
-      <div>{stat}</div>
+      <div className="text-sm">{stat}</div>
     </div>
   );
 };
