@@ -1,170 +1,178 @@
 import { FC, useEffect, useState } from "react";
 import { Loading } from "components";
-import { PostgrestError, useClient, useSelect } from "react-supabase";
+import { PostgrestError, useClient } from "react-supabase";
+import { FaHeart, FaLanguage, FaStar, FaTheaterMasks } from "react-icons/fa";
+import { addMinutes, intervalToDuration } from "date-fns";
+import { IconType } from "react-icons";
+import { usePalette } from "react-palette";
 
 const Home: FC = () => {
   return (
     <div>
-      <Genres />
-      <Languages />
+      <Films />
     </div>
   );
 };
 
-const Genres = () => {
-  const [{ data, error, fetching }] = useSelect("genre");
-
-  if (error || fetching) return <Loading error={error} loading={fetching} />;
-  if (!data || data.length === 0) return <div>No genres</div>;
-
-  return (
-    <div>
-      <div>count: {data.length}</div>
-      <pre>{JSON.stringify(data, null, 2)}</pre>
-    </div>
-  );
-};
-
-const Languages = () => {
+const Films = () => {
   const client = useClient();
 
   const [languages, setLanguages] = useState<any[] | null>();
-  const [fetching, setFetching] = useState(true);
+  const [genres, setGenres] = useState<any[] | null>();
+  const [films, setFilms] = useState<any[] | null>();
+  const [loading, setLoading] = useState(true);
   const [error, setError] = useState<PostgrestError | null>();
 
   useEffect(() => {
-    const fetch = async () => {
-      const { data, error } = await client
+    const fetchLanguages = async () => {
+      const { data } = await client
         .from("language")
         .select("*")
         .gt("count", 0)
         .order("count", { ascending: false });
 
-      setError(error);
       setLanguages(data);
-      setFetching(false);
     };
-    fetch();
+
+    const fetchGenres = async () => {
+      const { data } = await client.from("genre").select("*");
+
+      setGenres(data);
+    };
+
+    const fetchFilms = async () => {
+      const { data } = await client
+        .from("film")
+        .select("*, film_genre (film_id, genre_id)")
+        .order("user_vote_count", { ascending: false })
+        .limit(50);
+
+      setFilms(data);
+    };
+    try {
+      fetchLanguages();
+      fetchGenres();
+      fetchFilms();
+    } catch (e) {
+      // setError(e);
+    } finally {
+      setLoading(false);
+    }
   }, [client]);
 
-  if (error || fetching) return <Loading error={error} loading={fetching} />;
+  if (error || loading) return <Loading error={error} loading={loading} />;
+  if (!genres || genres.length === 0) return <div>No genres</div>;
   if (!languages || languages.length === 0) return <div>No languages</div>;
+  if (!films || films.length === 0) return <div>No films</div>;
 
   return (
-    <div>
-      <div>count: {languages.length}</div>
-      <pre>{JSON.stringify(languages, null, 2)}</pre>
+    <div className="grid lg:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 gap-4">
+      {films.map((film) => {
+        return <Film film={film} genres={genres} languages={languages} />;
+      })}
+      {/* <pre>{JSON.stringify(films, null, 2)}</pre> */}
+    </div>
+  );
+};
+
+const Film = ({
+  film,
+  genres,
+  languages,
+}: {
+  film: any;
+  genres: any[];
+  languages: any[];
+}) => {
+  const findLanguage = (languageId: string) => {
+    return languages?.find((lang) => lang.id === languageId);
+  };
+
+  const findGenre = (genreId: string) => {
+    return genres?.find((genre) => genre.id === genreId);
+  };
+
+  const posterPath = `https://image.tmdb.org/t/p/w92/${film.poster_path}`;
+  const year = film.year.slice(0, film.year.indexOf("-"));
+  const runtime = intervalToDuration({
+    start: new Date(),
+    end: addMinutes(new Date(), Number(film.runtime)),
+  });
+  const voteCount = Intl.NumberFormat().format(film.user_vote_count);
+
+  const {
+    data: palette,
+    loading: loadingPalette,
+    error: loadingPaletteError,
+  } = usePalette(posterPath);
+
+  return (
+    <div className="flex flex-col gap-4 p-4 bg-gray-800 rounded-lg">
+      <div className="flex gap-4">
+        <div className="flex-shrink-0">
+          <img className="" src={posterPath} alt="poster" />
+        </div>
+        <div className="flex flex-col gap-1">
+          <div>
+            <span className="font-bold text-lg">{film.title}</span> ({year})
+          </div>
+          <div>{`${runtime.hours}h ${runtime.minutes}m`}</div>
+          <div>Director: {film.director} </div>
+          <div>Cast: {film.actors}</div>
+        </div>
+      </div>
+      <div className="flex flex-col gap-4">
+        <div className="flex flex-wrap gap-4">
+          <FilmStat
+            Icon={FaHeart}
+            color={"text-red-600"}
+            bgColor={palette.darkMuted}
+            stat={film.user_vote_average}
+          />
+          <FilmStat
+            Icon={FaStar}
+            color={"text-yellow-300"}
+            bgColor={palette.darkMuted}
+            stat={voteCount}
+          />
+          <FilmStat
+            Icon={FaLanguage}
+            color={"text-green-500"}
+            bgColor={palette.darkMuted}
+            stat={findLanguage(film.language_id).name}
+          />
+          <FilmStat
+            Icon={FaTheaterMasks}
+            color={"text-blue-500"}
+            bgColor={palette.darkMuted}
+            stat={findGenre(film.film_genre?.[0].genre_id).name}
+          />
+        </div>
+        <div className="text-justify">{film.overview}</div>
+      </div>
+    </div>
+  );
+};
+
+interface StatProps {
+  Icon: IconType;
+  color?: string;
+  bgColor?: string;
+  stat: string;
+}
+
+const FilmStat: FC<StatProps> = ({ Icon, color, bgColor, stat }) => {
+  return (
+    <div
+      className="flex flex-col items-center px-4 py-2 rounded-lg bg-gray-700"
+      style={{ backgroundColor: bgColor }}
+    >
+      <div>
+        <Icon className={color} />
+      </div>
+      <div>{stat}</div>
     </div>
   );
 };
 
 export default Home;
-
-/*
-<div th:fragment="filmMediaItems" id="results-block">
-    <th:block th:each="film,loop : ${filmSearchResult.pageOfResults}">
-<!--        th:title="${loop.count + ((filmSearchResult.page - 1) * filmSearchResult.pageSize)}-->
-        <article class="media">
-            <figure class="media-left">
-                <p class="image">
-                    <img th:src="@{https://image.tmdb.org/t/p/w92} + ${film.posterPath}" alt="poster"/>
-                </p>
-            </figure>
-            <div class="media-content">
-                <div class="content">
-                    <div>
-                        <strong th:text="${film.title}"></strong>
-                        <small th:text="${'(' + film.released.year + ')'}"></small>
-                        <small th:text="${film.runtimeString}"></small>
-                        <br>
-                        <div>
-                            <strong>Cast:</strong>
-                            <span th:text="${film.actors}"></span>
-                        </div>
-                        <div>
-                            <strong>Director:</strong>
-                            <span th:text="${film.director}"></span>
-                        </div>
-                        <div style="cursor:pointer;" th:attr="data-text=${film.overview}" th:text="${#strings.abbreviate(film.overview,100)}"
-                             onclick="const temp = this.innerText; this.innerText = this.dataset.text; this.dataset.text=temp;"></div>
-                    </div>
-                    <nav class="level is-mobile is-hidden-desktop">
-                        <div class="level-item has-text-centered">
-                            <div>
-                                <div class="icon is-small has-text-danger"><i class="fas fa-heart"></i></div>
-                                <div><span class="tag"><span th:text="${film.userVoteAverage}"></span></span></div>
-                            </div>
-                        </div>
-                        <div class="level-item has-text-centered">
-                            <div>
-                                <div class="icon is-small has-text-warning"><i class="fas fa-star"></i></div>
-                                <div><span class="tag"><span th:text="${film.userVoteCountString}"></span></span></div>
-                            </div>
-                        </div>
-                        <div class="level-item has-text-centered">
-                            <div>
-                                <div class="icon is-small has-text-success"><i class="fas fa-language"></i></div>
-                                <div><span class="tag"><span th:text="${film.language.name}"></span></span></div>
-                            </div>
-                        </div>
-                        <div class="level-item has-text-centered">
-                            <div>
-                                <div class="icon is-small has-text-link"><i class="fas fa-theater-masks"></i></div>
-                                <div><span class="tag"><span th:text="${film.primaryGenre}"></span></span></div>
-                            </div>
-                        </div>
-                    </nav>
-                </div>
-            </div>
-            <div class="media-right is-hidden-touch">
-                <div class="has-text-right">
-                    <div>
-                        <span class="tag">
-                            <span th:text="${film.userVoteAverage}"></span>
-                            <span class="icon is-small has-text-danger"><i class="fas fa-heart"></i></span>
-                        </span>
-                    </div>
-                    <div>
-                        <span class="tag">
-                            <span th:text="${film.userVoteCountString}"></span>
-                            <span class="icon is-small has-text-warning"><i class="fas fa-star"></i></span>
-                        </span>
-                    </div>
-                    <div>
-                        <span class="tag">
-                            <span th:text="${film.language.name}"></span>
-                            <span class="icon is-small has-text-success"><i class="fas fa-language"></i></span>
-                        </span>
-                    </div>
-                    <div>
-                        <span class="tag">
-                            <span th:text="${film.genreString}"></span>
-                            <span class="icon is-small has-text-link"><i class="fas fa-theater-masks"></i></span>
-                        </span>
-                    </div>
-                </div>
-            </div>
-        </article>
-
-    </th:block>
-
-    <div th:if="${filmSearchResult.searchResults.isEmpty()}">
-        No films found...
-    </div>
-
-    <br/>
-    <div style="text-align: center;">
-        <input class="button is-small firstButton" type="button" value="First" onclick="goToPage('first')" th:disabled="${!filmSearchResult.hasPrevious}" />
-        <input class="button is-small previousButton" type="button" value="Previous" onclick="goToPage('previous')" th:disabled="${!filmSearchResult.hasPrevious}" />
-
-        <button class="button is-small is-light" th:title="${#numbers.formatInteger(filmSearchResult.size, 0, 'COMMA') + ' Results'}">
-            <span class="currentPageSpan" th:text="${#numbers.formatInteger(filmSearchResult.page, 0)}"></span>
-            /
-            <span th:text="${#numbers.formatInteger(filmSearchResult.pages, 0)}"></span>
-        </button>
-
-        <input class="button is-small nextButton" type="button" value="Next" onclick="goToPage('next')" th:disabled="${!filmSearchResult.hasNext}" />
-        <input class="button is-small lastButton" type="button" value="Last" onclick="goToPage('last')" th:disabled="${!filmSearchResult.hasNext}" />
-    </div>
-</div>
-*/
