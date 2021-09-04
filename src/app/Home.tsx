@@ -22,43 +22,44 @@ const Films = () => {
   const [genres, setGenres] = useState<any[] | null>();
   const [films, setFilms] = useState<any[] | null>();
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<PostgrestError | null>();
+  const [error, setError] = useState<unknown>();
 
   useEffect(() => {
     const fetchLanguages = async () => {
-      const { data } = await client
+      return client
         .from("language")
         .select("*")
         .gt("count", 0)
         .order("count", { ascending: false });
-
-      setLanguages(data);
     };
 
     const fetchGenres = async () => {
-      const { data } = await client.from("genre").select("*");
-
-      setGenres(data);
+      return client.from("genre").select("*");
     };
 
     const fetchFilms = async () => {
-      const { data } = await client
+      return client
         .from("film")
         .select("*, film_genre (film_id, genre_id)")
         .order("user_vote_count", { ascending: false })
         .limit(50);
-
-      setFilms(data);
     };
-    try {
-      fetchLanguages();
-      fetchGenres();
-      fetchFilms();
-    } catch (e) {
-      // setError(e);
-    } finally {
-      setLoading(false);
-    }
+
+    const fetchData = async () => {
+      try {
+        const [languagesResults, genresResults, filmsResults] =
+          await Promise.all([fetchLanguages(), fetchGenres(), fetchFilms()]);
+        setLanguages(languagesResults.data);
+        setGenres(genresResults.data);
+        setFilms(filmsResults.data);
+      } catch (e) {
+        setError(e);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchData();
   }, [client]);
 
   if (error || loading) return <Loading error={error} loading={loading} />;
