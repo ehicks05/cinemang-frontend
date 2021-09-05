@@ -8,23 +8,24 @@ import { usePalette } from "react-palette";
 import { truncate } from "lodash";
 import SearchForm, { ISearchForm, DEFAULT_SEARCH_FORM } from "./SearchForm";
 
+export interface Genre {
+  id: number;
+  name: string;
+}
+
+export interface Language {
+  id: number;
+  name: string;
+  count: number;
+}
+
 const Home: FC = () => {
   const [form, setForm] = useState<ISearchForm>(DEFAULT_SEARCH_FORM);
 
-  return (
-    <div className="flex flex-col gap-4">
-      <SearchForm form={form} setForm={setForm} />
-      <Films form={form} />
-    </div>
-  );
-};
-
-const Films: FC<{ form: ISearchForm }> = ({ form }) => {
   const client = useClient();
 
   const [languages, setLanguages] = useState<any[] | null>();
   const [genres, setGenres] = useState<any[] | null>();
-  const [films, setFilms] = useState<any[] | null>();
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<unknown>();
 
@@ -43,26 +44,14 @@ const Films: FC<{ form: ISearchForm }> = ({ form }) => {
       return client.from("genre").select("*");
     };
 
-    const fetchFilms = async () => {
-      return client
-        .from("film")
-        .select("*, film_genre (film_id, genre_id)")
-        .ilike("title", `${form.title || ""}*`)
-        .gte("user_vote_count", form.minVotes || 0)
-        .lte("user_vote_count", form.maxVotes || 100_000_000)
-        .gte("user_vote_average", form.minRating || 0)
-        .lte("user_vote_average", form.minRating || 10)
-        .order(form.sortColumn, { ascending: form.ascending })
-        .limit(50);
-    };
-
     const fetchData = async () => {
       try {
-        const [languagesResults, genresResults, filmsResults] =
-          await Promise.all([fetchLanguages(), fetchGenres(), fetchFilms()]);
+        const [languagesResults, genresResults] = await Promise.all([
+          fetchLanguages(),
+          fetchGenres(),
+        ]);
         setLanguages(languagesResults.data);
         setGenres(genresResults.data);
-        setFilms(filmsResults.data);
       } catch (e) {
         setError(e);
       } finally {
@@ -71,29 +60,78 @@ const Films: FC<{ form: ISearchForm }> = ({ form }) => {
     };
 
     fetchData();
-  }, [form, client]);
+  }, [client]);
 
   if (error || loading) return <Loading error={error} loading={loading} />;
   if (!genres || genres.length === 0) return <div>No genres</div>;
   if (!languages || languages.length === 0) return <div>No languages</div>;
-  if (!films || films.length === 0) return <div>No films</div>;
 
   return (
-    <div className="grid md:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 gap-4">
-      {films.map((film) => {
-        return (
-          <Film
-            key={film.tmdb_id}
-            film={film}
-            genres={genres}
-            languages={languages}
-          />
-        );
-      })}
-      {/* <pre>{JSON.stringify(films, null, 2)}</pre> */}
+    <div className="flex flex-col gap-4">
+      <SearchForm
+        form={form}
+        setForm={setForm}
+        languages={languages}
+        genres={genres}
+      />
+      <Films form={form} languages={languages} genres={genres} />
     </div>
   );
 };
+
+const Films: FC<{ form: ISearchForm; languages: Language[]; genres: Genre[] }> =
+  ({ form, languages, genres }) => {
+    const client = useClient();
+
+    const [films, setFilms] = useState<any[] | null>();
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState<unknown>();
+
+    useEffect(() => {
+      setLoading(true);
+
+      const fetchFilms = async () => {
+        try {
+          const filmsResults = await client
+            .from("film")
+            .select("*, film_genre (film_id, genre_id)")
+            .ilike("title", `${form.title || ""}*`)
+            .gte("user_vote_count", form.minVotes || 0)
+            .lte("user_vote_count", form.maxVotes || 100_000_000)
+            .gte("user_vote_average", form.minRating || 0)
+            .lte("user_vote_average", form.minRating || 10)
+            .order(form.sortColumn, { ascending: form.ascending })
+            .limit(50);
+          setFilms(filmsResults.data);
+        } catch (e) {
+          setError(e);
+        } finally {
+          setLoading(false);
+        }
+      };
+
+      fetchFilms();
+    }, [form, client]);
+
+    if (error || loading) return <Loading error={error} loading={loading} />;
+    if (!films || films.length === 0) return <div>No films</div>;
+
+    return (
+      <div className="grid md:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 gap-4">
+        {films.map((film) => {
+          return (
+            <Film
+              key={film.tmdb_id}
+              film={film}
+              genres={genres}
+              languages={languages}
+            />
+          );
+        })}
+        {/* <pre>{JSON.stringify(films, null, 2)}</pre> */}
+      </div>
+    );
+  };
 
 const Film = ({
   film,

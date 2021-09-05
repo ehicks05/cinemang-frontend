@@ -2,6 +2,7 @@ import { useState } from "react";
 import { FC } from "react";
 import { UnmountClosed } from "react-collapse";
 import { BiDownArrow, BiUpArrow } from "react-icons/bi";
+import { Genre, Language } from "./Home";
 
 export interface ISearchForm {
   title?: string;
@@ -31,9 +32,11 @@ export const DEFAULT_SEARCH_FORM = {
 interface Props {
   form: ISearchForm;
   setForm: React.Dispatch<React.SetStateAction<ISearchForm>>;
+  languages: Language[];
+  genres: Genre[];
 }
 
-const SearchForm: FC<Props> = ({ form, setForm }) => {
+const SearchForm: FC<Props> = ({ form, setForm, languages, genres }) => {
   const [isOpen, setIsOpen] = useState(false);
   const Icon = isOpen ? BiUpArrow : BiDownArrow;
   return (
@@ -49,14 +52,19 @@ const SearchForm: FC<Props> = ({ form, setForm }) => {
       </div>
       <UnmountClosed isOpened={isOpen}>
         <div className="grid grid-cols-2 gap-2">
-          <FormFields form={form} setForm={setForm} />
+          <FormFields
+            form={form}
+            setForm={setForm}
+            languages={languages}
+            genres={genres}
+          />
         </div>
       </UnmountClosed>
     </div>
   );
 };
 
-const FormFields: FC<Props> = ({ form, setForm }) => {
+const FormFields: FC<Props> = ({ form, setForm, languages, genres }) => {
   return (
     <>
       <div>Title</div>
@@ -140,6 +148,40 @@ const FormFields: FC<Props> = ({ form, setForm }) => {
           }
         />
       </div>
+
+      <div>Language</div>
+      <div>
+        <select
+          className="w-full bg-gray-700"
+          value={form.language}
+          onChange={(e) => setForm({ ...form, language: e.target.value })}
+        >
+          {languages
+            .sort((o1, o2) => o2.count - o1.count)
+            .slice(0, 10)
+            .map((language) => (
+              <option key={language.id} value={language.id}>
+                {language.name}
+              </option>
+            ))}
+        </select>
+      </div>
+
+      <div>Genre</div>
+      <div>
+        <select
+          className="w-full bg-gray-700"
+          value={form.genre}
+          onChange={(e) => setForm({ ...form, genre: e.target.value })}
+        >
+          {genres.map((genre) => (
+            <option key={genre.id} value={genre.id}>
+              {genre.name}
+            </option>
+          ))}
+        </select>
+      </div>
+
       <div>Sort Column</div>
       <div>
         <select
