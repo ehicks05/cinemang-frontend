@@ -23,3 +23,8 @@ body {
 #root {
   min-height: 100vh;
 }
+
+/* for react-collapse */
+.ReactCollapse--collapse {
+  transition: height 500ms;
+}

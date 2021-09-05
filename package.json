@@ -11,6 +11,7 @@
     "@types/react-icons": "^3.0.0",
     "date-fns": "^2.23.0",
     "react": "^17.0.2",
+    "react-collapse": "^5.1.0",
     "react-dom": "^17.0.2",
     "react-icons": "^4.2.0",
     "react-loader-spinner": "^4.0.0",
@@ -48,6 +49,7 @@
   "devDependencies": {
     "@tailwindcss/postcss7-compat": "^2.2.7",
     "@types/lodash": "^4.14.172",
+    "@types/react-collapse": "^5.0.1",
     "@types/react-router-dom": "^5.1.8",
     "autoprefixer": "^9.8.6",
     "eslint": "^7.32.0",
