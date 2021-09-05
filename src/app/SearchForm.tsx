@@ -1,7 +1,6 @@
-import { FC, useEffect, useState } from "react";
-import { FaHeart, FaLanguage, FaStar, FaTheaterMasks } from "react-icons/fa";
+import { FC } from "react";
 
-interface SearchForm {
+export interface ISearchForm {
   title?: string;
   minVotes?: number;
   maxVotes?: number;
@@ -13,17 +12,25 @@ interface SearchForm {
   genre?: string;
 
   sortColumn: string;
-  sortDirection: number;
+  ascending: boolean;
 }
 
-const DEFAULT_SEARCH_FORM = {
+export const DEFAULT_SEARCH_FORM = {
+  minVotes: 0,
+  maxVotes: 100_000,
+  minRating: 0,
+  maxRating: 10,
   language: "eng",
   sortColumn: "user_vote_count",
-  sortDirection: -1,
+  ascending: false,
 };
 
-const SearchForm = () => {
-  const [form, setForm] = useState<SearchForm>(DEFAULT_SEARCH_FORM);
+interface Props {
+  form: ISearchForm;
+  setForm: React.Dispatch<React.SetStateAction<ISearchForm>>;
+}
+
+const SearchForm: FC<Props> = ({ form, setForm }) => {
   return (
     <div className="flex flex-col gap-4 p-4 bg-gray-800 rounded-lg">
       <div className="text-xl">Search</div>
@@ -41,6 +48,8 @@ const SearchForm = () => {
         <div className="flex gap-2">
           <input
             type="number"
+            min={1}
+            max={form.maxVotes || undefined}
             className="w-full bg-gray-700"
             value={form.minVotes}
             onChange={(e) =>
@@ -49,6 +58,7 @@ const SearchForm = () => {
           />
           <input
             type="number"
+            min={form.minVotes || undefined}
             className="w-full bg-gray-700"
             value={form.maxVotes}
             onChange={(e) =>
@@ -111,9 +121,13 @@ const SearchForm = () => {
 
         <div>Sort Column</div>
         <div>
-          <select className="w-full bg-gray-700">
-            {["user_vote_count"].map((option) => (
-              <option selected={form.sortColumn === option} value={option}>
+          <select
+            className="w-full bg-gray-700"
+            value={form.sortColumn}
+            onChange={(e) => setForm({ ...form, sortColumn: e.target.value })}
+          >
+            {["user_vote_average", "user_vote_count"].map((option) => (
+              <option key={option} value={option}>
                 {option}
               </option>
             ))}
