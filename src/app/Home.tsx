@@ -6,126 +6,13 @@ import { addMinutes, intervalToDuration } from "date-fns";
 import { IconType } from "react-icons";
 import { usePalette } from "react-palette";
 import { truncate } from "lodash";
+import SearchForm from "./SearchForm";
 
 const Home: FC = () => {
   return (
     <div className="flex flex-col gap-4">
       <SearchForm />
       <Films />
-    </div>
-  );
-};
-
-interface SearchForm {
-  title?: string;
-  minVotes?: number;
-  maxVotes?: number;
-  minReleased?: string;
-  maxReleased?: string;
-  minRating?: number;
-  maxRating?: number;
-  language?: string;
-  genre?: string;
-
-  sortColumn: string;
-  sortDirection: number;
-}
-
-const DEFAULT_SEARCH_FORM = {
-  language: "eng",
-  sortColumn: "user_vote_count",
-  sortDirection: -1,
-};
-
-const SearchForm = () => {
-  const [searchForm, setSearchForm] = useState<SearchForm>(DEFAULT_SEARCH_FORM);
-  return (
-    <div className="p-4 bg-gray-800 rounded-lg">
-      <div className="text-xl">Search</div>
-      <div className="grid grid-cols-2 gap-2">
-        <div>Title</div>
-        <div>
-          <input
-            type="text"
-            className="w-full bg-gray-700"
-            value={searchForm.title}
-            onChange={(e) =>
-              setSearchForm({ ...searchForm, title: e.target.value })
-            }
-          />
-        </div>
-        <div>Votes</div>
-        <div className="flex gap-2">
-          <input
-            type="number"
-            className="w-full bg-gray-700"
-            value={searchForm.minVotes}
-            onChange={(e) =>
-              setSearchForm({ ...searchForm, minVotes: Number(e.target.value) })
-            }
-          />
-          <input
-            type="number"
-            className="w-full bg-gray-700"
-            value={searchForm.maxVotes}
-            onChange={(e) =>
-              setSearchForm({ ...searchForm, maxVotes: Number(e.target.value) })
-            }
-          />
-        </div>
-
-        <div>Rating</div>
-        <div className="flex gap-2">
-          <input
-            type="number"
-            className="w-full bg-gray-700"
-            value={searchForm.minRating}
-            onChange={(e) =>
-              setSearchForm({
-                ...searchForm,
-                minRating: Number(e.target.value),
-              })
-            }
-          />
-          <input
-            type="number"
-            className="w-full bg-gray-700"
-            value={searchForm.maxRating}
-            onChange={(e) =>
-              setSearchForm({
-                ...searchForm,
-                maxRating: Number(e.target.value),
-              })
-            }
-          />
-        </div>
-
-        <div>Released</div>
-        <div className="flex gap-2">
-          <input
-            type="date"
-            className="w-full bg-gray-700"
-            value={searchForm.minReleased}
-            onChange={(e) =>
-              setSearchForm({
-                ...searchForm,
-                minReleased: e.target.value,
-              })
-            }
-          />
-          <input
-            type="date"
-            className="w-full bg-gray-700"
-            value={searchForm.maxReleased}
-            onChange={(e) =>
-              setSearchForm({
-                ...searchForm,
-                maxReleased: e.target.value,
-              })
-            }
-          />
-        </div>
-      </div>
     </div>
   );
 };
