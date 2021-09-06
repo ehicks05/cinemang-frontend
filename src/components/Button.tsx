@@ -11,9 +11,7 @@ const Button: FC<Props> = ({ className, disabled, onClick, children }) => {
     <button
       disabled={disabled}
       onClick={onClick}
-      className={`px-2 py-1 border
-      text-black bg-white
-      dark:text-white dark:bg-black
+      className={`px-2 py-1 border text-white bg-black
       ${disabled ? "opacity-50 cursor-default" : ""} ${className}`}
     >
       {children}

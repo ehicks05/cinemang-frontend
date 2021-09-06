@@ -42,9 +42,9 @@ const SearchForm: FC<Props> = ({ form, setForm, languages, genres }) => {
   const [isOpen, setIsOpen] = useState(true);
   const Icon = isOpen ? FaChevronUp : FaChevronDown;
   return (
-    <div className="flex flex-col gap-4 p-4 bg-gray-800 rounded-lg">
+    <div className="flex flex-col max-w-screen-sm mx-auto gap-4 p-4 bg-gray-800 rounded-lg">
       <div
-        className="flex justify-between cursor-pointer"
+        className="flex gap-32 justify-between cursor-pointer"
         onClick={() => setIsOpen(!isOpen)}
       >
         <span className="text-xl">Search</span>
