@@ -105,6 +105,8 @@ const Films: FC<{ form: ISearchForm; languages: Language[]; genres: Genre[] }> =
               "released",
               form.maxReleased || new Date().toLocaleDateString()
             )
+            .like("language_id", form.language || "*")
+            // .contains("film_genre.genre_id", form.genre || "")
             .order(form.sortColumn, { ascending: form.ascending })
             .limit(50);
           setFilms(filmsResults.data);

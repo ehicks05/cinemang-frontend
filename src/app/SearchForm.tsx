@@ -26,7 +26,7 @@ export const DEFAULT_SEARCH_FORM = {
   maxVotes: 100_000,
   minRating: 0,
   maxRating: 10,
-  language: "eng",
+  language: "en",
   sortColumn: "user_vote_count",
   ascending: false,
 };
@@ -156,6 +156,7 @@ const FormFields: FC<Props> = ({ form, setForm, languages, genres }) => {
           value={form.language}
           onChange={(e) => setForm({ ...form, language: e.target.value })}
         >
+          <option value="">Any</option>
           {languages
             .sort((o1, o2) => o2.count - o1.count)
             .slice(0, 10)
@@ -174,6 +175,7 @@ const FormFields: FC<Props> = ({ form, setForm, languages, genres }) => {
           value={form.genre}
           onChange={(e) => setForm({ ...form, genre: e.target.value })}
         >
+          <option value="">Any</option>
           {genres.map((genre) => (
             <option key={genre.id} value={genre.id}>
               {genre.name}
