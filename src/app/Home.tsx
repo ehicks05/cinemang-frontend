@@ -182,7 +182,7 @@ const Film = ({
         </div>
       </div>
       <div className="flex flex-col gap-4">
-        <div className="flex flex-wrap gap-4">
+        <div className="flex flex-wrap gap-2">
           <FilmStat
             Icon={FaHeart}
             color={"text-red-600"}
@@ -203,7 +203,7 @@ const Film = ({
           />
           <FilmStat
             Icon={FaTheaterMasks}
-            color={"text-blue-500"}
+            color={"text-blue-400"}
             bgColor={palette.darkVibrant}
             stat={genre}
           />
