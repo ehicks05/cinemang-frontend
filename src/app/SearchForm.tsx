@@ -1,7 +1,9 @@
+import { Button } from "components";
 import { useState } from "react";
 import { FC } from "react";
 import { UnmountClosed } from "react-collapse";
-import { BiDownArrow, BiUpArrow } from "react-icons/bi";
+import { FaChevronDown, FaChevronUp } from "react-icons/fa";
+import { HiSortAscending, HiSortDescending } from "react-icons/hi";
 import { Genre, Language } from "./Home";
 
 export interface ISearchForm {
@@ -20,7 +22,7 @@ export interface ISearchForm {
 }
 
 export const DEFAULT_SEARCH_FORM = {
-  minVotes: 0,
+  minVotes: 100,
   maxVotes: 100_000,
   minRating: 0,
   maxRating: 10,
@@ -37,8 +39,8 @@ interface Props {
 }
 
 const SearchForm: FC<Props> = ({ form, setForm, languages, genres }) => {
-  const [isOpen, setIsOpen] = useState(false);
-  const Icon = isOpen ? BiUpArrow : BiDownArrow;
+  const [isOpen, setIsOpen] = useState(true);
+  const Icon = isOpen ? FaChevronUp : FaChevronDown;
   return (
     <div className="flex flex-col gap-4 p-4 bg-gray-800 rounded-lg">
       <div
@@ -183,18 +185,32 @@ const FormFields: FC<Props> = ({ form, setForm, languages, genres }) => {
       </div>
 
       <div>Sort Column</div>
-      <div>
+      <div className="flex">
         <select
           className="w-full bg-gray-700"
           value={form.sortColumn}
           onChange={(e) => setForm({ ...form, sortColumn: e.target.value })}
         >
-          {["user_vote_average", "user_vote_count"].map((option) => (
-            <option key={option} value={option}>
-              {option}
+          {[
+            { value: "user_vote_average", label: "User Rating" },
+            { value: "user_vote_count", label: "User Votes" },
+            { value: "released", label: "Released" },
+          ].map((option) => (
+            <option key={option.value} value={option.value}>
+              {option.label}
             </option>
           ))}
         </select>
+        <Button
+          className="px-4 dark:bg-gray-700 dark:border-gray-500 border-l-0"
+          onClick={() => setForm({ ...form, ascending: !form.ascending })}
+        >
+          {form.ascending ? (
+            <HiSortAscending className="text-xl" />
+          ) : (
+            <HiSortDescending className="text-xl" />
+          )}
+        </Button>
       </div>
     </>
   );

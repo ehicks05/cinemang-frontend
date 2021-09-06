@@ -1,9 +1,9 @@
 import React, { FC } from "react";
 
 interface Props {
-  className: string;
+  className?: string;
   disabled?: boolean;
-  onClick?: () => {};
+  onClick?: () => any;
 }
 
 const Button: FC<Props> = ({ className, disabled, onClick, children }) => {
@@ -12,12 +12,9 @@ const Button: FC<Props> = ({ className, disabled, onClick, children }) => {
       disabled={disabled}
       onClick={onClick}
       className={`px-2 py-1 border
-      dark:border-gray-600
       text-black bg-white
       dark:text-white dark:bg-black
-      hover:bg-gray-100
-      dark:hover:bg-gray-900
-      ${disabled && "opacity-50 cursor-default"} ${className}`}
+      ${disabled ? "opacity-50 cursor-default" : ""} ${className}`}
     >
       {children}
     </button>
