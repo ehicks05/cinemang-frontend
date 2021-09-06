@@ -53,14 +53,12 @@ const SearchForm: FC<Props> = ({ form, setForm, languages, genres }) => {
         </span>
       </div>
       <UnmountClosed isOpened={isOpen}>
-        <div className="grid grid-cols-2 gap-2">
-          <FormFields
-            form={form}
-            setForm={setForm}
-            languages={languages}
-            genres={genres}
-          />
-        </div>
+        <FormFields
+          form={form}
+          setForm={setForm}
+          languages={languages}
+          genres={genres}
+        />
       </UnmountClosed>
     </div>
   );
@@ -68,7 +66,7 @@ const SearchForm: FC<Props> = ({ form, setForm, languages, genres }) => {
 
 const FormFields: FC<Props> = ({ form, setForm, languages, genres }) => {
   return (
-    <>
+    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-sm sm:text-base">
       <div>Title</div>
       <div>
         <input
@@ -202,7 +200,7 @@ const FormFields: FC<Props> = ({ form, setForm, languages, genres }) => {
           ))}
         </select>
         <Button
-          className="px-4 dark:bg-gray-700 dark:border-gray-500 border-l-0"
+          className="px-4 text-white bg-gray-700 border-gray-500 border-l-0"
           onClick={() => setForm({ ...form, ascending: !form.ascending })}
         >
           {form.ascending ? (
@@ -212,7 +210,7 @@ const FormFields: FC<Props> = ({ form, setForm, languages, genres }) => {
           )}
         </Button>
       </div>
-    </>
+    </div>
   );
 };
 

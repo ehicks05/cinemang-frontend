@@ -100,6 +100,11 @@ const Films: FC<{ form: ISearchForm; languages: Language[]; genres: Genre[] }> =
             .lte("user_vote_count", form.maxVotes || 100_000_000)
             .gte("user_vote_average", form.minRating || 0)
             .lte("user_vote_average", form.minRating || 10)
+            .gte("released", form.minReleased || "1870-01-01")
+            .lte(
+              "released",
+              form.maxReleased || new Date().toLocaleDateString()
+            )
             .order(form.sortColumn, { ascending: form.ascending })
             .limit(50);
           setFilms(filmsResults.data);
