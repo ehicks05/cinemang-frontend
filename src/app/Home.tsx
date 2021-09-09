@@ -1,12 +1,22 @@
 import { FC, useEffect, useState } from "react";
 import { Loading } from "components";
 import { useClient } from "react-supabase";
-import { FaHeart, FaLanguage, FaStar, FaTheaterMasks } from "react-icons/fa";
-import { addMinutes, intervalToDuration } from "date-fns";
+import {
+  FaChevronLeft,
+  FaChevronRight,
+  FaHeart,
+  FaLanguage,
+  FaStar,
+  FaTheaterMasks,
+} from "react-icons/fa";
+import { addMinutes, intervalToDuration, parseISO } from "date-fns";
 import { IconType } from "react-icons";
 import { usePalette } from "react-palette";
 import { truncate } from "lodash";
 import SearchForm, { ISearchForm, DEFAULT_SEARCH_FORM } from "./SearchForm";
+import { format } from "date-fns";
+import usePagination from "headless-pagination-react";
+import { PaginatorLink } from "headless-pagination";
 
 export interface Genre {
   id: number;
@@ -79,51 +89,59 @@ const Home: FC = () => {
   );
 };
 
-const Films: FC<{ form: ISearchForm; languages: Language[]; genres: Genre[] }> =
-  ({ form, languages, genres }) => {
-    const client = useClient();
+const Films: FC<{
+  form: ISearchForm;
+  languages: Language[];
+  genres: Genre[];
+}> = ({ form, languages, genres }) => {
+  const client = useClient();
 
-    const [films, setFilms] = useState<any[] | null>();
-    const [loading, setLoading] = useState(true);
-    const [error, setError] = useState<unknown>();
+  const [films, setFilms] = useState<any[] | null>();
+  const [count, setCount] = useState(0);
+  const [page, setPage] = useState(0);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<unknown>();
 
-    useEffect(() => {
-      setLoading(true);
+  useEffect(() => {
+    setLoading(true);
 
-      const fetchFilms = async () => {
-        try {
-          const filmsResults = await client
-            .from("film")
-            .select("*, film_genre (film_id, genre_id)")
-            .ilike("title", `${form.title || ""}*`)
-            .gte("user_vote_count", form.minVotes || 0)
-            .lte("user_vote_count", form.maxVotes || 100_000_000)
-            .gte("user_vote_average", form.minRating || 0)
-            .lte("user_vote_average", form.minRating || 10)
-            .gte("released", form.minReleased || "1870-01-01")
-            .lte(
-              "released",
-              form.maxReleased || new Date().toLocaleDateString()
-            )
-            .like("language_id", form.language || "*")
-            // .contains("film_genre.genre_id", form.genre || "")
-            .order(form.sortColumn, { ascending: form.ascending })
-            .limit(50);
-          setFilms(filmsResults.data);
-        } catch (e) {
-          setError(e);
-        } finally {
-          setLoading(false);
-        }
-      };
+    const fetchFilms = async () => {
+      try {
+        const filmsResults = await client
+          .from("movie")
+          .select("*", { count: "exact" })
+          .ilike("title", `${form.title || ""}*`)
+          .gte("vote_count", form.minVotes || 0)
+          .lte("vote_count", form.maxVotes || 100_000_000)
+          .gte("vote_average", form.minRating || 0)
+          .lte("vote_average", form.minRating || 10)
+          .gte("released_at", form.minReleasedAt || "1870-01-01")
+          .lte(
+            "released_at",
+            form.maxReleasedAt || new Date().toLocaleDateString()
+          )
+          .like("language_id", form.language || "*")
+          .contains("genres.id", form.genre || "")
+          .order(form.sortColumn, { ascending: form.ascending })
+          .range(page * 50, (page + 1) * 50);
+        setCount(filmsResults.count || 0);
+        setFilms(filmsResults.data);
+      } catch (e) {
+        setError(e);
+      } finally {
+        setLoading(false);
+      }
+    };
 
-      fetchFilms();
-    }, [form, client]);
+    fetchFilms();
+  }, [form, page, client]);
 
-    if (error || loading) return <Loading error={error} loading={loading} />;
-    if (!films || films.length === 0) return <div>No films</div>;
+  if (error || loading) return <Loading error={error} loading={loading} />;
+  if (!films || films.length === 0) return <div>No films</div>;
 
-    return (
+  return (
+    <>
+      <Paginator page={page} setPage={setPage} count={count} />
       <div className="grid md:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 gap-4">
         {films.map((film) => {
           return (
@@ -135,10 +153,79 @@ const Films: FC<{ form: ISearchForm; languages: Language[]; genres: Genre[] }> =
             />
           );
         })}
-        {/* <pre>{JSON.stringify(films, null, 2)}</pre> */}
       </div>
-    );
-  };
+    </>
+  );
+};
+
+interface PaginatorProps {
+  page: number;
+  setPage: React.Dispatch<React.SetStateAction<number>>;
+  count: number;
+}
+const Paginator: FC<PaginatorProps> = ({ page, setPage, count }) => {
+  const { links, hasNext, hasPrevious, from, to } = usePagination({
+    totalItems: count,
+    initialPage: page + 1,
+    perPage: 50,
+    maxLinks: 7,
+  });
+
+  return (
+    <div className="flex flex-col sm:flex-row items-center justify-between gap-4 p-4 bg-gray-800 rounded-lg">
+      <div>{`Showing ${from}-${Math.min(to, count)} of ${count} results`}</div>
+      <div className="flex -space-x-px">
+        <Link
+          page={page}
+          setPage={setPage}
+          link={{ active: false, disabled: !hasPrevious, label: "" }}
+          prev
+        >
+          <FaChevronLeft className="my-auto text-sm" />
+        </Link>
+        {links.map((link) => (
+          <Link page={page} setPage={setPage} link={link}>
+            {link.label}
+          </Link>
+        ))}
+        <Link
+          page={page}
+          setPage={setPage}
+          link={{ active: false, disabled: !hasNext, label: "" }}
+          next
+        >
+          <FaChevronRight className="my-auto text-sm" />
+        </Link>
+      </div>
+    </div>
+  );
+};
+
+interface LinkProps {
+  page: number;
+  setPage: React.Dispatch<React.SetStateAction<number>>;
+  link: PaginatorLink;
+  prev?: boolean;
+  next?: boolean;
+}
+const Link: FC<LinkProps> = ({ page, setPage, link, prev, next, children }) => {
+  const newPage = prev ? page - 1 : next ? page + 1 : Number(link.label) - 1;
+  const onClick = link.disabled ? undefined : () => setPage(newPage);
+  return (
+    <div
+      onClick={onClick}
+      className={`flex px-3 py-1 border border-solid border-gray-500 ${
+        link.disabled ? "opacity-60" : "cursor-pointer"
+      } ${!link.disabled && !link.active ? "hover:bg-gray-700" : undefined} ${
+        link.active ? "z-10 bg-green-700 border-green-500" : undefined
+      } ${prev ? "rounded-l-md px-1" : undefined} ${
+        next ? "rounded-r-md px-1" : undefined
+      }`}
+    >
+      {children}
+    </div>
+  );
+};
 
 const Film = ({
   film,
@@ -153,20 +240,16 @@ const Film = ({
     return languages?.find((lang) => lang.id === languageId);
   };
 
-  const findGenre = (genreId: string) => {
-    return genres?.find((genre) => genre.id === genreId);
-  };
-
   const posterPath = film.poster_path
     ? `https://image.tmdb.org/t/p/w92/${film.poster_path}`
     : "/92x138.png";
-  const year = film.year.slice(0, film.year.indexOf("-"));
+  const year = format(parseISO(film.released_at), "yyyy");
   const runtime = intervalToDuration({
     start: new Date(),
     end: addMinutes(new Date(), Number(film.runtime)),
   });
-  const voteCount = Intl.NumberFormat().format(film.user_vote_count);
-  const genre = findGenre(film.film_genre?.[0]?.genre_id)?.name;
+  const voteCount = Intl.NumberFormat().format(film.vote_count);
+  const genre = film.genres[0]?.name;
 
   const { data: palette, loading, error } = usePalette(posterPath);
 
@@ -185,7 +268,7 @@ const Film = ({
           </div>
           <div>{`${runtime.hours}h ${runtime.minutes}m`}</div>
           <div>Director: {film.director} </div>
-          <div>Cast: {film.actors}</div>
+          <div>Cast: {film.cast}</div>
         </div>
       </div>
       <div className="flex flex-col gap-4">
@@ -194,7 +277,7 @@ const Film = ({
             Icon={FaHeart}
             color={"text-red-600"}
             bgColor={palette.darkVibrant}
-            stat={film.user_vote_average}
+            stat={film.vote_average}
           />
           <FilmStat
             Icon={FaStar}
@@ -236,13 +319,13 @@ interface StatProps {
 const FilmStat: FC<StatProps> = ({ Icon, color, bgColor, stat }) => {
   return (
     <div
-      className="flex flex-col gap-1 items-center px-4 py-2 rounded-lg bg-gray-700"
+      className="flex flex-col gap-1 items-center px-2 py-1 sm:px-4 sm:py-2 rounded-lg bg-gray-700"
       style={{ backgroundColor: bgColor }}
     >
       <div>
         <Icon className={color} />
       </div>
-      <div className="text-sm">{stat}</div>
+      <div className="text-xs sm:text-sm">{stat}</div>
     </div>
   );
 };

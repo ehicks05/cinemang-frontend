@@ -10,8 +10,8 @@ export interface ISearchForm {
   title?: string;
   minVotes?: number;
   maxVotes?: number;
-  minReleased?: string;
-  maxReleased?: string;
+  minReleasedAt?: string;
+  maxReleasedAt?: string;
   minRating?: number;
   maxRating?: number;
   language?: string;
@@ -19,6 +19,7 @@ export interface ISearchForm {
 
   sortColumn: string;
   ascending: boolean;
+  page: number;
 }
 
 export const DEFAULT_SEARCH_FORM = {
@@ -27,8 +28,9 @@ export const DEFAULT_SEARCH_FORM = {
   minRating: 0,
   maxRating: 10,
   language: "en",
-  sortColumn: "user_vote_count",
+  sortColumn: "vote_count",
   ascending: false,
+  page: 0,
 };
 
 interface Props {
@@ -66,7 +68,7 @@ const SearchForm: FC<Props> = ({ form, setForm, languages, genres }) => {
 
 const FormFields: FC<Props> = ({ form, setForm, languages, genres }) => {
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-sm sm:text-base">
+    <div className="flex flex-col gap-2 text-sm sm:text-sm">
       <div>Title</div>
       <div>
         <input
@@ -124,67 +126,73 @@ const FormFields: FC<Props> = ({ form, setForm, languages, genres }) => {
         />
       </div>
       <div>Released</div>
-      <div className="flex gap-2">
+      <div className="flex flex-col sm:flex-row gap-2">
         <input
           type="date"
           className="w-full bg-gray-700"
-          value={form.minReleased}
+          value={form.minReleasedAt}
           onChange={(e) =>
             setForm({
               ...form,
-              minReleased: e.target.value,
+              minReleasedAt: e.target.value,
             })
           }
         />
         <input
           type="date"
           className="w-full bg-gray-700"
-          value={form.maxReleased}
+          value={form.maxReleasedAt}
           onChange={(e) =>
             setForm({
               ...form,
-              maxReleased: e.target.value,
+              maxReleasedAt: e.target.value,
             })
           }
         />
       </div>
 
-      <div>Language</div>
-      <div>
-        <select
-          className="w-full bg-gray-700"
-          value={form.language}
-          onChange={(e) => setForm({ ...form, language: e.target.value })}
-        >
-          <option value="">Any</option>
-          {languages
-            .sort((o1, o2) => o2.count - o1.count)
-            .slice(0, 10)
-            .map((language) => (
-              <option key={language.id} value={language.id}>
-                {language.name}
-              </option>
-            ))}
-        </select>
+      <div className="flex flex-col sm:flex-row gap-2">
+        <div className="flex flex-col gap-2 w-full">
+          <div>Language</div>
+          <div>
+            <select
+              className="w-full bg-gray-700"
+              value={form.language}
+              onChange={(e) => setForm({ ...form, language: e.target.value })}
+            >
+              <option value="">Any</option>
+              {languages
+                .sort((o1, o2) => o2.count - o1.count)
+                .slice(0, 10)
+                .map((language) => (
+                  <option key={language.id} value={language.id}>
+                    {language.name}
+                  </option>
+                ))}
+            </select>
+          </div>
+        </div>
+
+        <div className="flex flex-col gap-2 w-full">
+          <div>Genre</div>
+          <div>
+            <select
+              className="w-full bg-gray-700"
+              value={form.genre}
+              onChange={(e) => setForm({ ...form, genre: e.target.value })}
+            >
+              <option value="">Any</option>
+              {genres.map((genre) => (
+                <option key={genre.id} value={genre.id}>
+                  {genre.name}
+                </option>
+              ))}
+            </select>
+          </div>
+        </div>
       </div>
 
-      <div>Genre</div>
-      <div>
-        <select
-          className="w-full bg-gray-700"
-          value={form.genre}
-          onChange={(e) => setForm({ ...form, genre: e.target.value })}
-        >
-          <option value="">Any</option>
-          {genres.map((genre) => (
-            <option key={genre.id} value={genre.id}>
-              {genre.name}
-            </option>
-          ))}
-        </select>
-      </div>
-
-      <div>Sort Column</div>
+      <div>Sort</div>
       <div className="flex">
         <select
           className="w-full bg-gray-700"
@@ -192,9 +200,9 @@ const FormFields: FC<Props> = ({ form, setForm, languages, genres }) => {
           onChange={(e) => setForm({ ...form, sortColumn: e.target.value })}
         >
           {[
-            { value: "user_vote_average", label: "User Rating" },
-            { value: "user_vote_count", label: "User Votes" },
-            { value: "released", label: "Released" },
+            { value: "vote_average", label: "User Rating" },
+            { value: "vote_count", label: "User Votes" },
+            { value: "released_at", label: "Released" },
           ].map((option) => (
             <option key={option.value} value={option.value}>
               {option.label}
@@ -202,7 +210,7 @@ const FormFields: FC<Props> = ({ form, setForm, languages, genres }) => {
           ))}
         </select>
         <Button
-          className="px-4 text-white bg-gray-700 border-gray-500 border-l-0"
+          className="px-3 text-white bg-gray-700 border-gray-500 border-l-0"
           onClick={() => setForm({ ...form, ascending: !form.ascending })}
         >
           {form.ascending ? (
