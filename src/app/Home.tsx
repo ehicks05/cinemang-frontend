@@ -114,7 +114,7 @@ const Films: FC<{
           .gte("vote_count", form.minVotes || 0)
           .lte("vote_count", form.maxVotes || 100_000_000)
           .gte("vote_average", form.minRating || 0)
-          .lte("vote_average", form.minRating || 10)
+          .lte("vote_average", form.maxRating || 10)
           .gte("released_at", form.minReleasedAt || "1870-01-01")
           .lte(
             "released_at",
