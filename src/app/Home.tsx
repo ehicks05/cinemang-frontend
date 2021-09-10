@@ -43,11 +43,13 @@ const Home: FC = () => {
     setLoading(true);
 
     const fetchLanguages = async () => {
-      return client
-        .from("language")
-        .select("*")
-        .gt("count", 0)
-        .order("count", { ascending: false });
+      return (
+        client
+          .from("language")
+          .select("*")
+          // .gt("count", 0)
+          .order("count", { ascending: false })
+      );
     };
 
     const fetchGenres = async () => {
@@ -121,7 +123,7 @@ const Films: FC<{
             form.maxReleasedAt || new Date().toLocaleDateString()
           )
           .like("language_id", form.language || "*")
-          .contains("genres.id", form.genre || "")
+          .like("genre", form.genre || "*")
           .order(form.sortColumn, { ascending: form.ascending })
           .range(page * 50, (page + 1) * 50);
         setCount(filmsResults.count || 0);
@@ -240,6 +242,10 @@ const Film = ({
     return languages?.find((lang) => lang.id === languageId);
   };
 
+  const findGenre = (genreId: string) => {
+    return genres?.find((genre) => genre.id === Number(genreId));
+  };
+
   const posterPath = film.poster_path
     ? `https://image.tmdb.org/t/p/w92/${film.poster_path}`
     : "/92x138.png";
@@ -249,7 +255,7 @@ const Film = ({
     end: addMinutes(new Date(), Number(film.runtime)),
   });
   const voteCount = Intl.NumberFormat().format(film.vote_count);
-  const genre = film.genres[0]?.name;
+  const genre = findGenre(film.genre)?.name;
 
   const { data: palette, loading, error } = usePalette(posterPath);
 
