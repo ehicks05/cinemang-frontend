@@ -17,6 +17,7 @@ import SearchForm, { ISearchForm, DEFAULT_SEARCH_FORM } from "./SearchForm";
 import { format } from "date-fns";
 import usePagination from "headless-pagination-react";
 import { PaginatorLink } from "headless-pagination";
+import { MdMovie } from "react-icons/md";
 
 export interface Genre {
   id: number;
@@ -273,8 +274,10 @@ const Film = ({
             <span className="text-sm">({year})</span>
           </div>
           <div>{`${runtime.hours}h ${runtime.minutes}m`}</div>
-          <div>Director: {film.director} </div>
-          <div>Cast: {film.cast}</div>
+          <div className="flex items-center gap-1">
+            <MdMovie className="inline" /> {film.director}
+          </div>
+          <div>{film.cast}</div>
         </div>
       </div>
       <div className="flex flex-col gap-4">
