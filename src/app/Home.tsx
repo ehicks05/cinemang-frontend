@@ -18,6 +18,7 @@ import { format } from "date-fns";
 import usePagination from "headless-pagination-react";
 import { PaginatorLink } from "headless-pagination";
 import { MdMovie } from "react-icons/md";
+import chroma from "chroma-js";
 
 const PAGE_SIZE = 20;
 
@@ -264,8 +265,11 @@ const Film = ({
 
   if (loading || error) return <Loading error={error} loading={loading} />;
 
+  const blend = chroma.mix(palette.darkVibrant || "", "rgb(38,38,38)", 0.9);
+  const cardStyle = { backgroundColor: blend.toString() };
+
   return (
-    <div className="flex flex-col gap-4 p-4 bg-gray-800 rounded-lg">
+    <div className="flex flex-col gap-4 p-4 rounded-lg" style={cardStyle}>
       <div className="flex gap-4">
         <div className="flex-shrink-0">
           <img className="" src={posterPath} alt="poster" />
@@ -273,9 +277,9 @@ const Film = ({
         <div className="flex flex-col gap-1">
           <div>
             <span className="font-bold text-lg">{film.title}</span>{" "}
-            <span className="text-sm">({year})</span>
+            <span className="text-xs">({year})</span>
           </div>
-          <div>{`${runtime.hours}h ${runtime.minutes}m`}</div>
+          <div className="text-xs">{`${runtime.hours}h ${runtime.minutes}m`}</div>
           <div className="flex items-center gap-1">
             <MdMovie className="inline" /> {film.director}
           </div>
