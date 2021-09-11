@@ -217,7 +217,7 @@ const Link: FC<LinkProps> = ({ page, setPage, link, prev, next, children }) => {
   return (
     <div
       onClick={onClick}
-      className={`flex px-3 py-1 border border-solid border-gray-500 ${
+      className={`flex px-2 sm:px-3 sm:py-1 border border-solid border-gray-500 ${
         link.disabled ? "opacity-60" : "cursor-pointer"
       } ${!link.disabled && !link.active ? "hover:bg-gray-700" : undefined} ${
         link.active ? "z-10 bg-green-700 border-green-500" : undefined
