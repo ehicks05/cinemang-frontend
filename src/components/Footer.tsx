@@ -1,29 +1,39 @@
 import React, { FC } from "react";
+import { FaGithubSquare, FaHome } from "react-icons/fa";
+import { SiThemoviedatabase } from "react-icons/si";
 
-const REPO_URL = "https://www.github.com/hicks-team/arc/";
-const SITE_URL = "https://ehicks.net";
+const LINKS = [
+  {
+    url: "https://www.themoviedb.org",
+    icon: SiThemoviedatabase,
+  },
+  {
+    url: "https://www.github.com/ehicks05/cinemang-frontend",
+    icon: FaGithubSquare,
+  },
+  {
+    url: "https://ehicks.net",
+    icon: FaHome,
+  },
+];
 
 const Footer = () => {
   return (
     <footer className="flex justify-end p-4 gap-4">
-      <Link href={REPO_URL}>github</Link>
-      <Link href={SITE_URL}>ehicks</Link>
+      {LINKS.map((link) => {
+        return (
+          <Link href={link.url}>
+            <link.icon className="text-green-500 hover:text-green-400 text-3xl" />
+          </Link>
+        );
+      })}
     </footer>
   );
 };
 
-interface Props {
-  href: string;
-}
-
-const Link: FC<Props> = ({ href, children }) => {
+const Link: FC<{ href: string }> = ({ href, children }) => {
   return (
-    <a
-      href={href}
-      className="text-blue-400 hover:underline hover:text-blue-600 visited:text-purple-600"
-      target="_blank"
-      rel="noreferrer"
-    >
+    <a href={href} target="_blank" rel="noreferrer">
       {children}
     </a>
   );
