@@ -25,7 +25,7 @@ export interface ISearchForm {
 export const DEFAULT_SEARCH_FORM = {
   minVotes: 100,
   maxVotes: 100_000,
-  minRating: 0,
+  minRating: 6,
   maxRating: 10,
   language: "en",
   sortColumn: "vote_count",
