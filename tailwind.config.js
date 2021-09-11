@@ -21,6 +21,9 @@ module.exports = {
         gray: colors.trueGray,
         blueGray: colors.blueGray,
       },
+      screens: {
+        "3xl": "2000px",
+      },
     },
   },
   variants: {

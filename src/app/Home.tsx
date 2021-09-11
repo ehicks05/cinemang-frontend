@@ -148,7 +148,7 @@ const Films: FC<{
   return (
     <>
       <Paginator page={page} setPage={setPage} count={count} />
-      <div className="grid md:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 gap-4">
+      <div className="grid md:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 3xl:grid-cols-5 gap-4">
         {films.map((film) => {
           return (
             <Film
