@@ -281,7 +281,7 @@ const Film = ({
         </div>
       </div>
       <div className="flex flex-col gap-4">
-        <div className="flex flex-wrap gap-2">
+        <div className="flex flex-wrap mx-auto gap-2">
           <FilmStat
             Icon={FaHeart}
             color={"text-red-600"}
