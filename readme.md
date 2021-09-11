@@ -1,4 +1,4 @@
-# arc-backend
+# cinemang-backend
 
 ## Prereqs
 
