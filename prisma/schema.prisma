@@ -1,0 +1,49 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Movie {
+  tmdbId        Int       @id @map("tmdb_id")
+  imdbId        String?   @map("imdb_id")
+  title         String
+  releasedAt    DateTime  @map("released_at") @db.Timestamptz
+  languageId    String    @map("language_id")
+  director      String
+  cast          String
+  posterPath    String    @map("poster_path")
+  posterData    String?   @map("poster_data")
+  overview      String
+  runtime       Int
+  certification String?
+  voteCount     Int       @map("vote_count")
+  voteAverage   Float     @map("vote_average")
+  genre         String
+  updatedAt     DateTime? @updatedAt @map("updated_at") @db.Timestamptz
+
+  @@index([title])
+  @@index([languageId])
+  @@index([releasedAt])
+  @@index([voteAverage])
+  @@index([voteCount])
+  @@map("movie")
+}
+
+model Genre {
+  id   Int    @id
+  name String
+
+  @@map("genre")
+}
+
+model Language {
+  id    String @id
+  name  String
+  count Int    @default(0)
+
+  @@map("language")
+}
