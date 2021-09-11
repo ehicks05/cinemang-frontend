@@ -44,7 +44,7 @@ const SearchForm: FC<Props> = ({ form, setForm, languages, genres }) => {
   const [isOpen, setIsOpen] = useState(true);
   const Icon = isOpen ? FaChevronUp : FaChevronDown;
   return (
-    <div className="flex flex-col max-w-screen-sm mx-auto gap-4 p-4 bg-gray-800 rounded-lg">
+    <div className="flex flex-col mx-auto gap-4 p-4 bg-gray-800 rounded-lg">
       <div
         className="flex gap-32 justify-between cursor-pointer"
         onClick={() => setIsOpen(!isOpen)}
@@ -68,91 +68,102 @@ const SearchForm: FC<Props> = ({ form, setForm, languages, genres }) => {
 
 const FormFields: FC<Props> = ({ form, setForm, languages, genres }) => {
   return (
-    <div className="flex flex-col gap-2 text-sm sm:text-sm">
-      <div>Title</div>
+    <div className="grid sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 text-sm sm:text-sm">
       <div>
-        <input
-          type="text"
-          className="w-full bg-gray-700"
-          value={form.title}
-          onChange={(e) => setForm({ ...form, title: e.target.value })}
-        />
+        <div>Title</div>
+        <div>
+          <input
+            type="text"
+            className="w-full bg-gray-700"
+            value={form.title}
+            onChange={(e) => setForm({ ...form, title: e.target.value })}
+          />
+        </div>
       </div>
-      <div>Votes</div>
+
       <div className="flex gap-2">
-        <input
-          type="number"
-          min={1}
-          max={form.maxVotes || undefined}
-          className="w-full bg-gray-700"
-          value={form.minVotes}
-          onChange={(e) =>
-            setForm({ ...form, minVotes: Number(e.target.value) })
-          }
-        />
-        <input
-          type="number"
-          min={form.minVotes || undefined}
-          className="w-full bg-gray-700"
-          value={form.maxVotes}
-          onChange={(e) =>
-            setForm({ ...form, maxVotes: Number(e.target.value) })
-          }
-        />
+        <div className="flex-shrink-0">
+          <div className="whitespace-nowrap">Min Votes</div>
+          <div className="flex gap-2">
+            <input
+              type="number"
+              min={1}
+              max={form.maxVotes || undefined}
+              className="w-full bg-gray-700"
+              value={form.minVotes}
+              onChange={(e) =>
+                setForm({ ...form, minVotes: Number(e.target.value) })
+              }
+            />
+            {/* <input
+              type="number"
+              min={form.minVotes || undefined}
+              className="w-full bg-gray-700"
+              value={form.maxVotes}
+              onChange={(e) =>
+                setForm({ ...form, maxVotes: Number(e.target.value) })
+              }
+            /> */}
+          </div>
+        </div>
+        <div className="flex-shrink">
+          <div>Rating</div>
+          <div className="flex gap-2">
+            <input
+              type="number"
+              className="w-full bg-gray-700"
+              value={form.minRating}
+              onChange={(e) =>
+                setForm({
+                  ...form,
+                  minRating: Number(e.target.value),
+                })
+              }
+            />
+            <input
+              type="number"
+              className="w-full bg-gray-700"
+              value={form.maxRating}
+              onChange={(e) =>
+                setForm({
+                  ...form,
+                  maxRating: Number(e.target.value),
+                })
+              }
+            />
+          </div>
+        </div>
       </div>
-      <div>Rating</div>
-      <div className="flex gap-2">
-        <input
-          type="number"
-          className="w-full bg-gray-700"
-          value={form.minRating}
-          onChange={(e) =>
-            setForm({
-              ...form,
-              minRating: Number(e.target.value),
-            })
-          }
-        />
-        <input
-          type="number"
-          className="w-full bg-gray-700"
-          value={form.maxRating}
-          onChange={(e) =>
-            setForm({
-              ...form,
-              maxRating: Number(e.target.value),
-            })
-          }
-        />
-      </div>
-      <div>Released</div>
-      <div className="flex flex-col sm:flex-row gap-2">
-        <input
-          type="date"
-          className="w-full bg-gray-700"
-          value={form.minReleasedAt}
-          onChange={(e) =>
-            setForm({
-              ...form,
-              minReleasedAt: e.target.value,
-            })
-          }
-        />
-        <input
-          type="date"
-          className="w-full bg-gray-700"
-          value={form.maxReleasedAt}
-          onChange={(e) =>
-            setForm({
-              ...form,
-              maxReleasedAt: e.target.value,
-            })
-          }
-        />
+      <div>
+        <div>Released</div>
+        <div className="flex flex-col sm:flex-row gap-2">
+          <input
+            type="date"
+            className="w-full bg-gray-700"
+            value={form.minReleasedAt}
+            onChange={(e) =>
+              setForm({
+                ...form,
+                minReleasedAt: e.target.value,
+              })
+            }
+          />
+          <input
+            type="date"
+            className="w-full bg-gray-700"
+            value={form.maxReleasedAt}
+            onChange={(e) =>
+              setForm({
+                ...form,
+                maxReleasedAt: e.target.value,
+              })
+            }
+          />
+        </div>
       </div>
 
       <div className="flex flex-col sm:flex-row gap-2">
-        <div className="flex flex-col gap-2 w-full">
+        <div className="flex flex-col w-full">
           <div>Language</div>
           <div>
             <select
@@ -173,7 +184,7 @@ const FormFields: FC<Props> = ({ form, setForm, languages, genres }) => {
           </div>
         </div>
 
-        <div className="flex flex-col gap-2 w-full">
+        <div className="flex flex-col w-full">
           <div>Genre</div>
           <div>
             <select
@@ -192,33 +203,35 @@ const FormFields: FC<Props> = ({ form, setForm, languages, genres }) => {
         </div>
       </div>
 
-      <div>Sort</div>
-      <div className="flex">
-        <select
-          className="w-full bg-gray-700"
-          value={form.sortColumn}
-          onChange={(e) => setForm({ ...form, sortColumn: e.target.value })}
-        >
-          {[
-            { value: "vote_average", label: "User Rating" },
-            { value: "vote_count", label: "User Votes" },
-            { value: "released_at", label: "Released" },
-          ].map((option) => (
-            <option key={option.value} value={option.value}>
-              {option.label}
-            </option>
-          ))}
-        </select>
-        <Button
-          className="px-3 text-white bg-gray-700 border-gray-500 border-l-0"
-          onClick={() => setForm({ ...form, ascending: !form.ascending })}
-        >
-          {form.ascending ? (
-            <HiSortAscending className="text-xl" />
-          ) : (
-            <HiSortDescending className="text-xl" />
-          )}
-        </Button>
+      <div>
+        <div>Sort</div>
+        <div className="flex">
+          <select
+            className="w-full bg-gray-700"
+            value={form.sortColumn}
+            onChange={(e) => setForm({ ...form, sortColumn: e.target.value })}
+          >
+            {[
+              { value: "vote_average", label: "User Rating" },
+              { value: "vote_count", label: "User Votes" },
+              { value: "released_at", label: "Released" },
+            ].map((option) => (
+              <option key={option.value} value={option.value}>
+                {option.label}
+              </option>
+            ))}
+          </select>
+          <Button
+            className="px-3 text-white bg-gray-700 border-gray-500 border-l-0"
+            onClick={() => setForm({ ...form, ascending: !form.ascending })}
+          >
+            {form.ascending ? (
+              <HiSortAscending className="text-xl" />
+            ) : (
+              <HiSortDescending className="text-xl" />
+            )}
+          </Button>
+        </div>
       </div>
     </div>
   );
