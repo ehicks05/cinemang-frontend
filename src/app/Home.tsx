@@ -19,6 +19,8 @@ import usePagination from "headless-pagination-react";
 import { PaginatorLink } from "headless-pagination";
 import { MdMovie } from "react-icons/md";
 
+const PAGE_SIZE = 20;
+
 export interface Genre {
   id: number;
   name: string;
@@ -126,7 +128,7 @@ const Films: FC<{
           .like("language_id", form.language || "*")
           .like("genre", form.genre || "*")
           .order(form.sortColumn, { ascending: form.ascending })
-          .range(page * 50, (page + 1) * 50);
+          .range(page * PAGE_SIZE, (page + 1) * PAGE_SIZE - 1);
         setCount(filmsResults.count || 0);
         setFilms(filmsResults.data);
       } catch (e) {
@@ -170,7 +172,7 @@ const Paginator: FC<PaginatorProps> = ({ page, setPage, count }) => {
   const { links, hasNext, hasPrevious, from, to } = usePagination({
     totalItems: count,
     initialPage: page + 1,
-    perPage: 50,
+    perPage: PAGE_SIZE,
     maxLinks: 7,
   });
 
