@@ -189,6 +189,18 @@ const updateMovies = async () => {
     } movie ids`,
   );
 
+  if (isStartOfMonth) {
+    logger.info(
+      'start of month detected. deleting dead movies before loading.',
+    );
+    const deadMovies = await prisma.movie.count({
+      where: { tmdbId: { notIn: movieIds } },
+    });
+    logger.info(`${deadMovies} detected. deleting...`);
+    await prisma.movie.deleteMany({ where: { tmdbId: { notIn: movieIds } } });
+    logger.info(`finished deleting dead movies`);
+  }
+
   const chunks = _.chunk(movieIds, 10_000);
   await Promise.each(chunks, processChunk);
 };
