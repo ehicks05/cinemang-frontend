@@ -8,7 +8,7 @@
     "generate": "npx prisma generate",
     "dev": "set NODE_ENV=development&&ts-node-dev --transpile-only --no-notify src/app.ts",
     "build": "tsc",
-    "start": "set NODE_ENV=production&&node ./dist/src/app.ts"
+    "start": "set NODE_ENV=production&&node ./dist/src/app.js"
   },
   "author": "",
   "license": "ISC",
