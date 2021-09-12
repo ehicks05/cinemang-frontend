@@ -250,6 +250,11 @@ const Film = ({
     return genres?.find((genre) => genre.id === Number(genreId));
   };
 
+  const getGenreName = (genre: {name: string}) => {
+    const CUSTOM_NAMES = {'Science Fiction': 'Sci-Fi'} as Record <string, string>
+    return CUSTOM_NAMES[genre.name] || genre.name;
+  }
+
   const posterPath = film.poster_path
     ? `https://image.tmdb.org/t/p/w92/${film.poster_path}`
     : "/92x138.png";
@@ -259,7 +264,7 @@ const Film = ({
     end: addMinutes(new Date(), Number(film.runtime)),
   });
   const voteCount = Intl.NumberFormat().format(film.vote_count);
-  const genre = findGenre(film.genre)?.name;
+  const genre = getGenreName(findGenre(film.genre));
 
   const { data: palette, loading, error } = usePalette(posterPath);
 
