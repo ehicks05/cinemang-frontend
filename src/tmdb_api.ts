@@ -102,6 +102,7 @@ const parseMovie = async (id: number) => {
   )?.certification;
   const genreObj = data.genres[0];
   const genre = String(genreObj?.id);
+  const watchProviders = data['watch/providers']?.results?.US?.flatrate;
 
   // what is required?
   if (
@@ -132,6 +133,7 @@ const parseMovie = async (id: number) => {
     voteCount: data.vote_count,
     voteAverage: data.vote_average,
     genre,
+    watchProviders,
     updatedAt: new Date(),
   } as Movie;
 };

@@ -23,6 +23,7 @@ model Movie {
   voteCount     Int       @map("vote_count")
   voteAverage   Float     @map("vote_average")
   genre         String
+  watchProviders Json? @map("watch_providers")
   updatedAt     DateTime? @updatedAt @map("updated_at") @db.Timestamptz
 
   @@index([title])
