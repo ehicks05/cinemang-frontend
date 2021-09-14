@@ -20,6 +20,7 @@ import { PaginatorLink } from "headless-pagination";
 import { MdMovie } from "react-icons/md";
 import chroma from "chroma-js";
 import { SiAmazon, SiAppletv, SiHulu, SiNetflix } from "react-icons/si";
+import { useDebounce } from "react-use";
 
 const PAGE_SIZE = 20;
 
@@ -100,14 +101,23 @@ const Films: FC<{
   form: ISearchForm;
   languages: Language[];
   genres: Genre[];
-}> = ({ form, languages, genres }) => {
+}> = ({ form: formProp, languages, genres }) => {
   const client = useClient();
 
+  const [form, setForm] = useState(formProp);
   const [films, setFilms] = useState<any[] | null>();
   const [count, setCount] = useState(0);
   const [page, setPage] = useState(0);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<unknown>();
+
+  useDebounce(
+    () => {
+      setForm(formProp);
+    },
+    250,
+    [formProp]
+  );
 
   useEffect(() => {
     setLoading(true);
