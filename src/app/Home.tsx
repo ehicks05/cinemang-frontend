@@ -282,6 +282,7 @@ const Film = ({
   const genre = getGenreName(findGenre(film.genre));
 
   const { data: palette, loading, error } = usePalette(posterPath);
+  const [truncateOverview, setTruncateOverview] = useState(true);
 
   if (loading || error) return <Loading error={error} loading={loading} />;
 
@@ -350,9 +351,12 @@ const Film = ({
             stat={genre}
           />
         </div>
-        <div className="text-justify">
+        <div
+          className="text-justify"
+          onClick={() => setTruncateOverview(!truncateOverview)}
+        >
           {truncate(film.overview, {
-            length: 256,
+            length: truncateOverview ? 256 : 1024,
             separator: " ",
           })}
         </div>
