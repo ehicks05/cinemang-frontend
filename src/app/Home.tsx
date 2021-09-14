@@ -1,4 +1,4 @@
-import { FC, useEffect, useState } from "react";
+import React, { FC, useEffect, useState } from "react";
 import { Loading } from "components";
 import { useClient } from "react-supabase";
 import {
@@ -19,6 +19,7 @@ import usePagination from "headless-pagination-react";
 import { PaginatorLink } from "headless-pagination";
 import { MdMovie } from "react-icons/md";
 import chroma from "chroma-js";
+import { SiAmazon, SiAppletv, SiHulu, SiNetflix } from "react-icons/si";
 
 const PAGE_SIZE = 20;
 
@@ -250,10 +251,13 @@ const Film = ({
     return genres?.find((genre) => genre.id === Number(genreId));
   };
 
-  const getGenreName = (genre: {name: string}) => {
-    const CUSTOM_NAMES = {'Science Fiction': 'Sci-Fi'} as Record <string, string>
+  const getGenreName = (genre: { name: string }) => {
+    const CUSTOM_NAMES = { "Science Fiction": "Sci-Fi" } as Record<
+      string,
+      string
+    >;
     return CUSTOM_NAMES[genre.name] || genre.name;
-  }
+  };
 
   const posterPath = film.poster_path
     ? `https://image.tmdb.org/t/p/w92/${film.poster_path}`
@@ -289,6 +293,21 @@ const Film = ({
             <MdMovie className="inline" /> {film.director}
           </div>
           <div>{film.cast}</div>
+          <div>
+            <div className="flex flex-wrap mx-auto gap-2">
+              {film.watch_providers?.map((provider: PROVIDER) => {
+                const providerInfo = PROVIDERS[provider.provider_id];
+                if (!providerInfo) return undefined;
+                return (
+                  <WatchProvider
+                    Icon={providerInfo.icon}
+                    color={providerInfo.color}
+                    colorStyle={providerInfo.colorStyle}
+                  />
+                );
+              })}
+            </div>
+          </div>
         </div>
       </div>
       <div className="flex flex-col gap-4">
@@ -346,6 +365,40 @@ const FilmStat: FC<StatProps> = ({ Icon, color, bgColor, stat }) => {
         <Icon className={color} />
       </div>
       <div className="text-xs sm:text-sm">{stat}</div>
+    </div>
+  );
+};
+
+type PROVIDER = {
+  provider_id: number;
+  provider_name: "Netflix" | "Amazon Prime Video" | "Hulu" | "Apple TV Plus";
+};
+
+const PROVIDERS: Record<
+  number,
+  { id: number; icon: IconType; color?: string; colorStyle?: string }
+> = {
+  8: { id: 8, icon: SiNetflix, color: "text-netflix" },
+  9: { id: 9, icon: SiAmazon, color: "text-amazon" },
+  15: { id: 15, icon: SiHulu, colorStyle: "#66aa33" },
+  350: { id: 350, icon: SiAppletv, color: "text-white" },
+};
+
+interface ProviderProps {
+  Icon: IconType;
+  color?: string;
+  colorStyle?: string;
+}
+
+const WatchProvider: FC<ProviderProps> = ({ Icon, color, colorStyle }) => {
+  return (
+    <div
+      className="flex items-center p-1 rounded border border-solid border-gray-600"
+      style={{ color: colorStyle }}
+    >
+      <div>
+        <Icon className={`${color} text-xl`} />
+      </div>
     </div>
   );
 };
