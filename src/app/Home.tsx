@@ -272,6 +272,7 @@ const Film = ({
   const posterPath = film.poster_path
     ? `https://image.tmdb.org/t/p/w92/${film.poster_path}`
     : "/92x138.png";
+  const releasedAt = format(parseISO(film.released_at), "MM-dd-yyyy");
   const year = format(parseISO(film.released_at), "yyyy");
   const runtime = intervalToDuration({
     start: new Date(),
@@ -296,7 +297,9 @@ const Film = ({
         <div className="flex flex-col gap-1">
           <div>
             <span className="font-bold text-lg">{film.title}</span>{" "}
-            <span className="text-xs">({year})</span>
+            <span className="text-xs" title={releasedAt}>
+              ({year})
+            </span>
           </div>
           <div className="text-xs">{`${runtime.hours}h ${runtime.minutes}m`}</div>
           <div className="flex items-center gap-1">
