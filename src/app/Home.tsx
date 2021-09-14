@@ -17,7 +17,6 @@ import SearchForm, { ISearchForm, DEFAULT_SEARCH_FORM } from "./SearchForm";
 import { format } from "date-fns";
 import usePagination from "headless-pagination-react";
 import { PaginatorLink } from "headless-pagination";
-import { MdMovie } from "react-icons/md";
 import chroma from "chroma-js";
 import { SiAmazon, SiAppletv, SiHulu, SiNetflix } from "react-icons/si";
 import { useDebounce } from "react-use";
@@ -303,9 +302,7 @@ const Film = ({
             </span>
           </div>
           <div className="text-xs">{`${runtime.hours}h ${runtime.minutes}m`}</div>
-          <div className="flex items-center gap-1">
-            <MdMovie className="inline" /> {film.director}
-          </div>
+          <div>{film.director}</div>
           <div>{film.cast}</div>
           <div>
             <div className="flex flex-wrap mx-auto gap-2">
