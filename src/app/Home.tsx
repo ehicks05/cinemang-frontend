@@ -285,8 +285,11 @@ const Film = ({
 
   if (loading || error) return <Loading error={error} loading={loading} />;
 
-  const blend = chroma.mix(palette.darkVibrant || "", "rgb(38,38,38)", 0.9);
-  const cardStyle = { backgroundColor: blend.toString() };
+  const lessMuted = chroma.mix(palette.darkVibrant || "", "rgb(38,38,38)", 0.7);
+  const muted = chroma.mix(palette.darkVibrant || "", "rgb(38,38,38)", 0.95);
+  const cardStyle = {
+    background: `linear-gradient(45deg, ${muted} 5%, ${muted} 45%, ${lessMuted} 95%)`,
+  };
 
   return (
     <div className="flex flex-col gap-4 p-4 rounded-lg" style={cardStyle}>
