@@ -123,7 +123,7 @@ const Films: FC<{
 
     const fetchFilms = async () => {
       try {
-        const filmsResults = await client
+        const query = client
           .from("movie")
           .select("*", { count: "exact" })
           .ilike("title", `${form.title || ""}*`)
@@ -136,10 +136,19 @@ const Films: FC<{
             "released_at",
             form.maxReleasedAt || new Date().toLocaleDateString()
           )
-          .like("language_id", form.language || "*")
-          .like("genre", form.genre || "*")
+          .like("language_id", form.language || "*");
+        // .neq("watch_providers", null)
+
+        if (form.genre) {
+          query.eq("genre_id", form.genre || "*");
+        }
+
+        query
           .order(form.sortColumn, { ascending: form.ascending })
           .range(page * PAGE_SIZE, (page + 1) * PAGE_SIZE - 1);
+
+        const filmsResults = await query;
+
         setCount(filmsResults.count || 0);
         setFilms(filmsResults.data);
       } catch (e) {
@@ -257,7 +266,7 @@ const Film = ({
   };
 
   const findGenre = (genreId: string) => {
-    return genres?.find((genre) => genre.id === Number(genreId));
+    return genres?.find((genre) => genre.id === genreId);
   };
 
   const getGenreName = (genre: { name: string }) => {
@@ -278,7 +287,7 @@ const Film = ({
     end: addMinutes(new Date(), Number(film.runtime)),
   });
   const voteCount = Intl.NumberFormat().format(film.vote_count);
-  const genre = getGenreName(findGenre(film.genre));
+  const genre = getGenreName(findGenre(film.genre_id));
 
   const { data: palette, loading, error } = usePalette(posterPath);
   const [truncateOverview, setTruncateOverview] = useState(true);
