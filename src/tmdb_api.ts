@@ -101,7 +101,12 @@ const parseMovie = async (id: number) => {
       r.iso_3166_1 === 'US' && r.certification,
   )?.certification;
   const genreId = data.genres[0].id;
-  const watchProviders = data['watch/providers']?.results?.US?.flatrate;
+  const watchProviders: { provider_id: number }[] =
+    data['watch/providers']?.results?.US?.flatrate;
+  const netflix = !!watchProviders?.map((w) => w.provider_id)?.includes(8);
+  const amazonPrimeVideo = !!watchProviders
+    ?.map((w) => w.provider_id)
+    ?.includes(9);
 
   // what is required?
   if (
@@ -132,6 +137,8 @@ const parseMovie = async (id: number) => {
     voteAverage: data.vote_average,
     genreId,
     watchProviders,
+    netflix,
+    amazonPrimeVideo,
     updatedAt: new Date(),
   } as Movie;
 };

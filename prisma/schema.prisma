@@ -8,23 +8,25 @@ datasource db {
 }
 
 model Movie {
-  tmdbId        Int       @id @map("tmdb_id")
-  imdbId        String?   @map("imdb_id")
-  title         String
-  releasedAt    DateTime  @map("released_at") @db.Timestamptz
-  languageId    String    @map("language_id")
-  director      String
-  cast          String
-  posterPath    String    @map("poster_path")
-  posterData    String?   @map("poster_data")
-  overview      String
-  runtime       Int
-  certification String?
-  voteCount     Int       @map("vote_count")
-  voteAverage   Float     @map("vote_average")
-  genreId       Int      @map("genre_id")
-  watchProviders Json? @map("watch_providers")
-  updatedAt     DateTime? @updatedAt @map("updated_at") @db.Timestamptz
+  tmdbId           Int       @id @map("tmdb_id")
+  imdbId           String?   @map("imdb_id")
+  title            String
+  releasedAt       DateTime  @map("released_at") @db.Timestamptz
+  languageId       String    @map("language_id")
+  director         String
+  cast             String
+  posterPath       String    @map("poster_path")
+  posterData       String?   @map("poster_data")
+  overview         String
+  runtime          Int
+  certification    String?
+  voteCount        Int       @map("vote_count")
+  voteAverage      Float     @map("vote_average")
+  genreId          Int       @map("genre_id")
+  watchProviders   Json?     @map("watch_providers")
+  netflix          Boolean   @default(false)
+  amazonPrimeVideo Boolean   @default(false) @map("amazon_prime_video")
+  updatedAt        DateTime? @updatedAt @map("updated_at") @db.Timestamptz
 
   @@index([title])
   @@index([languageId])
