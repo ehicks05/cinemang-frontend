@@ -208,8 +208,8 @@ const Paginator: FC<PaginatorProps> = ({ page, setPage, count }) => {
         >
           <FaChevronLeft className="my-auto text-sm" />
         </Link>
-        {links.map((link) => (
-          <Link page={page} setPage={setPage} link={link}>
+        {links.map((link, i) => (
+          <Link key={i} page={page} setPage={setPage} link={link}>
             {link.label}
           </Link>
         ))}
