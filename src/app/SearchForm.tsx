@@ -41,7 +41,7 @@ interface Props {
 }
 
 const SearchForm: FC<Props> = ({ form, setForm, languages, genres }) => {
-  const [isOpen, setIsOpen] = useState(true);
+  const [isOpen, setIsOpen] = useState(false);
   const Icon = isOpen ? FaChevronUp : FaChevronDown;
   return (
     <div className="flex flex-col mx-auto gap-4 p-4 bg-gray-800 rounded-lg">
