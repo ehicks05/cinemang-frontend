@@ -22,7 +22,7 @@ model Movie {
   certification String?
   voteCount     Int       @map("vote_count")
   voteAverage   Float     @map("vote_average")
-  genre         String
+  genreId       Int      @map("genre_id")
   watchProviders Json? @map("watch_providers")
   updatedAt     DateTime? @updatedAt @map("updated_at") @db.Timestamptz
 

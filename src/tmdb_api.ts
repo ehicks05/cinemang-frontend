@@ -86,7 +86,7 @@ const getMovie = async (id: number) => {
 
 const parseMovie = async (id: number) => {
   const data = await getMovie(id);
-  if (!data || !data.credits || !data.releases || !data.genres) {
+  if (!data || !data.credits || !data.releases || !data.genres[0]) {
     return undefined;
   }
 
@@ -100,8 +100,7 @@ const parseMovie = async (id: number) => {
     (r: { iso_3166_1: string; certification: string }) =>
       r.iso_3166_1 === 'US' && r.certification,
   )?.certification;
-  const genreObj = data.genres[0];
-  const genre = String(genreObj?.id);
+  const genreId = data.genres[0].id;
   const watchProviders = data['watch/providers']?.results?.US?.flatrate;
 
   // what is required?
@@ -111,8 +110,7 @@ const parseMovie = async (id: number) => {
     !cast ||
     !data.poster_path ||
     !data.runtime ||
-    data.vote_count < 3 ||
-    !genre
+    data.vote_count < 3
   ) {
     return undefined;
   }
@@ -132,7 +130,7 @@ const parseMovie = async (id: number) => {
     certification,
     voteCount: data.vote_count,
     voteAverage: data.vote_average,
-    genre,
+    genreId,
     watchProviders,
     updatedAt: new Date(),
   } as Movie;
