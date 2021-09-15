@@ -4,6 +4,7 @@ import { FC } from "react";
 import { UnmountClosed } from "react-collapse";
 import { FaChevronDown, FaChevronUp } from "react-icons/fa";
 import { HiSortAscending, HiSortDescending } from "react-icons/hi";
+import { SiAmazon, SiNetflix } from "react-icons/si";
 import { Genre, Language } from "./Home";
 
 export interface ISearchForm {
@@ -16,6 +17,8 @@ export interface ISearchForm {
   maxRating?: number;
   language?: string;
   genre?: string;
+  netflix?: boolean;
+  amazonPrimeVideo?: boolean;
 
   sortColumn: string;
   ascending: boolean;
@@ -41,7 +44,7 @@ interface Props {
 }
 
 const SearchForm: FC<Props> = ({ form, setForm, languages, genres }) => {
-  const [isOpen, setIsOpen] = useState(false);
+  const [isOpen, setIsOpen] = useState(process.env.NODE_ENV !== "production");
   const Icon = isOpen ? FaChevronUp : FaChevronDown;
   return (
     <div className="flex flex-col mx-auto gap-4 p-4 bg-gray-800 rounded-lg">
@@ -69,18 +72,50 @@ const SearchForm: FC<Props> = ({ form, setForm, languages, genres }) => {
 const FormFields: FC<Props> = ({ form, setForm, languages, genres }) => {
   return (
     <div className="grid sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 text-sm sm:text-sm">
-      <div>
-        <div>Title</div>
+      <div className="flex gap-2">
+        <div className="flex-grow">
+          <div>Title</div>
+          <div>
+            <input
+              type="text"
+              className="w-full bg-gray-700"
+              value={form.title}
+              onChange={(e) => setForm({ ...form, title: e.target.value })}
+            />
+          </div>
+        </div>
         <div>
-          <input
-            type="text"
-            className="w-full bg-gray-700"
-            value={form.title}
-            onChange={(e) => setForm({ ...form, title: e.target.value })}
-          />
+          <div>Stream</div>
+          <div className="flex gap-2">
+            <div
+              className={`p-2 border border-solid border-gray-600 ${
+                form.netflix ? "bg-gray-600" : ""
+              }`}
+              onClick={() => setForm({ ...form, netflix: !form.netflix })}
+            >
+              <SiNetflix
+                className={`text-2xl ${
+                  form.netflix ? "text-netflix" : "text-gray-400"
+                }`}
+              />
+            </div>
+            <div
+              className={`p-2 border border-solid border-gray-600 ${
+                form.amazonPrimeVideo ? "bg-gray-600" : ""
+              }`}
+              onClick={() =>
+                setForm({ ...form, amazonPrimeVideo: !form.amazonPrimeVideo })
+              }
+            >
+              <SiAmazon
+                className={`text-2xl ${
+                  form.amazonPrimeVideo ? "text-amazon" : "text-gray-400"
+                }`}
+              />
+            </div>
+          </div>
         </div>
       </div>
-
       <div className="flex gap-2">
         <div className="flex-shrink-0">
           <div className="whitespace-nowrap">Min Votes</div>

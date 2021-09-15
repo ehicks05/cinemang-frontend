@@ -143,6 +143,14 @@ const Films: FC<{
           query.eq("genre_id", form.genre || "*");
         }
 
+        if (form.netflix) {
+          query.eq("netflix", true);
+        }
+
+        if (form.amazonPrimeVideo) {
+          query.eq("amazon_prime_video", true);
+        }
+
         query
           .order(form.sortColumn, { ascending: form.ascending })
           .range(page * PAGE_SIZE, (page + 1) * PAGE_SIZE - 1);
@@ -318,17 +326,13 @@ const Film = ({
           <div>{film.cast}</div>
           <div>
             <div className="flex flex-wrap mx-auto gap-2">
-              {film.watch_providers?.map((provider: PROVIDER) => {
-                const providerInfo = PROVIDERS[provider.provider_id];
-                if (!providerInfo) return undefined;
-                return (
-                  <WatchProvider
-                    Icon={providerInfo.icon}
-                    color={providerInfo.color}
-                    colorStyle={providerInfo.colorStyle}
-                  />
-                );
-              })}
+              {film.watch_providers?.map(
+                ({ provider_id: id }: { provider_id: number }) => {
+                  const providerInfo = PROVIDERS[id];
+                  if (!providerInfo) return null;
+                  return <WatchProvider key={id} provider={providerInfo} />;
+                }
+              )}
             </div>
           </div>
         </div>
@@ -395,35 +399,41 @@ const FilmStat: FC<StatProps> = ({ Icon, color, bgColor, stat }) => {
   );
 };
 
-type PROVIDER = {
-  provider_id: number;
-  provider_name: "Netflix" | "Amazon Prime Video" | "Hulu" | "Apple TV Plus";
-};
-
-const PROVIDERS: Record<
-  number,
-  { id: number; icon: IconType; color?: string; colorStyle?: string }
-> = {
-  8: { id: 8, icon: SiNetflix, color: "text-netflix" },
-  9: { id: 9, icon: SiAmazon, color: "text-amazon" },
-  15: { id: 15, icon: SiHulu, colorStyle: "#66aa33" },
-  350: { id: 350, icon: SiAppletv, color: "text-white" },
-};
-
-interface ProviderProps {
-  Icon: IconType;
+interface Provider {
+  id: number;
+  name: string;
+  Icon?: IconType;
   color?: string;
   colorStyle?: string;
 }
 
-const WatchProvider: FC<ProviderProps> = ({ Icon, color, colorStyle }) => {
+const PROVIDERS: Record<number, Provider> = {
+  8: { id: 8, name: "Netflix", Icon: SiNetflix, color: "text-netflix" },
+  9: {
+    id: 9,
+    name: "Amazon Prime Video",
+    Icon: SiAmazon,
+    color: "text-amazon",
+  },
+  15: { id: 15, name: "Hulu", Icon: SiHulu, colorStyle: "#66aa33" },
+  337: { id: 337, name: "Disney+", Icon: undefined, color: "text-white" },
+  350: { id: 350, name: "Apple TV Plus", Icon: SiAppletv, color: "text-white" },
+};
+
+interface ProviderProps {
+  provider: Provider;
+}
+
+const WatchProvider: FC<ProviderProps> = ({ provider }) => {
+  const { Icon, name, color, colorStyle } = provider;
   return (
     <div
       className="flex items-center p-1 rounded border border-solid border-gray-600"
       style={{ color: colorStyle }}
     >
       <div>
-        <Icon className={`${color} text-xl`} />
+        {Icon && <Icon className={`${color} text-xl`} />}
+        {!Icon && <span className={`${color} text-xs`}>{name}</span>}
       </div>
     </div>
   );
