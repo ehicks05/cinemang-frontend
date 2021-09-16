@@ -68,7 +68,7 @@ const Film = ({
     <div className="flex flex-col gap-4 p-4 rounded-lg" style={cardStyle}>
       <div className="flex gap-4">
         <div className="flex-shrink-0">
-          <img className="" src={posterPath} alt="poster" />
+          <img src={posterPath} alt="poster" />
         </div>
         <div className="flex flex-col gap-1">
           <div>

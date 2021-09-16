@@ -177,6 +177,12 @@ const Films: FC<{
           );
         })}
       </div>
+      <Paginator
+        pageSize={PAGE_SIZE}
+        page={page}
+        setPage={setPage}
+        count={count}
+      />
     </>
   );
 };
