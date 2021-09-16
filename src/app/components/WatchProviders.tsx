@@ -47,11 +47,12 @@ interface Props {
 }
 
 const WatchProviders: FC<Props> = ({ watchProviders }) => {
+  if (!watchProviders) return null;
   const providers = watchProviders
     .map((p) => PROVIDERS[p.provider_id])
     .filter((p) => p);
 
-  if (providers?.length === 0) return null;
+  if (providers.length === 0) return null;
   return (
     <div>
       <div className="flex flex-wrap mx-auto gap-2">
