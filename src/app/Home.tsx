@@ -17,11 +17,11 @@ import SearchForm, {
   ISearchForm,
   DEFAULT_SEARCH_FORM,
 } from "./components/SearchForm";
+import WatchProviders from "./components/WatchProviders";
 import { format } from "date-fns";
 import usePagination from "headless-pagination-react";
 import { PaginatorLink } from "headless-pagination";
 import chroma from "chroma-js";
-import { SiAmazon, SiAppletv, SiHulu, SiNetflix } from "react-icons/si";
 import { useDebounce } from "react-use";
 
 const PAGE_SIZE = 20;
@@ -326,17 +326,7 @@ const Film = ({
           <div className="text-xs text-gray-300">{`${runtime.hours}h ${runtime.minutes}m`}</div>
           <div>{film.director}</div>
           <div>{film.cast}</div>
-          <div>
-            <div className="flex flex-wrap mx-auto gap-2">
-              {film.watch_providers?.map(
-                ({ provider_id: id }: { provider_id: number }) => {
-                  const providerInfo = PROVIDERS[id];
-                  if (!providerInfo) return null;
-                  return <WatchProvider key={id} provider={providerInfo} />;
-                }
-              )}
-            </div>
-          </div>
+          <WatchProviders watchProviders={film.watch_providers} />
         </div>
       </div>
       <div className="flex flex-col gap-4">
@@ -401,46 +391,6 @@ const FilmStat: FC<StatProps> = ({ Icon, color, bgColor, stat }) => {
         <Icon className={color} />
       </div>
       <div className="text-xs sm:text-sm">{stat}</div>
-    </div>
-  );
-};
-
-interface Provider {
-  id: number;
-  name: string;
-  Icon?: IconType;
-  color?: string;
-  colorStyle?: string;
-}
-
-const PROVIDERS: Record<number, Provider> = {
-  8: { id: 8, name: "Netflix", Icon: SiNetflix, color: "text-netflix" },
-  9: {
-    id: 9,
-    name: "Amazon Prime Video",
-    Icon: SiAmazon,
-    color: "text-amazon",
-  },
-  15: { id: 15, name: "Hulu", Icon: SiHulu, colorStyle: "#66aa33" },
-  337: { id: 337, name: "Disney+", Icon: undefined, color: "text-white" },
-  350: { id: 350, name: "Apple TV Plus", Icon: SiAppletv, color: "text-white" },
-};
-
-interface ProviderProps {
-  provider: Provider;
-}
-
-const WatchProvider: FC<ProviderProps> = ({ provider }) => {
-  const { Icon, name, color, colorStyle } = provider;
-  return (
-    <div
-      className="flex p-1 rounded border border-solid border-gray-600"
-      style={{ color: colorStyle }}
-    >
-      <div className="flex">
-        {Icon && <Icon className={`${color} text-xl`} />}
-        {!Icon && <span className={`${color} text-xs`}>{name}</span>}
-      </div>
     </div>
   );
 };
