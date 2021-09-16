@@ -3,24 +3,18 @@ import { IconType } from "react-icons";
 import { SiAmazon, SiAppletv, SiHulu, SiNetflix } from "react-icons/si";
 
 interface Provider {
-  id: number;
-  name: string;
+  id?: number;
+  name?: string;
   Icon?: IconType;
   color?: string;
-  colorStyle?: string;
 }
 
 const PROVIDERS: Record<number, Provider> = {
-  8: { id: 8, name: "Netflix", Icon: SiNetflix, color: "text-netflix" },
-  9: {
-    id: 9,
-    name: "Amazon Prime Video",
-    Icon: SiAmazon,
-    color: "text-amazon",
-  },
-  15: { id: 15, name: "Hulu", Icon: SiHulu, colorStyle: "#66aa33" },
-  337: { id: 337, name: "Disney+", Icon: undefined, color: "text-white" },
-  350: { id: 350, name: "Apple TV Plus", Icon: SiAppletv, color: "text-white" },
+  8: { Icon: SiNetflix, color: "text-netflix" },
+  9: { Icon: SiAmazon, color: "text-amazon" },
+  15: { Icon: SiHulu, color: "text-green-500" },
+  337: { Icon: undefined, color: "text-white" },
+  350: { Icon: SiAppletv, color: "text-white" },
 };
 
 interface WatchProviderProps {
@@ -28,12 +22,9 @@ interface WatchProviderProps {
 }
 
 const WatchProvider: FC<WatchProviderProps> = ({ provider }) => {
-  const { Icon, name, color, colorStyle } = provider;
+  const { Icon, name, color } = provider;
   return (
-    <div
-      className="flex p-1 rounded border border-solid border-gray-600"
-      style={{ color: colorStyle }}
-    >
+    <div className="flex p-1 text-gree rounded border border-solid border-gray-600">
       <div className="flex">
         {Icon && <Icon className={`${color} text-xl`} />}
         {!Icon && <span className={`${color} text-xs`}>{name}</span>}
@@ -43,13 +34,13 @@ const WatchProvider: FC<WatchProviderProps> = ({ provider }) => {
 };
 
 interface Props {
-  watchProviders: { provider_id: number }[];
+  watchProviders: { provider_id: number; provider_name: string }[];
 }
 
 const WatchProviders: FC<Props> = ({ watchProviders }) => {
   if (!watchProviders) return null;
   const providers = watchProviders
-    .map((p) => PROVIDERS[p.provider_id])
+    .map((p) => ({ ...PROVIDERS[p.provider_id], name: p.provider_name }))
     .filter((p) => p);
 
   if (providers.length === 0) return null;
