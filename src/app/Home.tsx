@@ -316,11 +316,11 @@ const Film = ({
         <div className="flex flex-col gap-1">
           <div>
             <span className="font-bold text-lg">{film.title}</span>{" "}
-            <span className="text-xs" title={releasedAt}>
+            <span className="text-xs text-gray-300" title={releasedAt}>
               ({year})
             </span>
           </div>
-          <div className="text-xs">{`${runtime.hours}h ${runtime.minutes}m`}</div>
+          <div className="text-xs text-gray-300">{`${runtime.hours}h ${runtime.minutes}m`}</div>
           <div>{film.director}</div>
           <div>{film.cast}</div>
           <div>
@@ -431,10 +431,10 @@ const WatchProvider: FC<ProviderProps> = ({ provider }) => {
   const { Icon, name, color, colorStyle } = provider;
   return (
     <div
-      className="flex items-center p-1 rounded border border-solid border-gray-600"
+      className="flex p-1 rounded border border-solid border-gray-600"
       style={{ color: colorStyle }}
     >
-      <div>
+      <div className="flex">
         {Icon && <Icon className={`${color} text-xl`} />}
         {!Icon && <span className={`${color} text-xs`}>{name}</span>}
       </div>
