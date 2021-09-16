@@ -294,7 +294,6 @@ const Film = ({
     start: new Date(),
     end: addMinutes(new Date(), Number(film.runtime)),
   });
-  const voteCount = Intl.NumberFormat().format(film.vote_count);
   const genre = getGenreName(findGenre(film.genre_id));
 
   const { data: palette, loading, error } = usePalette(posterPath);
@@ -349,7 +348,11 @@ const Film = ({
             Icon={FaStar}
             color={"text-yellow-300"}
             bgColor={palette.darkVibrant}
-            stat={voteCount}
+            stat={
+              Number(film.vote_count) > 1000
+                ? `${Math.round(film.vote_count / 1000)}k`
+                : film.vote_count
+            }
           />
           <FilmStat
             Icon={FaLanguage}
