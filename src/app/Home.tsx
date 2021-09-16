@@ -1,14 +1,7 @@
 import React, { FC, useEffect, useState } from "react";
 import { Loading } from "components";
 import { useClient } from "react-supabase";
-import {
-  FaChevronLeft,
-  FaChevronRight,
-  FaHeart,
-  FaLanguage,
-  FaStar,
-  FaTheaterMasks,
-} from "react-icons/fa";
+import { FaHeart, FaLanguage, FaStar, FaTheaterMasks } from "react-icons/fa";
 import { addMinutes, intervalToDuration, parseISO } from "date-fns";
 import { IconType } from "react-icons";
 import { usePalette } from "react-palette";
@@ -19,10 +12,9 @@ import SearchForm, {
 } from "./components/SearchForm";
 import WatchProviders from "./components/WatchProviders";
 import { format } from "date-fns";
-import usePagination from "headless-pagination-react";
-import { PaginatorLink } from "headless-pagination";
 import chroma from "chroma-js";
 import { useDebounce } from "react-use";
+import { Paginator } from "./components";
 
 const PAGE_SIZE = 20;
 
@@ -177,7 +169,12 @@ const Films: FC<{
 
   return (
     <>
-      <Paginator page={page} setPage={setPage} count={count} />
+      <Paginator
+        pageSize={PAGE_SIZE}
+        page={page}
+        setPage={setPage}
+        count={count}
+      />
       <div className="grid md:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 3xl:grid-cols-5 gap-4">
         {films.map((film) => {
           return (
@@ -191,75 +188,6 @@ const Films: FC<{
         })}
       </div>
     </>
-  );
-};
-
-interface PaginatorProps {
-  page: number;
-  setPage: React.Dispatch<React.SetStateAction<number>>;
-  count: number;
-}
-const Paginator: FC<PaginatorProps> = ({ page, setPage, count }) => {
-  const { links, hasNext, hasPrevious, from, to } = usePagination({
-    totalItems: count,
-    initialPage: page + 1,
-    perPage: PAGE_SIZE,
-    maxLinks: 7,
-  });
-
-  return (
-    <div className="flex flex-col sm:flex-row items-center justify-between gap-4 p-4 bg-gray-800 rounded-lg">
-      <div>{`Showing ${from}-${Math.min(to, count)} of ${count} results`}</div>
-      <div className="flex -space-x-px">
-        <Link
-          page={page}
-          setPage={setPage}
-          link={{ active: false, disabled: !hasPrevious, label: "" }}
-          prev
-        >
-          <FaChevronLeft className="my-auto text-sm" />
-        </Link>
-        {links.map((link, i) => (
-          <Link key={i} page={page} setPage={setPage} link={link}>
-            {link.label}
-          </Link>
-        ))}
-        <Link
-          page={page}
-          setPage={setPage}
-          link={{ active: false, disabled: !hasNext, label: "" }}
-          next
-        >
-          <FaChevronRight className="my-auto text-sm" />
-        </Link>
-      </div>
-    </div>
-  );
-};
-
-interface LinkProps {
-  page: number;
-  setPage: React.Dispatch<React.SetStateAction<number>>;
-  link: PaginatorLink;
-  prev?: boolean;
-  next?: boolean;
-}
-const Link: FC<LinkProps> = ({ page, setPage, link, prev, next, children }) => {
-  const newPage = prev ? page - 1 : next ? page + 1 : Number(link.label) - 1;
-  const onClick = link.disabled ? undefined : () => setPage(newPage);
-  return (
-    <div
-      onClick={onClick}
-      className={`flex px-2 sm:px-3 sm:py-1 border border-solid border-gray-500 ${
-        link.disabled ? "opacity-60" : "cursor-pointer"
-      } ${!link.disabled && !link.active ? "hover:bg-gray-700" : undefined} ${
-        link.active ? "z-10 bg-green-700 border-green-500" : undefined
-      } ${prev ? "rounded-l-md px-1" : undefined} ${
-        next ? "rounded-r-md px-1" : undefined
-      }`}
-    >
-      {children}
-    </div>
   );
 };
 
