@@ -36,13 +36,10 @@ const Home: FC = () => {
     setLoading(true);
 
     const fetchLanguages = async () => {
-      return (
-        client
-          .from("language")
-          .select("*")
-          // .gt("count", 0)
-          .order("count", { ascending: false })
-      );
+      return client
+        .from("language")
+        .select("*")
+        .order("count", { ascending: false });
     };
 
     const fetchGenres = async () => {
