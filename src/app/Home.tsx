@@ -1,9 +1,7 @@
 import React, { FC, useEffect, useState } from "react";
 import { Loading } from "components";
 import { useClient } from "react-supabase";
-import { FaHeart, FaLanguage, FaStar, FaTheaterMasks } from "react-icons/fa";
 import { addMinutes, intervalToDuration, parseISO } from "date-fns";
-import { IconType } from "react-icons";
 import { usePalette } from "react-palette";
 import { truncate } from "lodash";
 import SearchForm, {
@@ -15,6 +13,7 @@ import { format } from "date-fns";
 import chroma from "chroma-js";
 import { useDebounce } from "react-use";
 import { Paginator } from "./components";
+import Stats from "./components/Stats";
 
 const PAGE_SIZE = 20;
 
@@ -225,7 +224,6 @@ const Film = ({
     start: new Date(),
     end: addMinutes(new Date(), Number(film.runtime)),
   });
-  const genre = getGenreName(findGenre(film.genre_id));
 
   const { data: palette, loading, error } = usePalette(posterPath);
   const [truncateOverview, setTruncateOverview] = useState(true);
@@ -236,6 +234,16 @@ const Film = ({
   const muted = chroma.mix(palette.darkVibrant || "", "rgb(38,38,38)", 0.95);
   const cardStyle = {
     background: `linear-gradient(45deg, ${muted} 5%, ${muted} 45%, ${lessMuted} 95%)`,
+  };
+
+  const statData = {
+    voteAverage: film.vote_average,
+    voteCount:
+      Number(film.vote_count) > 1000
+        ? `${Math.round(film.vote_count / 1000)}k`
+        : film.vote_count,
+    language: findLanguage(film.language_id).name,
+    genre: getGenreName(findGenre(film.genre_id)),
   };
 
   return (
@@ -258,36 +266,7 @@ const Film = ({
         </div>
       </div>
       <div className="flex flex-col gap-4">
-        <div className="flex flex-wrap mx-auto gap-2">
-          <FilmStat
-            Icon={FaHeart}
-            color={"text-red-600"}
-            bgColor={palette.darkVibrant}
-            stat={film.vote_average}
-          />
-          <FilmStat
-            Icon={FaStar}
-            color={"text-yellow-300"}
-            bgColor={palette.darkVibrant}
-            stat={
-              Number(film.vote_count) > 1000
-                ? `${Math.round(film.vote_count / 1000)}k`
-                : film.vote_count
-            }
-          />
-          <FilmStat
-            Icon={FaLanguage}
-            color={"text-green-500"}
-            bgColor={palette.darkVibrant}
-            stat={findLanguage(film.language_id).name}
-          />
-          <FilmStat
-            Icon={FaTheaterMasks}
-            color={"text-blue-400"}
-            bgColor={palette.darkVibrant}
-            stat={genre}
-          />
-        </div>
+        <Stats bgColor={palette.darkVibrant || ""} data={statData} />
         <div
           className="text-justify"
           onClick={() => setTruncateOverview(!truncateOverview)}
@@ -298,27 +277,6 @@ const Film = ({
           })}
         </div>
       </div>
-    </div>
-  );
-};
-
-interface StatProps {
-  Icon: IconType;
-  color?: string;
-  bgColor?: string;
-  stat: string;
-}
-
-const FilmStat: FC<StatProps> = ({ Icon, color, bgColor, stat }) => {
-  return (
-    <div
-      className="flex flex-col gap-1 items-center px-2 py-1 sm:px-4 sm:py-2 rounded-lg bg-gray-700"
-      style={{ backgroundColor: bgColor }}
-    >
-      <div>
-        <Icon className={color} />
-      </div>
-      <div className="text-xs sm:text-sm">{stat}</div>
     </div>
   );
 };
