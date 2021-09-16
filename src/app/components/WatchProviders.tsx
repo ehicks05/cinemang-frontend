@@ -13,16 +13,17 @@ const PROVIDERS: Record<number, Provider> = {
   8: { Icon: SiNetflix, color: "text-netflix" },
   9: { Icon: SiAmazon, color: "text-amazon" },
   15: { Icon: SiHulu, color: "text-green-500" },
-  337: { Icon: undefined, color: "text-white" },
-  350: { Icon: SiAppletv, color: "text-white" },
+  337: { Icon: undefined },
+  350: { Icon: SiAppletv },
 };
 
 interface WatchProviderProps {
   provider: Provider;
 }
 
-const WatchProvider: FC<WatchProviderProps> = ({ provider }) => {
-  const { Icon, name, color } = provider;
+const WatchProvider: FC<WatchProviderProps> = ({
+  provider: { Icon, name, color = "text-gray-400" },
+}) => {
   return (
     <div className="flex p-1 text-gree rounded border border-solid border-gray-600">
       <div className="flex">
