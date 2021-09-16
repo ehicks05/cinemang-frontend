@@ -34,7 +34,7 @@ const Film = ({
   };
 
   const posterPath = film.poster_path
-    ? `https://image.tmdb.org/t/p/w92/${film.poster_path}`
+    ? `https://image.tmdb.org/t/p/w154/${film.poster_path}`
     : "/92x138.png";
   const releasedAt = format(parseISO(film.released_at), "MM-dd-yyyy");
   const year = format(parseISO(film.released_at), "yyyy");
@@ -83,10 +83,9 @@ const Film = ({
           <WatchProviders watchProviders={film.watch_providers} />
         </div>
       </div>
-      <div className="flex flex-col gap-4">
-        <Stats bgColor={palette.darkVibrant || ""} data={statData} />
+      <div className="flex flex-col justify-between h-full gap-4">
         <div
-          className="text-justify"
+          className="text-justify text-sm"
           onClick={() => setTruncateOverview(!truncateOverview)}
         >
           {truncate(film.overview, {
@@ -94,6 +93,7 @@ const Film = ({
             separator: " ",
           })}
         </div>
+        <Stats bgColor={palette.darkVibrant || ""} data={statData} />
       </div>
     </div>
   );
