@@ -13,7 +13,10 @@ import { addMinutes, intervalToDuration, parseISO } from "date-fns";
 import { IconType } from "react-icons";
 import { usePalette } from "react-palette";
 import { truncate } from "lodash";
-import SearchForm, { ISearchForm, DEFAULT_SEARCH_FORM } from "./SearchForm";
+import SearchForm, {
+  ISearchForm,
+  DEFAULT_SEARCH_FORM,
+} from "./components/SearchForm";
 import { format } from "date-fns";
 import usePagination from "headless-pagination-react";
 import { PaginatorLink } from "headless-pagination";
