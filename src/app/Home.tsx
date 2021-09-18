@@ -138,6 +138,7 @@ const Films: FC<{
 
         query
           .order(form.sortColumn, { ascending: form.ascending })
+          .order("tmdb_id", { ascending: true })
           .range(page * PAGE_SIZE, (page + 1) * PAGE_SIZE - 1);
 
         const filmsResults = await query;
