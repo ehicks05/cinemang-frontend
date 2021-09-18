@@ -47,7 +47,7 @@ const WatchProviders: FC<Props> = ({ watchProviders }) => {
   if (providers.length === 0) return null;
   return (
     <div>
-      <div className="flex flex-wrap mx-auto gap-2">
+      <div className="flex flex-wrap items-center mx-auto gap-2">
         {providers.map((provider) => {
           return <WatchProvider key={provider.id} provider={provider} />;
         })}
