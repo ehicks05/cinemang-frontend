@@ -128,12 +128,16 @@ const Films: FC<{
           query.eq("genre_id", form.genre || "*");
         }
 
-        if (form.netflix) {
-          query.eq("netflix", true);
-        }
+        if (form.netflix && form.amazonPrimeVideo) {
+          query.or(`netflix.eq.true,amazon_prime_video.eq.true`);
+        } else {
+          if (form.netflix) {
+            query.eq("netflix", true);
+          }
 
-        if (form.amazonPrimeVideo) {
-          query.eq("amazon_prime_video", true);
+          if (form.amazonPrimeVideo) {
+            query.eq("amazon_prime_video", true);
+          }
         }
 
         query
