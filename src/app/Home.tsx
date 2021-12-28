@@ -111,7 +111,7 @@ const Films: FC<{
         const query = client
           .from("movie")
           .select("*", { count: "exact" })
-          .ilike("title", `${form.title || ""}*`)
+          .ilike("title", `*${encodeURIComponent(form.title || "")}*`)
           .gte("vote_count", form.minVotes || 0)
           .lte("vote_count", form.maxVotes || 100_000_000)
           .gte("vote_average", form.minRating || 0)

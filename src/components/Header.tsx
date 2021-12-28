@@ -1,4 +1,4 @@
-import { FaCat } from "react-icons/all";
+import { FaCat } from "react-icons/fa";
 
 const Header = () => {
   return (
