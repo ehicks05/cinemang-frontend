@@ -18,8 +18,8 @@ module.exports = {
           800: "#0d8e61",
           900: "#0a744f",
         },
-        gray: colors.trueGray,
-        blueGray: colors.blueGray,
+        gray: colors.neutral,
+        blueGray: colors.slate,
       },
       screens: {
         "3xl": "2000px",
