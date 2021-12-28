@@ -6,7 +6,8 @@ module.exports = {
   theme: {
     extend: {
       colors: {
-        "caribbean-green": {
+        // caribbean green
+        "green": {
           50: "#f3fefa",
           100: "#e8fdf6",
           200: "#c5fbe8",
