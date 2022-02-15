@@ -8,6 +8,9 @@ import chroma from "chroma-js";
 import Stats from "./Stats";
 import WatchProviders from "./WatchProviders";
 
+const IMAGE_WIDTH = 300;
+const SCALED_IMAGE = { w: IMAGE_WIDTH / 2, h: (IMAGE_WIDTH / 2) * 1.5 };
+
 const Film = ({
   film,
   genres,
@@ -34,7 +37,7 @@ const Film = ({
   };
 
   const posterPath = film.poster_path
-    ? `https://image.tmdb.org/t/p/w300/${film.poster_path}`
+    ? `https://image.tmdb.org/t/p/w${IMAGE_WIDTH}/${film.poster_path}`
     : "/92x138.png";
   const releasedAt = format(parseISO(film.released_at), "MM-dd-yyyy");
   const year = format(parseISO(film.released_at), "yyyy");
@@ -69,7 +72,12 @@ const Film = ({
     <div className="flex flex-col gap-4 p-4 rounded-lg" style={cardStyle}>
       <div className="flex gap-4">
         <div className="flex-shrink-0">
-          <img src={posterPath} alt="poster" width={150} height={225} />
+          <img
+            src={posterPath}
+            alt="poster"
+            width={SCALED_IMAGE.w}
+            height={SCALED_IMAGE.h}
+          />
         </div>
         <div className="flex flex-col gap-1">
           <div>
