@@ -34,7 +34,7 @@ const Film = ({
   };
 
   const posterPath = film.poster_path
-    ? `https://image.tmdb.org/t/p/w154/${film.poster_path}`
+    ? `https://image.tmdb.org/t/p/w300/${film.poster_path}`
     : "/92x138.png";
   const releasedAt = format(parseISO(film.released_at), "MM-dd-yyyy");
   const year = format(parseISO(film.released_at), "yyyy");
