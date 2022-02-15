@@ -80,6 +80,7 @@ const Film = ({
           <div className="text-xs text-gray-300">{`${runtime.hours}h ${runtime.minutes}m`}</div>
           <div>{film.director}</div>
           <div>{film.cast}</div>
+          <div className="flex-grow"></div>
           <WatchProviders watchProviders={film.watch_providers} />
         </div>
       </div>
