@@ -20,10 +20,10 @@ const LINKS = [
 const Footer = () => {
   return (
     <footer className="flex justify-end p-4 gap-4">
-      {LINKS.map((link) => {
+      {LINKS.map(({ url, icon: Icon }) => {
         return (
-          <Link key={link.url} href={link.url}>
-            <link.icon className="text-green-500 hover:text-green-400 text-3xl" />
+          <Link key={url} href={url}>
+            <Icon className="text-green-500 hover:text-green-400 text-3xl" />
           </Link>
         );
       })}

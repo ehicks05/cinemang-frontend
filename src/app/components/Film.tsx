@@ -46,7 +46,8 @@ const Film = ({
   const { data: palette, loading, error } = usePalette(posterPath);
   const [truncateOverview, setTruncateOverview] = useState(true);
 
-  if (loading || error) return <Loading error={error} loading={loading} />;
+  if (error) return <Loading error={error} loading={loading} />;
+  if (loading) return <div className="w-full h-full bg-slate-700" />;
 
   const lessMuted = chroma.mix(palette.darkVibrant || "", "rgb(38,38,38)", 0.7);
   const muted = chroma.mix(palette.darkVibrant || "", "rgb(38,38,38)", 0.95);
@@ -68,7 +69,7 @@ const Film = ({
     <div className="flex flex-col gap-4 p-4 rounded-lg" style={cardStyle}>
       <div className="flex gap-4">
         <div className="flex-shrink-0">
-          <img src={posterPath} alt="poster" />
+          <img src={posterPath} alt="poster" width={150} height={225} />
         </div>
         <div className="flex flex-col gap-1">
           <div>
