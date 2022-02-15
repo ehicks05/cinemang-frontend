@@ -3,7 +3,7 @@ import { FaHeart, FaLanguage, FaStar, FaTheaterMasks } from "react-icons/fa";
 import { IconType } from "react-icons";
 
 interface StatProps {
-  Icon: IconType;
+  Icon?: IconType;
   color: string;
   bgColor: string;
   value: string;
@@ -12,12 +12,14 @@ interface StatProps {
 const FilmStat: FC<StatProps> = ({ Icon, color, bgColor, value }) => {
   return (
     <div
-      className="flex flex-col gap-1 items-center px-2 py-1 sm:px-4 sm:py-2 rounded-lg bg-gray-700"
+      className="flex gap-1 items-center px-2 py-1 sm:px-4 sm:py-2 rounded-lg bg-gray-700"
       style={{ backgroundColor: bgColor }}
     >
-      <div>
-        <Icon className={color} />
-      </div>
+      {Icon && (
+        <div>
+          <Icon className={color} />
+        </div>
+      )}
       <div className="text-xs sm:text-sm">{value}</div>
     </div>
   );
@@ -35,7 +37,7 @@ interface Props {
 
 const Stats: FC<Props> = ({ bgColor, data }) => {
   const stats = [
-    { icon: FaHeart, color: "text-red-600", value: data.voteAverage },
+    { value: data.voteAverage, icon: FaHeart, color: "text-red-600" },
     {
       value: data.voteCount,
       icon: FaStar,
@@ -43,10 +45,9 @@ const Stats: FC<Props> = ({ bgColor, data }) => {
     },
     {
       value: data.language,
-      icon: FaLanguage,
       color: "text-green-500",
     },
-    { value: data.genre, icon: FaTheaterMasks, color: "text-blue-400" },
+    { value: data.genre, color: "text-blue-400" },
   ];
 
   return (
