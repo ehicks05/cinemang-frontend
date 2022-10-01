@@ -36,8 +36,8 @@ const Film = ({
     return CUSTOM_NAMES[genre.name] || genre.name;
   };
 
-  const posterPath = film.poster_path
-    ? `https://image.tmdb.org/t/p/w${IMAGE_WIDTH}/${film.poster_path}`
+  const posterUrl = film.poster_path
+    ? `https://image.tmdb.org/t/p/w${IMAGE_WIDTH}${film.poster_path}`
     : "/92x138.png";
   const releasedAt = format(parseISO(film.released_at), "MM-dd-yyyy");
   const year = format(parseISO(film.released_at), "yyyy");
@@ -46,7 +46,7 @@ const Film = ({
     end: addMinutes(new Date(), Number(film.runtime)),
   });
 
-  const { data: palette, loading, error } = usePalette(posterPath);
+  const { data: palette, loading, error } = usePalette(posterUrl);
   const [truncateOverview, setTruncateOverview] = useState(true);
 
   if (error) return <Loading error={error} loading={loading} />;
@@ -73,7 +73,7 @@ const Film = ({
       <div className="flex gap-4">
         <div className="flex-shrink-0">
           <img
-            src={posterPath}
+            src={posterUrl}
             alt="poster"
             width={SCALED_IMAGE.w}
             height={SCALED_IMAGE.h}
