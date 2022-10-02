@@ -3,13 +3,17 @@ import { IconType } from "react-icons";
 import { SiAmazon, SiAppletv, SiHulu, SiNetflix } from "react-icons/si";
 
 interface Provider {
-  id?: number;
-  provider_name?: string;
+  provider_id: number;
+  provider_name: string;
+  display_priority: number;
+}
+
+interface ProviderUI {
   Icon?: IconType;
   color?: string;
 }
 
-const PROVIDER_RENDER_DETAILS: Record<number, Provider> = {
+const PROVIDER_RENDER_DETAILS: Record<number, ProviderUI> = {
   8: { Icon: SiNetflix, color: "text-netflix" },
   9: { Icon: SiAmazon, color: "text-amazon" },
   15: { Icon: SiHulu, color: "text-green-500" },
@@ -18,7 +22,7 @@ const PROVIDER_RENDER_DETAILS: Record<number, Provider> = {
 };
 
 interface WatchProviderProps {
-  provider: Provider;
+  provider: Provider & ProviderUI;
 }
 
 const WatchProvider: FC<WatchProviderProps> = ({
@@ -35,25 +39,20 @@ const WatchProvider: FC<WatchProviderProps> = ({
 };
 
 interface Props {
-  watchProviders: {
-    provider_id: number;
-    provider_name: string;
-    display_priority: number;
-  }[];
+  watchProviders: Provider[];
 }
 
 const WatchProviders: FC<Props> = ({ watchProviders }) => {
-  if (!watchProviders) return null;
   const providers = watchProviders
-    .map((p) => ({ ...p, ...PROVIDER_RENDER_DETAILS[p.provider_id] }))
-    .filter((p) => p.display_priority <= 6);
+    .filter((p) => p.display_priority <= 6)
+    .map((p) => ({ ...p, ...PROVIDER_RENDER_DETAILS[p.provider_id] }));
 
   if (providers.length === 0) return null;
   return (
     <div>
       <div className="flex flex-wrap items-center mx-auto gap-2">
         {providers.map((provider) => {
-          return <WatchProvider key={provider.id} provider={provider} />;
+          return <WatchProvider key={provider.provider_id} provider={provider} />;
         })}
       </div>
     </div>

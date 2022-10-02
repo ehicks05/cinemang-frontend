@@ -90,7 +90,7 @@ const Film = ({
           <div>{film.director}</div>
           <div>{film.cast}</div>
           <div className="flex-grow"></div>
-          <WatchProviders watchProviders={film.watch_providers} />
+          {film.watch_providers && <WatchProviders watchProviders={film.watch_providers} />}
         </div>
       </div>
       <div className="flex flex-col justify-between h-full gap-4">
