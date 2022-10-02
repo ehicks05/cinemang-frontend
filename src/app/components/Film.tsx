@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { Loading } from "components";
 import { addMinutes, intervalToDuration, parseISO } from "date-fns";
-import { usePalette } from "react-palette";
+import { usePalette } from "@universemc/react-palette";
 import { truncate } from "lodash";
 import { format } from "date-fns";
 import chroma from "chroma-js";
