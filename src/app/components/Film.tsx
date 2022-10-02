@@ -8,6 +8,8 @@ import chroma from "chroma-js";
 import Stats from "./Stats";
 import WatchProviders from "./WatchProviders";
 
+const nf = Intl.NumberFormat('en-US', {maximumFractionDigits: 1});
+
 const IMAGE_WIDTH = 300;
 const SCALED_IMAGE = { w: IMAGE_WIDTH / 2, h: (IMAGE_WIDTH / 2) * 1.5 };
 
@@ -59,7 +61,7 @@ const Film = ({
   };
 
   const statData = {
-    voteAverage: film.vote_average,
+    voteAverage: nf.format(film.vote_average),
     voteCount:
       Number(film.vote_count) > 1000
         ? `${Math.round(film.vote_count / 1000)}k`

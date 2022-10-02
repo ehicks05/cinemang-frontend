@@ -22,7 +22,7 @@ const SearchForm: FC<Props> = ({ languages, genres }) => {
         className="flex gap-32 justify-between cursor-pointer"
         onClick={() => setIsOpen(!isOpen)}
       >
-        <span className="text-xl">Search</span>
+        <span className="text-xl select-none">Search</span>
         <span>
           <Icon className="inline" />
         </span>
@@ -41,7 +41,7 @@ const FormFields: FC<Props> = ({ languages, genres }) => {
   const [form, setForm] = useQueryParams();
 
   return (
-    <div className="grid sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 text-sm sm:text-sm">
+    <div className="grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 text-sm sm:text-sm">
       <div className="flex gap-2">
         <div className="flex-grow">
           <div>Title</div>

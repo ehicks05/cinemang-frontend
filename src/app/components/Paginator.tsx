@@ -3,6 +3,8 @@ import { FaChevronLeft, FaChevronRight } from "react-icons/fa";
 import usePagination from "headless-pagination-react";
 import { PaginatorLink } from "headless-pagination";
 
+const nf = Intl.NumberFormat('en-US');
+
 interface PaginatorProps {
   pageSize: number;
   page: number;
@@ -19,7 +21,7 @@ const Paginator: FC<PaginatorProps> = ({ pageSize, page, setPage, count }) => {
 
   return (
     <div className="flex flex-col sm:flex-row items-center justify-between gap-4 p-4 bg-gray-800 rounded-lg">
-      <div>{`Showing ${from}-${Math.min(to, count)} of ${count} results`}</div>
+      <div>{`Showing ${from}-${Math.min(to, count)} of ${nf.format(count)} films`}</div>
       <div className="flex -space-x-px">
         <Link
           page={page}

@@ -53,10 +53,12 @@ const Home: FC = () => {
 
   return (
     <div className="flex flex-col gap-4">
-      <SearchForm
-        languages={languages}
-        genres={genres}
-      />
+      <div className="w-full">
+        <SearchForm
+          languages={languages}
+          genres={genres}
+        />
+      </div>
       <Films languages={languages} genres={genres} />
     </div>
   );
