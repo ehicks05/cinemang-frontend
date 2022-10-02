@@ -1,26 +1,13 @@
 import React, { FC, useEffect, useState } from "react";
 import { Loading } from "components";
 import { useClient } from "react-supabase";
+import { useDebounce } from "react-use";
 import SearchForm, {
-  ISearchForm,
   DEFAULT_SEARCH_FORM,
 } from "./components/SearchForm";
-import { useDebounce } from "react-use";
-import { Paginator } from "./components";
-import Film from "./components/Film";
-
-const PAGE_SIZE = 20;
-
-export interface Genre {
-  id: number;
-  name: string;
-}
-
-export interface Language {
-  id: number;
-  name: string;
-  count: number;
-}
+import { PAGE_SIZE } from "../constants";
+import { Language, Genre, ISearchForm } from "../types";
+import { Film, Paginator } from "./components";
 
 const Home: FC = () => {
   const [form, setForm] = useState<ISearchForm>(DEFAULT_SEARCH_FORM);

@@ -5,25 +5,7 @@ import { UnmountClosed } from "react-collapse";
 import { FaChevronDown, FaChevronUp } from "react-icons/fa";
 import { HiSortAscending, HiSortDescending } from "react-icons/hi";
 import { SiAmazon, SiNetflix } from "react-icons/si";
-import { Genre, Language } from "../Home";
-
-export interface ISearchForm {
-  title?: string;
-  minVotes?: number;
-  maxVotes?: number;
-  minReleasedAt?: string;
-  maxReleasedAt?: string;
-  minRating?: number;
-  maxRating?: number;
-  language?: string;
-  genre?: string;
-  netflix?: boolean;
-  amazonPrimeVideo?: boolean;
-
-  sortColumn: string;
-  ascending: boolean;
-  page: number;
-}
+import { Genre, ISearchForm, Language } from "../../types";
 
 export const DEFAULT_SEARCH_FORM = {
   minVotes: 100,
