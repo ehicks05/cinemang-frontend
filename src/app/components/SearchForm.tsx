@@ -5,27 +5,15 @@ import { UnmountClosed } from "react-collapse";
 import { FaChevronDown, FaChevronUp } from "react-icons/fa";
 import { HiSortAscending, HiSortDescending } from "react-icons/hi";
 import { SiAmazon, SiNetflix } from "react-icons/si";
-import { Genre, ISearchForm, Language } from "../../types";
-
-export const DEFAULT_SEARCH_FORM = {
-  minVotes: 100,
-  maxVotes: 100_000,
-  minRating: 6,
-  maxRating: 10,
-  language: "en",
-  sortColumn: "vote_count",
-  ascending: false,
-  page: 0,
-};
+import { useQueryParams } from "use-query-params";
+import { Genre, Language } from "../../types";
 
 interface Props {
-  form: ISearchForm;
-  setForm: React.Dispatch<React.SetStateAction<ISearchForm>>;
   languages: Language[];
   genres: Genre[];
 }
 
-const SearchForm: FC<Props> = ({ form, setForm, languages, genres }) => {
+const SearchForm: FC<Props> = ({ languages, genres }) => {
   const [isOpen, setIsOpen] = useState(process.env.NODE_ENV !== "production");
   const Icon = isOpen ? FaChevronUp : FaChevronDown;
   return (
@@ -41,8 +29,6 @@ const SearchForm: FC<Props> = ({ form, setForm, languages, genres }) => {
       </div>
       <UnmountClosed isOpened={isOpen}>
         <FormFields
-          form={form}
-          setForm={setForm}
           languages={languages}
           genres={genres}
         />
@@ -51,7 +37,9 @@ const SearchForm: FC<Props> = ({ form, setForm, languages, genres }) => {
   );
 };
 
-const FormFields: FC<Props> = ({ form, setForm, languages, genres }) => {
+const FormFields: FC<Props> = ({ languages, genres }) => {
+  const [form, setForm] = useQueryParams();
+
   return (
     <div className="grid sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 text-sm sm:text-sm">
       <div className="flex gap-2">

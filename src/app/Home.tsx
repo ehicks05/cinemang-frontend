@@ -2,16 +2,12 @@ import React, { FC, useEffect, useState } from "react";
 import { Loading } from "components";
 import { useClient } from "react-supabase";
 import { useDebounce } from "react-use";
-import SearchForm, {
-  DEFAULT_SEARCH_FORM,
-} from "./components/SearchForm";
 import { PAGE_SIZE } from "../constants";
-import { Language, Genre, ISearchForm } from "../types";
-import { Film, Paginator } from "./components";
+import { Language, Genre } from "../types";
+import { Film, Paginator, SearchForm } from "./components";
+import { useQueryParams } from "use-query-params";
 
 const Home: FC = () => {
-  const [form, setForm] = useState<ISearchForm>(DEFAULT_SEARCH_FORM);
-
   const client = useClient();
 
   const [languages, setLanguages] = useState<any[] | null>();
@@ -58,22 +54,21 @@ const Home: FC = () => {
   return (
     <div className="flex flex-col gap-4">
       <SearchForm
-        form={form}
-        setForm={setForm}
         languages={languages}
         genres={genres}
       />
-      <Films form={form} languages={languages} genres={genres} />
+      <Films languages={languages} genres={genres} />
     </div>
   );
 };
 
 const Films: FC<{
-  form: ISearchForm;
   languages: Language[];
   genres: Genre[];
-}> = ({ form: formProp, languages, genres }) => {
+}> = ({ languages, genres }) => {
   const client = useClient();
+
+  const [formProp] = useQueryParams();
 
   const [form, setForm] = useState(formProp);
   const [films, setFilms] = useState<any[] | null>();
