@@ -1,42 +1,21 @@
 import { FC } from "react";
-import { IconType } from "react-icons";
-import { SiAmazon, SiAppletv, SiHulu, SiNetflix } from "react-icons/si";
 
 interface Provider {
   provider_id: number;
   provider_name: string;
   display_priority: number;
+  logo_path: string;
 }
 
-interface ProviderUI {
-  Icon?: IconType;
-  color?: string;
-}
-
-const PROVIDER_RENDER_DETAILS: Record<number, ProviderUI> = {
-  8: { Icon: SiNetflix, color: "text-netflix" },
-  9: { Icon: SiAmazon, color: "text-amazon" },
-  15: { Icon: SiHulu, color: "text-green-500" },
-  337: { Icon: undefined },
-  350: { Icon: SiAppletv },
-};
-
-interface WatchProviderProps {
-  provider: Provider & ProviderUI;
-}
-
-const WatchProvider: FC<WatchProviderProps> = ({
-  provider: { Icon, provider_name, color = "text-gray-400" },
-}) => {
-  return (
-    <div className="flex p-1 text-gree rounded border border-solid border-gray-600">
-      <div className="flex">
-        {Icon && <Icon className={`${color} text-xl`} />}
-        {!Icon && <span className={`${color} text-xs`}>{provider_name}</span>}
-      </div>
-    </div>
-  );
-};
+const WatchProvider: FC<{ provider: Provider }> = ({
+  provider: { provider_name, logo_path },
+}) => (
+  <img
+    title={provider_name}
+    className="w-10 h-10 rounded-lg"
+    src={`https://image.tmdb.org/t/p/original${logo_path}`}
+  />
+);
 
 interface Props {
   watchProviders: Provider[];
@@ -44,17 +23,15 @@ interface Props {
 
 const WatchProviders: FC<Props> = ({ watchProviders }) => {
   const providers = watchProviders
-    .filter((p) => p.display_priority <= 6)
-    .map((p) => ({ ...p, ...PROVIDER_RENDER_DETAILS[p.provider_id] }));
+    .filter((p) => p.display_priority <= 16)
+    .sort((p1, p2) => p1.display_priority - p2.display_priority);
 
   if (providers.length === 0) return null;
   return (
-    <div>
-      <div className="flex flex-wrap items-center mx-auto gap-2">
-        {providers.map((provider) => {
-          return <WatchProvider key={provider.provider_id} provider={provider} />;
-        })}
-      </div>
+    <div className="flex flex-wrap gap-2">
+      {providers.map((provider) => {
+        return <WatchProvider key={provider.provider_id} provider={provider} />;
+      })}
     </div>
   );
 };
