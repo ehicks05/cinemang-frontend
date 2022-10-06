@@ -52,6 +52,24 @@ const updateGenres = async () => {
   logger.info(`loaded ${data.length} genres`);
 };
 
+const getWatchProviders = async () => {
+  const result = await api.get(`/watch/providers/movie`, {
+    params: { watch_region: 'US' },
+  });
+  return result.data.results.map((r) => ({
+    ...r,
+    provider_id: r.provider_id.toString(),
+    display_priorities: undefined,
+  }));
+};
+
+const updateWatchProviders = async () => {
+  const data = await getWatchProviders();
+  await prisma.watchProvider.deleteMany();
+  await prisma.watchProvider.createMany({ data });
+  logger.info(`loaded ${data.length} watch providers`);
+};
+
 interface TmdbLanguage {
   iso_639_1: string;
   english_name: string;
@@ -214,7 +232,12 @@ const updateMovies = async () => {
 
 const updateDb = async () => {
   logger.info('starting daily refresh');
-  await Promise.all([updateGenres(), updateLanguages(), updateMovies()]);
+  await Promise.all([
+    updateGenres(),
+    updateLanguages(),
+    updateMovies(),
+    updateWatchProviders(),
+  ]);
 
   await updateLanguageCounts();
   logger.info('finished daily refresh');

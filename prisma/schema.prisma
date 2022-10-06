@@ -50,3 +50,12 @@ model Language {
 
   @@map("language")
 }
+
+model WatchProvider {
+  provider_id      String @id
+  display_priority Int
+  provider_name    String
+  logo_path        String
+
+  @@map("watch_provider")
+}
