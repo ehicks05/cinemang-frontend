@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Loading } from "components";
+import { Loading } from "core-components";
 import { addMinutes, intervalToDuration, parseISO } from "date-fns";
 import { usePalette } from "@universemc/react-palette";
 import { truncate } from "lodash";
@@ -8,7 +8,7 @@ import chroma from "chroma-js";
 import Stats from "./Stats";
 import WatchProviders from "./WatchProviders";
 
-const nf = Intl.NumberFormat('en-US', {maximumFractionDigits: 1});
+const nf = Intl.NumberFormat("en-US", { maximumFractionDigits: 1 });
 
 const IMAGE_WIDTH = 300;
 const SCALED_IMAGE = { w: IMAGE_WIDTH / 2, h: (IMAGE_WIDTH / 2) * 1.5 };
@@ -92,7 +92,9 @@ const Film = ({
           <div>{film.director}</div>
           <div>{film.cast}</div>
           <div className="flex-grow"></div>
-          {film.watch_providers && <WatchProviders watchProviders={film.watch_providers} />}
+          {film.watch_providers && (
+            <WatchProviders watchProviders={film.watch_providers} />
+          )}
         </div>
       </div>
       <div className="flex flex-col justify-between h-full gap-4">

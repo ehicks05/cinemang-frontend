@@ -1,19 +1,25 @@
-import { StringParam, withDefault, NumberParam, BooleanParam } from "use-query-params";
+import {
+  StringParam,
+  withDefault,
+  NumberParam,
+  BooleanParam,
+  ArrayParam,
+} from "use-query-params";
 
 export const PAGE_SIZE = 20;
 
 const DEFAULT_SEARCH_FORM = {
-  title: '',
+  title: "",
   minVotes: 100,
   maxVotes: 100_000,
-  minReleasedAt: '',
-  maxReleasedAt: '',
+  minReleasedAt: "",
+  maxReleasedAt: "",
   minRating: 6,
   maxRating: 10,
   language: "en",
   genre: "",
-  netflix: false,
-  amazonPrimeVideo: false,
+  watchProviders: [],
+
   sortColumn: "vote_count",
   ascending: false,
   page: 0,
@@ -29,8 +35,7 @@ export const QUERY_PARAMS = {
   maxRating: withDefault(NumberParam, DEFAULT_SEARCH_FORM.maxRating),
   language: withDefault(StringParam, DEFAULT_SEARCH_FORM.language),
   genre: withDefault(StringParam, DEFAULT_SEARCH_FORM.genre),
-  netflix: withDefault(BooleanParam, DEFAULT_SEARCH_FORM.netflix),
-  amazonPrimeVideo: withDefault(BooleanParam, DEFAULT_SEARCH_FORM.amazonPrimeVideo),
+  watchProviders: withDefault(ArrayParam, DEFAULT_SEARCH_FORM.watchProviders),
 
   sortColumn: withDefault(StringParam, DEFAULT_SEARCH_FORM.sortColumn),
   ascending: withDefault(BooleanParam, DEFAULT_SEARCH_FORM.ascending),

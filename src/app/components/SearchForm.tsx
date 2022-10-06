@@ -1,4 +1,4 @@
-import { Button } from "components";
+import { Button, ComboBox } from "core-components";
 import { useState } from "react";
 import { FC } from "react";
 import { UnmountClosed } from "react-collapse";
@@ -6,14 +6,15 @@ import { FaChevronDown, FaChevronUp } from "react-icons/fa";
 import { HiSortAscending, HiSortDescending } from "react-icons/hi";
 import { SiAmazon, SiNetflix } from "react-icons/si";
 import { useQueryParams } from "use-query-params";
-import { Genre, Language } from "../../types";
+import { Genre, Language, WatchProvider } from "../../types";
 
 interface Props {
   languages: Language[];
   genres: Genre[];
+  watchProviders: WatchProvider[];
 }
 
-const SearchForm: FC<Props> = ({ languages, genres }) => {
+const SearchForm: FC<Props> = ({ languages, genres, watchProviders }) => {
   const [isOpen, setIsOpen] = useState(process.env.NODE_ENV !== "production");
   const Icon = isOpen ? FaChevronUp : FaChevronDown;
   return (
@@ -31,13 +32,14 @@ const SearchForm: FC<Props> = ({ languages, genres }) => {
         <FormFields
           languages={languages}
           genres={genres}
+          watchProviders={watchProviders}
         />
       </UnmountClosed>
     </div>
   );
 };
 
-const FormFields: FC<Props> = ({ languages, genres }) => {
+const FormFields: FC<Props> = ({ languages, genres, watchProviders }) => {
   const [form, setForm] = useQueryParams();
 
   return (
@@ -51,6 +53,20 @@ const FormFields: FC<Props> = ({ languages, genres }) => {
               className="w-full bg-gray-700"
               value={form.title}
               onChange={(e) => setForm({ ...form, title: e.target.value })}
+            />
+          </div>
+        </div>
+        <div>
+          <div>Stream 2.0</div>
+          <div>
+            <ComboBox
+              options={watchProviders.slice(0, 16).map((provider) => ({
+                id: provider.provider_id,
+                label: provider.provider_name,
+                imageUrl: `https://image.tmdb.org/t/p/original${provider.logo_path}`,
+              }))}
+              selectedOptions={form.watchProviders}
+              onChange={setForm}
             />
           </div>
         </div>

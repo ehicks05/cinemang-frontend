@@ -10,6 +10,7 @@
     "generate": "graphql-codegen --config codegen.yml"
   },
   "dependencies": {
+    "@headlessui/react": "^1.7.3",
     "@supabase/supabase-js": "^1.29.1",
     "@tailwindcss/forms": "^0.4.0",
     "@universemc/react-palette": "^1.0.3",
@@ -20,7 +21,7 @@
     "react": "^17.0.2",
     "react-collapse": "^5.1.1",
     "react-dom": "^17.0.2",
-    "react-icons": "^4.3.1",
+    "react-icons": "^4.4.0",
     "react-loader-spinner": "^4.0.0",
     "react-router-dom": "^6.2.1",
     "react-scripts": "5.0.0",

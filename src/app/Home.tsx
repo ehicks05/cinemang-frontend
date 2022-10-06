@@ -1,17 +1,20 @@
 import React, { FC, useEffect, useState } from "react";
-import { Loading } from "components";
+import { Loading } from "core-components";
 import { useClient } from "react-supabase";
 import { useDebounce } from "react-use";
 import { PAGE_SIZE } from "../constants";
-import { Language, Genre } from "../types";
+import { Language, Genre, WatchProvider } from "../types";
 import { Film, Paginator, SearchForm } from "./components";
 import { useQueryParams } from "use-query-params";
 
 const Home: FC = () => {
   const client = useClient();
 
-  const [languages, setLanguages] = useState<any[] | null>();
-  const [genres, setGenres] = useState<any[] | null>();
+  const [languages, setLanguages] = useState<Language[] | null>();
+  const [genres, setGenres] = useState<Genre[] | null>();
+  const [watchProviders, setWatchProviders] = useState<
+    WatchProvider[] | null
+  >();
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<unknown>();
 
@@ -29,14 +32,24 @@ const Home: FC = () => {
       return client.from("genre").select("*");
     };
 
+    const fetchWatchProviders = async () => {
+      return client
+        .from("watch_provider")
+        .select("*")
+        .order("display_priority");
+    };
+
     const fetchData = async () => {
       try {
-        const [languagesResults, genresResults] = await Promise.all([
-          fetchLanguages(),
-          fetchGenres(),
-        ]);
+        const [languagesResults, genresResults, watchProviderResults] =
+          await Promise.all([
+            fetchLanguages(),
+            fetchGenres(),
+            fetchWatchProviders(),
+          ]);
         setLanguages(languagesResults.data);
         setGenres(genresResults.data);
+        setWatchProviders(watchProviderResults.data);
       } catch (e) {
         setError(e);
       } finally {
@@ -50,6 +63,8 @@ const Home: FC = () => {
   if (error || loading) return <Loading error={error} loading={loading} />;
   if (!genres || genres.length === 0) return <div>No genres</div>;
   if (!languages || languages.length === 0) return <div>No languages</div>;
+  if (!watchProviders || watchProviders.length === 0)
+    return <div>No watch providers</div>;
 
   return (
     <div className="flex flex-col gap-4">
@@ -57,6 +72,7 @@ const Home: FC = () => {
         <SearchForm
           languages={languages}
           genres={genres}
+          watchProviders={watchProviders}
         />
       </div>
       <Films languages={languages} genres={genres} />

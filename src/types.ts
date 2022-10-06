@@ -9,6 +9,13 @@ export interface Language {
   count: number;
 }
 
+export interface WatchProvider {
+  provider_id: number;
+  provider_name: string;
+  display_priority: number;
+  logo_path: string;
+}
+
 export interface ISearchForm {
   title?: string;
   minVotes?: number;
@@ -19,8 +26,7 @@ export interface ISearchForm {
   maxRating?: number;
   language?: string;
   genre?: string;
-  netflix?: boolean;
-  amazonPrimeVideo?: boolean;
+  watchProviders?: WatchProvider[];
 
   sortColumn: string;
   ascending: boolean;
