@@ -3,6 +3,7 @@ import { format, subDays } from 'date-fns';
 import { TextDecoder } from 'util';
 import logger from '../logger';
 import zlib from 'zlib';
+import { DailyFileRow } from './types';
 
 const host = 'https://files.tmdb.org';
 const path = '/p/exports/';
@@ -20,23 +21,25 @@ const getFilename = () =>
  * The export job runs every day starting at around 7:00 AM UTC, and all files are
  * available by 8:00 AM UTC.
  */
-export const getDailyFileIds = async () => {
+export const getDailyFile = async (): Promise<DailyFileRow[]> => {
   const url = `${host}${path}${getFilename()}`;
 
+  const result = await axios.get(url, {
+    responseType: 'arraybuffer',
+    maxBodyLength: 100_000_000,
+  });
+  const unzipped = zlib.gunzipSync(result.data);
+  const decoded = new TextDecoder().decode(unzipped);
+  return decoded
+    .split('\n')
+    .filter((l) => l)
+    .map((line) => JSON.parse(line));
+};
+
+export const getDailyFileIds = async () => {
   try {
-    const result = await axios.get(url, {
-      responseType: 'arraybuffer',
-      maxBodyLength: 100_000_000,
-    });
-    const unzipped = zlib.gunzipSync(result.data);
-    const decoded = new TextDecoder().decode(unzipped);
-    return decoded
-      .split('\n')
-      .filter((l) => l)
-      .map((line) => {
-        const json = JSON.parse(line);
-        return json.id;
-      });
+    const file = await getDailyFile();
+    file.map((line) => line.id);
   } catch (e) {
     logger.error(e);
   }

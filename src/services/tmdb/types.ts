@@ -11,3 +11,11 @@ export interface Crew {
   name: string;
   job: string;
 }
+
+export interface DailyFileRow {
+  adult: boolean;
+  id: number;
+  original_title: string;
+  popularity: number;
+  video: boolean;
+}
