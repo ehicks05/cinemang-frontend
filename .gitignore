@@ -2,7 +2,6 @@
 # Project exclude paths
 /node_modules/
 /.idea/
-package-lock.json
 .env.development
 /dist/
 .env

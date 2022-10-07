@@ -22,7 +22,14 @@ export const updateLanguages = async () => {
 
 export const updateWatchProviders = async () => {
   const data = await getWatchProviders();
-  await prisma.watchProvider.deleteMany();
-  await prisma.watchProvider.createMany({ data });
+  const existingIds = (await prisma.watchProvider.findMany()).map(
+    (e) => e.provider_id,
+  );
+
+  const newProviders = data.filter(
+    (d: { provider_id: number }) => !existingIds.includes(d.provider_id),
+  );
+
+  await prisma.watchProvider.createMany({ data: newProviders });
   logger.info(`loaded ${data.length} watch providers`);
 };
