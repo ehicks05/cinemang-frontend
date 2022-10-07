@@ -1,5 +1,5 @@
 import { scheduleJob } from 'node-schedule';
-import updateDb from './tmdb_api';
+import updateDb from './app/tmdb_loader';
 
 export function scheduleUpdateMovies() {
   return scheduleJob('0 10 * * *', async function () {
