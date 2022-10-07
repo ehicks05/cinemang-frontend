@@ -39,7 +39,7 @@ export const getDailyFile = async (): Promise<DailyFileRow[]> => {
 export const getDailyFileIds = async () => {
   try {
     const file = await getDailyFile();
-    file.map((line) => line.id);
+    return file.map((line) => line.id);
   } catch (e) {
     logger.error(e);
   }
