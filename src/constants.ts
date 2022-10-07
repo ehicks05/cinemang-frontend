@@ -3,7 +3,7 @@ import {
   withDefault,
   NumberParam,
   BooleanParam,
-  ArrayParam,
+  DelimitedNumericArrayParam,
 } from "use-query-params";
 
 export const PAGE_SIZE = 20;
@@ -35,7 +35,10 @@ export const QUERY_PARAMS = {
   maxRating: withDefault(NumberParam, DEFAULT_SEARCH_FORM.maxRating),
   language: withDefault(StringParam, DEFAULT_SEARCH_FORM.language),
   genre: withDefault(StringParam, DEFAULT_SEARCH_FORM.genre),
-  watchProviders: withDefault(ArrayParam, DEFAULT_SEARCH_FORM.watchProviders),
+  watchProviders: withDefault(
+    DelimitedNumericArrayParam,
+    DEFAULT_SEARCH_FORM.watchProviders
+  ),
 
   sortColumn: withDefault(StringParam, DEFAULT_SEARCH_FORM.sortColumn),
   ascending: withDefault(BooleanParam, DEFAULT_SEARCH_FORM.ascending),

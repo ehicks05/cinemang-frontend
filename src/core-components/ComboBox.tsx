@@ -1,48 +1,62 @@
 import { Fragment, useState } from "react";
 import { Combobox } from "@headlessui/react";
 import { HiCheck, HiChevronDown, HiChevronUp } from "react-icons/hi";
+import {
+  SetQuery,
+  QueryParamConfigMap,
+  DecodedValueMap,
+} from "use-query-params";
 
-interface Option {
-  id: string | number;
+type Id = string | number;
+
+export interface Option {
+  id: Id;
   label: string;
   imageUrl: string;
 }
 
-interface Props {
-  options: Option[];
-  selectedOptions: (string | number)[];
-  onChange: (selectedOptions: (string | number)[]) => void;
+interface Props<T> {
+  options: T[];
+  selectedOptionIds: Id[];
+  formKey: string;
+  form: DecodedValueMap<QueryParamConfigMap>;
+  onChange: SetQuery<QueryParamConfigMap>;
+  mapper: (input: T) => Option;
 }
 
-const ComboBox = ({ options, onChange }: Props) => {
-  const [selectedOptions, setSelectedOptions] = useState<Option[]>([]);
+const ComboBox = <T extends unknown>({
+  options,
+  selectedOptionIds,
+  formKey,
+  form,
+  onChange,
+  mapper,
+}: Props<T>) => {
   const [query, setQuery] = useState("");
+
+  const parsedOptions = options.map(mapper);
 
   const filteredOptions =
     query === ""
-      ? options
-      : options.filter(({ label }) => {
+      ? parsedOptions
+      : parsedOptions.filter(({ label }) => {
           return label.toLowerCase().includes(query.toLowerCase());
         });
 
-  const handleChange = (values: Option[]) => {
-    setSelectedOptions(values);
-    onChange(values.map((v) => v.id));
+  const handleChange = (values: Id[]) => {
+    onChange({ ...form, [formKey]: values });
   };
 
   return (
     <div className="relative">
       <Combobox
-        value={selectedOptions}
-        onChange={handleChange}
+        defaultValue={selectedOptionIds}
+        onChange={(values) => handleChange(values)}
         multiple
-        nullable
       >
-        {/* {JSON.stringify(selectedOptions, null, 2)} */}
         <Combobox.Input
-          className={"relative bg-gray-700"}
+          className={"bg-gray-700"}
           onChange={(event) => setQuery(event.target.value)}
-          displayValue={(option: Option) => option.label}
         />
         <Combobox.Button
           className={"flex flex-col absolute right-2 top-1.5 w-4"}
@@ -52,7 +66,7 @@ const ComboBox = ({ options, onChange }: Props) => {
         </Combobox.Button>
         <Combobox.Options className={"flex flex-col bg-gray-700"}>
           {filteredOptions.map((option) => (
-            <Combobox.Option key={option.label} value={option} as={Fragment}>
+            <Combobox.Option key={option.id} value={option.id} as={Fragment}>
               {({ active, selected }) => (
                 <li
                   className={`flex items-center justify-between p-2 cursor-pointer bg-gray-700 ${

@@ -1,13 +1,7 @@
 import { FC } from "react";
+import { WatchProvider as IWatchProvider } from "types";
 
-interface Provider {
-  provider_id: number;
-  provider_name: string;
-  display_priority: number;
-  logo_path: string;
-}
-
-const WatchProvider: FC<{ provider: Provider }> = ({
+const WatchProvider: FC<{ provider: IWatchProvider }> = ({
   provider: { provider_name, logo_path },
 }) => (
   <img
@@ -18,11 +12,14 @@ const WatchProvider: FC<{ provider: Provider }> = ({
 );
 
 interface Props {
-  watchProviders: Provider[];
+  watchProviders: IWatchProvider[];
+  selectedIds: { provider_id: number }[];
 }
 
-const WatchProviders: FC<Props> = ({ watchProviders }) => {
-  const providers = watchProviders
+const WatchProviders: FC<Props> = ({ watchProviders, selectedIds }) => {
+  const providers = selectedIds
+    .map((id) => watchProviders.find((wp) => wp.provider_id === id.provider_id))
+    .filter((p): p is IWatchProvider => p !== null && p !== undefined)
     .filter((p) => p.display_priority <= 16)
     .sort((p1, p2) => p1.display_priority - p2.display_priority);
 

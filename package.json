@@ -28,8 +28,6 @@
     "react-supabase": "^0.2.0",
     "react-use": "^17.3.1",
     "tailwindcss": "^3.0.7",
-    "tailwindcss-brand-colors": "^0.3.1",
-    "timeago-react": "^3.0.4",
     "use-query-params": "^2.1.1"
   },
   "devDependencies": {

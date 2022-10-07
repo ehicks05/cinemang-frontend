@@ -4,7 +4,6 @@ import { FC } from "react";
 import { UnmountClosed } from "react-collapse";
 import { FaChevronDown, FaChevronUp } from "react-icons/fa";
 import { HiSortAscending, HiSortDescending } from "react-icons/hi";
-import { SiAmazon, SiNetflix } from "react-icons/si";
 import { useQueryParams } from "use-query-params";
 import { Genre, Language, WatchProvider } from "../../types";
 
@@ -57,48 +56,22 @@ const FormFields: FC<Props> = ({ languages, genres, watchProviders }) => {
           </div>
         </div>
         <div>
-          <div>Stream 2.0</div>
+          <div>Stream</div>
           <div>
             <ComboBox
-              options={watchProviders.slice(0, 16).map((provider) => ({
+              options={watchProviders
+                .sort((o1, o2) => o1.display_priority - o2.display_priority)
+                .slice(0, 16)}
+              selectedOptionIds={form.watchProviders}
+              formKey="watchProviders"
+              form={form}
+              onChange={setForm}
+              mapper={(provider) => ({
                 id: provider.provider_id,
                 label: provider.provider_name,
                 imageUrl: `https://image.tmdb.org/t/p/original${provider.logo_path}`,
-              }))}
-              selectedOptions={form.watchProviders}
-              onChange={setForm}
+              })}
             />
-          </div>
-        </div>
-        <div>
-          <div>Stream</div>
-          <div className="flex gap-2">
-            <div
-              className={`p-2 border border-solid border-gray-600 ${
-                form.netflix ? "bg-gray-600" : ""
-              }`}
-              onClick={() => setForm({ ...form, netflix: !form.netflix })}
-            >
-              <SiNetflix
-                className={`text-2xl ${
-                  form.netflix ? "text-netflix" : "text-gray-400"
-                }`}
-              />
-            </div>
-            <div
-              className={`p-2 border border-solid border-gray-600 ${
-                form.amazonPrimeVideo ? "bg-gray-600" : ""
-              }`}
-              onClick={() =>
-                setForm({ ...form, amazonPrimeVideo: !form.amazonPrimeVideo })
-              }
-            >
-              <SiAmazon
-                className={`text-2xl ${
-                  form.amazonPrimeVideo ? "text-amazon" : "text-gray-400"
-                }`}
-              />
-            </div>
           </div>
         </div>
       </div>

@@ -75,7 +75,11 @@ const Home: FC = () => {
           watchProviders={watchProviders}
         />
       </div>
-      <Films languages={languages} genres={genres} />
+      <Films
+        languages={languages}
+        genres={genres}
+        watchProviders={watchProviders}
+      />
     </div>
   );
 };
@@ -83,7 +87,8 @@ const Home: FC = () => {
 const Films: FC<{
   languages: Language[];
   genres: Genre[];
-}> = ({ languages, genres }) => {
+  watchProviders: WatchProvider[];
+}> = ({ languages, genres, watchProviders }) => {
   const client = useClient();
 
   const [formProp] = useQueryParams();
@@ -110,7 +115,7 @@ const Films: FC<{
       try {
         const query = client
           .from("movie")
-          .select("*", { count: "exact" })
+          .select("*, watch_provider!inner(provider_id)", { count: "exact" })
           .ilike("title", `%${form.title || ""}%`)
           .gte("vote_count", form.minVotes || 0)
           .lte("vote_count", form.maxVotes || 100_000_000)
@@ -122,22 +127,13 @@ const Films: FC<{
             form.maxReleasedAt || new Date().toLocaleDateString()
           )
           .like("language_id", form.language || "*");
-        // .neq("watch_providers", null)
 
         if (form.genre) {
           query.eq("genre_id", form.genre || "*");
         }
 
-        if (form.netflix && form.amazonPrimeVideo) {
-          query.or(`netflix.eq.true,amazon_prime_video.eq.true`);
-        } else {
-          if (form.netflix) {
-            query.eq("netflix", true);
-          }
-
-          if (form.amazonPrimeVideo) {
-            query.eq("amazon_prime_video", true);
-          }
+        if (form.watchProviders.length > 0) {
+          query.in("watch_provider.provider_id", form.watchProviders);
         }
 
         query
@@ -178,6 +174,7 @@ const Films: FC<{
               film={film}
               genres={genres}
               languages={languages}
+              watchProviders={watchProviders}
             />
           );
         })}

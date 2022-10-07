@@ -26,7 +26,7 @@ export interface ISearchForm {
   maxRating?: number;
   language?: string;
   genre?: string;
-  watchProviders?: WatchProvider[];
+  watchProviders?: number[];
 
   sortColumn: string;
   ascending: boolean;

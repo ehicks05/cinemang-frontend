@@ -7,6 +7,7 @@ import { format } from "date-fns";
 import chroma from "chroma-js";
 import Stats from "./Stats";
 import WatchProviders from "./WatchProviders";
+import { Genre, Language, WatchProvider } from "types";
 
 const nf = Intl.NumberFormat("en-US", { maximumFractionDigits: 1 });
 
@@ -17,25 +18,27 @@ const Film = ({
   film,
   genres,
   languages,
+  watchProviders,
 }: {
   film: any;
-  genres: any[];
-  languages: any[];
+  genres: Genre[];
+  languages: Language[];
+  watchProviders: WatchProvider[];
 }) => {
-  const findLanguage = (languageId: string) => {
-    return languages?.find((lang) => lang.id === languageId);
+  const findLanguage = (languageId: number) => {
+    return languages.find((lang) => lang.id === languageId);
   };
 
-  const findGenre = (genreId: string) => {
-    return genres?.find((genre) => genre.id === genreId);
+  const findGenre = (genreId: number) => {
+    return genres.find((genre) => genre.id === genreId);
   };
 
-  const getGenreName = (genre: { name: string }) => {
+  const getGenreName = (genreName: string) => {
     const CUSTOM_NAMES = { "Science Fiction": "Sci-Fi" } as Record<
       string,
       string
     >;
-    return CUSTOM_NAMES[genre.name] || genre.name;
+    return CUSTOM_NAMES[genreName] || genreName;
   };
 
   const posterUrl = film.poster_path
@@ -66,8 +69,8 @@ const Film = ({
       Number(film.vote_count) > 1000
         ? `${Math.round(film.vote_count / 1000)}k`
         : film.vote_count,
-    language: findLanguage(film.language_id).name,
-    genre: getGenreName(findGenre(film.genre_id)),
+    language: findLanguage(film.language_id)?.name || "?",
+    genre: getGenreName(findGenre(film.genre_id)?.name || "?"),
   };
 
   return (
@@ -92,8 +95,11 @@ const Film = ({
           <div>{film.director}</div>
           <div>{film.cast}</div>
           <div className="flex-grow"></div>
-          {film.watch_providers && (
-            <WatchProviders watchProviders={film.watch_providers} />
+          {film.watch_provider && (
+            <WatchProviders
+              watchProviders={watchProviders}
+              selectedIds={film.watch_provider}
+            />
           )}
         </div>
       </div>
