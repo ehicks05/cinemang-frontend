@@ -20,7 +20,7 @@ const WatchProviders: FC<Props> = ({ watchProviders, selectedIds }) => {
   const providers = selectedIds
     .map((id) => watchProviders.find((wp) => wp.provider_id === id.provider_id))
     .filter((p): p is IWatchProvider => p !== null && p !== undefined)
-    .filter((p) => p.display_priority <= 16)
+    // .filter((p) => p.display_priority <= 16)
     .sort((p1, p2) => p1.display_priority - p2.display_priority);
 
   if (providers.length === 0) return null;
