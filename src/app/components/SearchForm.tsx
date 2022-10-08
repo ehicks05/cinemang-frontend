@@ -41,6 +41,9 @@ const SearchForm: FC<Props> = ({ languages, genres, watchProviders }) => {
 const FormFields: FC<Props> = ({ languages, genres, watchProviders }) => {
   const [form, setForm] = useQueryParams();
 
+  const getStreamLabel = (count: number) =>
+    count !== 0 ? `(${count} selected)` : "";
+
   return (
     <div className="grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 text-sm sm:text-sm">
       <div className="flex gap-2">
@@ -55,13 +58,18 @@ const FormFields: FC<Props> = ({ languages, genres, watchProviders }) => {
             />
           </div>
         </div>
-        <div>
-          <div>Stream</div>
+      </div>
+      <div className="flex gap-2">
+        <div className="w-full">
+          <div>Stream {getStreamLabel(form.watchProviders.length)}</div>
           <div>
             <ComboBox
-              options={watchProviders
-                .sort((o1, o2) => o1.display_priority - o2.display_priority)
-                .slice(0, 16)}
+              options={
+                watchProviders.sort(
+                  (o1, o2) => o1.display_priority - o2.display_priority
+                )
+                // .slice(0, 16)
+              }
               selectedOptionIds={form.watchProviders}
               formKey="watchProviders"
               form={form}

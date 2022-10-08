@@ -55,13 +55,8 @@ const ComboBox = <T extends unknown>({
         multiple
       >
         <Combobox.Input
-          className={"bg-gray-700"}
+          className={"w-full bg-gray-700"}
           onChange={(event) => setQuery(event.target.value)}
-          displayValue={(selectedOptionIds) =>
-            selectedOptionIds?.length
-              ? `${selectedOptionIds?.length || 0} selected`
-              : ""
-          }
         />
         <Combobox.Button
           className={"flex flex-col absolute right-2 top-1.5 w-4"}
@@ -80,7 +75,9 @@ const ComboBox = <T extends unknown>({
                 >
                   <div className="flex items-center gap-2">
                     <img
-                      className="h-6 w-6 rounded"
+                      className={`h-6 w-6 rounded ${
+                        !selected ? "opacity-50" : ""
+                      }`}
                       src={option.imageUrl}
                       alt="logo"
                     />
