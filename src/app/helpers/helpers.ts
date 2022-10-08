@@ -39,31 +39,15 @@ export const updateWatchProviders = async () => {
 
   const watchProviders = data.map(setUSPriority);
 
-  const existingIds = (await prisma.watchProvider.findMany()).map(
-    (e) => e.provider_id,
-  );
-
-  const newProviders = watchProviders.filter(
-    (d: { provider_id: number }) => !existingIds.includes(d.provider_id),
-  );
-
-  const existingProviders = watchProviders.filter(
-    (d: { provider_id: number }) => existingIds.includes(d.provider_id),
-  );
-
-  await prisma.watchProvider.createMany({ data: newProviders });
-  logger.info(`added ${newProviders.length} watch providers`);
-
-  // await prisma.watchProvider.updateMany({ data: existingProviders });
-
   await Promise.all(
-    existingProviders.map(async (p) => {
-      await prisma.watchProvider.update({
-        data: p,
+    watchProviders.map(async (p) => {
+      await prisma.watchProvider.upsert({
+        create: p,
+        update: p,
         where: { provider_id: p.provider_id },
       });
     }),
   );
 
-  logger.info(`updated ${existingProviders.length} watch providers`);
+  logger.info(`upserted ${watchProviders.length} watch providers`);
 };
