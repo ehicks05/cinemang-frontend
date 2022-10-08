@@ -1,7 +1,7 @@
 import { format, subDays } from 'date-fns';
 import logger from '../logger';
 import tmdb from './tmdb';
-import { TmdbLanguage } from './types';
+import { Genre, Language, WatchProvider } from './types';
 
 export const getMovie = async (id: number) => {
   try {
@@ -16,28 +16,25 @@ export const getMovie = async (id: number) => {
 
 export const getGenres = async () => {
   const result = await tmdb.get(`/genre/movie/list`);
-  return result.data.genres;
+  const genres: Genre[] = result.data.genres;
+  return genres;
 };
 
 export const getLanguages = async () => {
   const result = await tmdb.get(`/configuration/languages`);
-  return result.data.map((lang: TmdbLanguage) => ({
-    id: lang.iso_639_1,
-    name: lang.english_name,
-  }));
+  const languages: Language[] = result.data;
+  return languages;
 };
 
 export const getWatchProviders = async () => {
-  const result = await tmdb.get(`/watch/providers/movie`, {
-    params: { watch_region: 'US' },
-  });
-  return result.data.results.map((r: { provider_id: string }) => ({
-    ...r,
-    display_priorities: undefined,
-  }));
+  const url = '/watch/providers/movie';
+  const config = { params: { watch_region: 'US' } };
+  const result = await tmdb.get(url, config);
+  const providers: WatchProvider[] = result.data.results;
+  return providers;
 };
 
-export const getRecentlyChangedMovieIds = async () => {
+export const getRecentlyChangedMovieIds = async (): Promise<number[]> => {
   const start_date = format(subDays(new Date(), 1), 'yyyy-MM-dd');
   try {
     const result = await tmdb.get(`/movie/changes`, { params: { start_date } });
@@ -46,4 +43,5 @@ export const getRecentlyChangedMovieIds = async () => {
   } catch (e) {
     logger.error(e);
   }
+  return [];
 };

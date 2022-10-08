@@ -106,7 +106,7 @@ const updateMovies = async () => {
 };
 
 const updateDb = async () => {
-  logger.info('starting daily refresh');
+  logger.info('starting tmdb_loader script');
   await Promise.all([
     updateGenres(),
     updateLanguages(),
@@ -116,7 +116,7 @@ const updateDb = async () => {
   await updateMovies();
 
   await updateLanguageCounts();
-  logger.info('finished daily refresh');
+  logger.info('finished tmdb_loader script');
 };
 
 export default updateDb;
