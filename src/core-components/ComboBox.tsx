@@ -57,6 +57,11 @@ const ComboBox = <T extends unknown>({
         <Combobox.Input
           className={"bg-gray-700"}
           onChange={(event) => setQuery(event.target.value)}
+          displayValue={(selectedOptionIds) =>
+            selectedOptionIds?.length
+              ? `${selectedOptionIds?.length || 0} selected`
+              : ""
+          }
         />
         <Combobox.Button
           className={"flex flex-col absolute right-2 top-1.5 w-4"}
