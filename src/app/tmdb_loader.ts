@@ -9,7 +9,10 @@ import {
 } from './helpers/helpers';
 import logger from '../services/logger';
 import prisma from '../services/prisma';
-import { updateLanguageCounts } from './helpers/update_language_counts';
+import {
+  updateLanguageCounts,
+  updateWatchProviderCounts,
+} from './helpers/update_counts';
 import { movieIdToParsedMovie } from './helpers/parse_movie';
 import { argv } from '../services/args';
 
@@ -116,6 +119,7 @@ const updateDb = async () => {
   await updateMovies();
 
   await updateLanguageCounts();
+  await updateWatchProviderCounts();
   logger.info('finished tmdb_loader script');
 };
 
