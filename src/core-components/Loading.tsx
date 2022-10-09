@@ -1,16 +1,17 @@
 import { FC } from "react";
-import Loader from "react-loader-spinner";
+import { Oval } from "react-loader-spinner";
 
 interface Props {
   loading: boolean;
   error: any;
+  size?: number;
 }
 
-const Loading: FC<Props> = ({ loading, error }) => {
+const Loading: FC<Props> = ({ loading, error, size = 256 }) => {
   if (loading) {
     return (
       <div className="flex items-center justify-center flex-grow">
-        <Loader type="Rings" color="#15eda1" height={256} width={256} />
+        <Oval color="#15eda1" height={size} width={size} />
       </div>
     );
   }
