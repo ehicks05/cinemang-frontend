@@ -1,5 +1,5 @@
 import { FC } from "react";
-import { Oval } from "react-loader-spinner";
+import { VscLoading } from "react-icons/vsc";
 
 interface Props {
   loading: boolean;
@@ -7,11 +7,11 @@ interface Props {
   size?: number;
 }
 
-const Loading: FC<Props> = ({ loading, error, size = 256 }) => {
+const Loading: FC<Props> = ({ loading, error, size = 128 }) => {
   if (loading) {
     return (
       <div className="flex items-center justify-center flex-grow">
-        <Oval color="#15eda1" height={size} width={size} />
+        <VscLoading className="animate-spin" color="#15eda1" size={size} />
       </div>
     );
   }

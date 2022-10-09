@@ -14,14 +14,7 @@ const Home: FC = () => {
   } = useFetchSystemData();
 
   if (error || loading) return <Loading error={error} loading={loading} />;
-  if (
-    !genres ||
-    genres.length === 0 ||
-    !languages ||
-    languages.length === 0 ||
-    !watchProviders ||
-    watchProviders.length === 0
-  )
+  if (!genres?.length || !languages?.length || !watchProviders?.length)
     return <div>Missing system data</div>;
 
   return (
