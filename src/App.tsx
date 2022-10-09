@@ -1,16 +1,16 @@
-import React from "react";
-import { Route, Routes } from "react-router-dom";
+import React from 'react';
+import { Route, Routes } from 'react-router-dom';
 
-import { Header, Footer } from "./core-components";
-import { Home } from "./app/index";
+import { Header, Footer } from './core-components';
+import { Home } from './app/index';
 
 function App() {
   return (
-    <div className="flex flex-col min-h-screen text-gray-50 bg-gradient-to-tr from-indigo-900 to-green-900">
+    <div className="flex min-h-screen flex-col bg-gradient-to-tr from-indigo-900 to-green-900 text-gray-50">
       <Header />
-      <div className="p-4 flex-grow flex flex-col h-full">
+      <div className="flex h-full flex-grow flex-col p-4">
         <Routes>
-          <Route path={"/"} element={<Home />} />
+          <Route element={<Home />} path={'/'} />
         </Routes>
       </div>
       <Footer />

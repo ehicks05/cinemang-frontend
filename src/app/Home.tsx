@@ -1,10 +1,10 @@
-import React, { FC, useState } from "react";
-import { Loading } from "core-components";
-import { PAGE_SIZE } from "../constants";
-import { Language, Genre, WatchProvider } from "../types";
-import { Film, Paginator, SearchForm } from "./components";
-import { useFetchSystemData } from "./hooks/useFetchSystemData";
-import { useFetchFilms } from "./hooks/useFetchFilms";
+import React, { FC, useState } from 'react';
+import { Loading } from '../core-components';
+import { PAGE_SIZE } from '../constants';
+import { Language, Genre, WatchProvider } from '../types';
+import { Film, Paginator, SearchForm } from './components';
+import { useFetchSystemData } from './hooks/useFetchSystemData';
+import { useFetchFilms } from './hooks/useFetchFilms';
 
 const Home: FC = () => {
   const {
@@ -21,14 +21,14 @@ const Home: FC = () => {
     <div className="flex flex-col gap-4">
       <div className="w-full">
         <SearchForm
-          languages={languages}
           genres={genres}
+          languages={languages}
           watchProviders={watchProviders}
         />
       </div>
       <Films
-        languages={languages}
         genres={genres}
+        languages={languages}
         watchProviders={watchProviders}
       />
     </div>
@@ -36,8 +36,8 @@ const Home: FC = () => {
 };
 
 const Films: FC<{
-  languages: Language[];
   genres: Genre[];
+  languages: Language[];
   watchProviders: WatchProvider[];
 }> = ({ languages, genres, watchProviders }) => {
   const [page, setPage] = useState(0);
@@ -50,18 +50,18 @@ const Films: FC<{
   return (
     <>
       <Paginator
-        pageSize={PAGE_SIZE}
-        page={page}
-        setPage={setPage}
         count={count}
+        page={page}
+        pageSize={PAGE_SIZE}
+        setPage={setPage}
       />
-      <div className="grid md:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 3xl:grid-cols-5 gap-4">
+      <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 3xl:grid-cols-5">
         {films.map((film) => {
           return (
             <Film
-              key={film.tmdb_id}
               film={film}
               genres={genres}
+              key={film.tmdb_id}
               languages={languages}
               watchProviders={watchProviders}
             />
@@ -69,10 +69,10 @@ const Films: FC<{
         })}
       </div>
       <Paginator
-        pageSize={PAGE_SIZE}
-        page={page}
-        setPage={setPage}
         count={count}
+        page={page}
+        pageSize={PAGE_SIZE}
+        setPage={setPage}
       />
     </>
   );

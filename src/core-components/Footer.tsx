@@ -1,29 +1,29 @@
-import React, { FC } from "react";
-import { FaGithubSquare, FaHome } from "react-icons/fa";
-import { SiThemoviedatabase } from "react-icons/si";
+import React, { FC, ReactNode } from 'react';
+import { FaGithubSquare, FaHome } from 'react-icons/fa';
+import { SiThemoviedatabase } from 'react-icons/si';
 
 const LINKS = [
   {
-    url: "https://www.themoviedb.org",
     icon: SiThemoviedatabase,
+    url: 'https://www.themoviedb.org',
   },
   {
-    url: "https://www.github.com/ehicks05/cinemang-frontend",
     icon: FaGithubSquare,
+    url: 'https://www.github.com/ehicks05/cinemang-frontend',
   },
   {
-    url: "https://ehicks.net",
     icon: FaHome,
+    url: 'https://ehicks.net',
   },
 ];
 
 const Footer = () => {
   return (
-    <footer className="flex justify-end p-4 gap-4">
+    <footer className="flex justify-end gap-4 p-4">
       {LINKS.map(({ url, icon: Icon }) => {
         return (
-          <Link key={url} href={url}>
-            <Icon className="text-green-500 hover:text-green-400 text-3xl" />
+          <Link href={url} key={url}>
+            <Icon className="text-3xl text-green-500 hover:text-green-400" />
           </Link>
         );
       })}
@@ -31,9 +31,12 @@ const Footer = () => {
   );
 };
 
-const Link: FC<{ href: string }> = ({ href, children }) => {
+const Link: FC<{ children: ReactNode; href: string }> = ({
+  href,
+  children,
+}) => {
   return (
-    <a href={href} target="_blank" rel="noreferrer">
+    <a href={href} rel="noreferrer" target="_blank">
       {children}
     </a>
   );

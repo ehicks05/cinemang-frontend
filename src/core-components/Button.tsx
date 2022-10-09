@@ -1,18 +1,19 @@
-import React, { FC } from "react";
+import React, { FC, ReactNode } from 'react';
 
 interface Props {
+  children: ReactNode;
   className?: string;
   disabled?: boolean;
-  onClick?: () => any;
+  onClick?: () => void;
 }
 
 const Button: FC<Props> = ({ className, disabled, onClick, children }) => {
   return (
     <button
+      className={`border bg-black px-2 py-1 text-white
+      ${disabled ? 'cursor-default opacity-50' : ''} ${className}`}
       disabled={disabled}
       onClick={onClick}
-      className={`px-2 py-1 border text-white bg-black
-      ${disabled ? "opacity-50 cursor-default" : ""} ${className}`}
     >
       {children}
     </button>

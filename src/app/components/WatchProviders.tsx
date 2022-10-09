@@ -1,19 +1,19 @@
-import { FC } from "react";
-import { WatchProvider as IWatchProvider } from "types";
+import { FC } from 'react';
+import { WatchProvider as IWatchProvider } from '../../types';
 
 const WatchProvider: FC<{ provider: IWatchProvider }> = ({
   provider: { provider_name, logo_path },
 }) => (
   <img
-    title={provider_name}
-    className="w-10 h-10 rounded-lg"
+    className="h-10 w-10 rounded-lg"
     src={`https://image.tmdb.org/t/p/original${logo_path}`}
+    title={provider_name}
   />
 );
 
 interface Props {
-  watchProviders: IWatchProvider[];
   selectedIds: { provider_id: number }[];
+  watchProviders: IWatchProvider[];
 }
 
 const WatchProviders: FC<Props> = ({ watchProviders, selectedIds }) => {

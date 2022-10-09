@@ -1,16 +1,16 @@
-import { FC } from "react";
-import { VscLoading } from "react-icons/vsc";
+import { FC } from 'react';
+import { VscLoading } from 'react-icons/vsc';
 
 interface Props {
-  loading: boolean;
   error: any;
+  loading: boolean;
   size?: number;
 }
 
 const Loading: FC<Props> = ({ loading, error, size = 128 }) => {
   if (loading) {
     return (
-      <div className="flex items-center justify-center flex-grow">
+      <div className="flex flex-grow items-center justify-center">
         <VscLoading className="animate-spin" color="#15eda1" size={size} />
       </div>
     );
