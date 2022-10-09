@@ -8,7 +8,7 @@ import {
 
 export const PAGE_SIZE = 20;
 
-const DEFAULT_SEARCH_FORM = {
+export const DEFAULT_SEARCH_FORM = {
   title: "",
   minVotes: 100,
   maxVotes: 100_000,

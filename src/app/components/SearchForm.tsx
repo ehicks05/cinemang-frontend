@@ -5,6 +5,7 @@ import { UnmountClosed } from "react-collapse";
 import { FaChevronDown, FaChevronUp } from "react-icons/fa";
 import { HiSortAscending, HiSortDescending } from "react-icons/hi";
 import { useQueryParams } from "use-query-params";
+import { DEFAULT_SEARCH_FORM } from "../../constants";
 import { Genre, Language, WatchProvider } from "../../types";
 
 interface Props {
@@ -232,6 +233,18 @@ const FormFields: FC<Props> = ({ languages, genres, watchProviders }) => {
             ) : (
               <HiSortDescending className="text-xl" />
             )}
+          </Button>
+        </div>
+      </div>
+
+      <div>
+        <div>&nbsp;</div>
+        <div className="flex">
+          <Button
+            className="px-3 py-2 text-base text-white bg-gray-700 border-gray-500"
+            onClick={() => setForm({ ...DEFAULT_SEARCH_FORM })}
+          >
+            Reset
           </Button>
         </div>
       </div>
