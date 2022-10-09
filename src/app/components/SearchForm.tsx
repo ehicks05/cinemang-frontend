@@ -65,12 +65,9 @@ const FormFields: FC<Props> = ({ languages, genres, watchProviders }) => {
           <div>Stream {getStreamLabel(form.watchProviders.length)}</div>
           <div>
             <ComboBox
-              options={
-                watchProviders.sort(
-                  (o1, o2) => o1.display_priority - o2.display_priority
-                )
-                // .slice(0, 16)
-              }
+              options={watchProviders
+                .sort((o1, o2) => o1.display_priority - o2.display_priority)
+                .filter((wp) => wp.count > 0)}
               selectedOptionIds={form.watchProviders}
               formKey="watchProviders"
               form={form}

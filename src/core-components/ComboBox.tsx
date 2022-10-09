@@ -64,7 +64,9 @@ const ComboBox = <T extends unknown>({
           <HiChevronUp />
           <HiChevronDown />
         </Combobox.Button>
-        <Combobox.Options className={"flex flex-col bg-gray-700"}>
+        <Combobox.Options
+          className={"flex flex-col bg-gray-700 absolute w-full"}
+        >
           {filteredOptions.map((option) => (
             <Combobox.Option key={option.id} value={option.id} as={Fragment}>
               {({ active, selected }) => (
