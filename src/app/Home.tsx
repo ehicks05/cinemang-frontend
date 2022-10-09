@@ -115,7 +115,10 @@ const Films: FC<{
       try {
         const query = client
           .from("movie")
-          .select("*, watch_provider!inner(provider_id)", { count: "exact" })
+          .select(
+            "*, watch_provider(provider_id), wp:watch_provider!inner(provider_id)",
+            { count: "exact" }
+          )
           .ilike("title", `%${form.title || ""}%`)
           .gte("vote_count", form.minVotes || 0)
           .lte("vote_count", form.maxVotes || 100_000_000)
@@ -133,7 +136,7 @@ const Films: FC<{
         }
 
         if (form.watchProviders.length > 0) {
-          query.in("watch_provider.provider_id", form.watchProviders);
+          query.in("wp.provider_id", form.watchProviders);
         }
 
         query
