@@ -1,4 +1,4 @@
-import axios from 'axios';
+import axios, { ResponseType } from 'axios';
 import { format, subDays } from 'date-fns';
 import { TextDecoder } from 'util';
 import logger from '../logger';
@@ -13,7 +13,7 @@ const getFilename = () =>
   `${filenameBase}${format(subDays(new Date(), 1), 'MM_dd_yyyy')}${ext}`;
 
 /**
- * The daily files contain a list of the valid IDs you can find on TMDB
+ * The daily ID files contain a list of the valid IDs you can find on TMDB
  * and some higher level attributes that are helpful for filtering items
  * like the adult, video and popularity values.
  *
@@ -21,13 +21,14 @@ const getFilename = () =>
  * The export job runs every day starting at around 7:00 AM UTC, and all files are
  * available by 8:00 AM UTC.
  */
-export const getDailyFile = async (): Promise<DailyFileRow[]> => {
+export const getValidIdRows = async (): Promise<DailyFileRow[]> => {
   const url = `${host}${path}${getFilename()}`;
-
-  const result = await axios.get(url, {
-    responseType: 'arraybuffer',
+  const config = {
+    responseType: 'arraybuffer' as ResponseType,
     maxBodyLength: 100_000_000,
-  });
+  };
+
+  const result = await axios.get(url, config);
   const unzipped = zlib.gunzipSync(result.data);
   const decoded = new TextDecoder().decode(unzipped);
   return decoded
@@ -36,10 +37,10 @@ export const getDailyFile = async (): Promise<DailyFileRow[]> => {
     .map((line) => JSON.parse(line));
 };
 
-export const getDailyFileIds = async () => {
+export const getValidIds = async () => {
   try {
-    const file = await getDailyFile();
-    return file.map((line) => line.id);
+    const rows = await getValidIdRows();
+    return rows.filter((row) => row.popularity >= 2.2).map((row) => row.id);
   } catch (e) {
     logger.error(e);
   }

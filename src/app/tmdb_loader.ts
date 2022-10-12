@@ -1,7 +1,7 @@
-import _ from 'lodash';
+import { chunk } from 'lodash';
 import Promise from 'bluebird';
 import { isFirstDayOfMonth } from 'date-fns';
-import { getDailyFileIds, getRecentlyChangedMovieIds } from '../services/tmdb';
+import { getValidIds, getRecentlyChangedMovieIds } from '../services/tmdb';
 import {
   updateGenres,
   updateLanguages,
@@ -74,7 +74,7 @@ const updateMovies = async () => {
   const fullMode = isStartOfMonth || argv.full;
 
   const movieIds = fullMode
-    ? await getDailyFileIds()
+    ? await getValidIds()
     : await getRecentlyChangedMovieIds();
 
   logger.info(
@@ -92,17 +92,22 @@ const updateMovies = async () => {
     const deadIds = existingIds.filter((e) => !movieIds?.includes(e));
     logger.info(`identified ${deadIds.length} dead movies`);
 
-    const { count } = await prisma.movie.deleteMany({
-      where: { tmdbId: { in: deadIds } },
-    });
-    logger.info(`finished deleting ${count} dead movies`);
+    const chunks = chunk(deadIds, 10_000);
+
+    await Promise.each(chunks, (ids) =>
+      prisma.movie.deleteMany({
+        where: { tmdbId: { in: ids } },
+      }),
+    );
+
+    logger.info(`finished deleting dead movies`);
   }
 
   const watchProviders = (await prisma.watchProvider.findMany())
     .map((w) => Number(w.provider_id))
     .sort((o1, o2) => o1 - o2);
 
-  const chunks = _.chunk(movieIds, 10_000);
+  const chunks = chunk(movieIds, 10_000);
   await Promise.each(chunks, (movieIds) =>
     processMovieIds(movieIds, watchProviders),
   );

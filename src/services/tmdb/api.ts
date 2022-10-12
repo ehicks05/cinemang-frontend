@@ -1,7 +1,9 @@
 import { format, subDays } from 'date-fns';
+import { intersection } from 'lodash';
 import logger from '../logger';
 import tmdb from './tmdb';
 import { Genre, Language, WatchProvider } from './types';
+import { getValidIds } from './valid_ids';
 
 export const getMovie = async (id: number) => {
   try {
@@ -34,12 +36,25 @@ export const getWatchProviders = async () => {
   return providers;
 };
 
-export const getRecentlyChangedMovieIds = async (): Promise<number[]> => {
+const _getRecentlyChangedMovieIds = async (): Promise<number[]> => {
   const start_date = format(subDays(new Date(), 1), 'yyyy-MM-dd');
   try {
     const result = await tmdb.get(`/movie/changes`, { params: { start_date } });
     const ids: number[] = result.data.results.map((r: { id: number }) => r.id);
     return ids;
+  } catch (e) {
+    logger.error(e);
+  }
+  return [];
+};
+
+export const getRecentlyChangedMovieIds = async () => {
+  try {
+    const [recentlyChangedIds, validIds] = await Promise.all([
+      _getRecentlyChangedMovieIds(),
+      getValidIds(),
+    ]);
+    return intersection(recentlyChangedIds, validIds);
   } catch (e) {
     logger.error(e);
   }

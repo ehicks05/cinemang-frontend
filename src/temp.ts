@@ -1,5 +1,5 @@
 import _ from 'lodash';
-import { getDailyFile } from './services/tmdb';
+import { getValidIdRows } from './services/tmdb';
 import { DailyFileRow } from './services/tmdb/types';
 
 const processPopularity = (popularity: number, rows: DailyFileRow[]) => {
@@ -12,7 +12,7 @@ const processPopularity = (popularity: number, rows: DailyFileRow[]) => {
 };
 
 const calculate = async () => {
-  const dailyFileRows = await getDailyFile();
+  const dailyFileRows = await getValidIdRows();
 
   _.range(0, 10, 0.1).forEach((popularity) =>
     processPopularity(popularity, dailyFileRows),
