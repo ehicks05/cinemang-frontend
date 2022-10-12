@@ -4,7 +4,11 @@ import { useState, FC } from 'react';
 import { UnmountClosed } from 'react-collapse';
 import { FaChevronDown, FaChevronUp } from 'react-icons/fa';
 import { HiSortAscending, HiSortDescending } from 'react-icons/hi';
-import { useQueryParams } from 'use-query-params';
+import {
+  DecodedValueMap,
+  QueryParamConfigMap,
+  useQueryParams,
+} from 'use-query-params';
 import { DEFAULT_SEARCH_FORM } from '../../constants';
 import { Genre, Language, WatchProvider } from '../../types';
 
@@ -40,7 +44,14 @@ const SearchForm: FC<Props> = ({ languages, genres, watchProviders }) => {
 };
 
 const FormFields: FC<Props> = ({ languages, genres, watchProviders }) => {
-  const [form, setForm] = useQueryParams();
+  const [form, setFormInner] = useQueryParams();
+
+  const setForm = (updatedForm: DecodedValueMap<QueryParamConfigMap>) => {
+    if (updatedForm.page === form.page) {
+      updatedForm.page = 0;
+    }
+    setFormInner(updatedForm);
+  };
 
   const getStreamLabel = (count: number) =>
     count !== 0 ? `(${count} selected)` : '';

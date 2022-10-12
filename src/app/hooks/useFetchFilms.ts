@@ -33,8 +33,14 @@ export const useFetchFilms = ({ page }: { page: number }) => {
         const query = supabase
           .from('movie')
           .select(
-            '*, watch_provider(provider_id), wp:watch_provider!inner(provider_id)',
-            { count: 'exact' },
+            `tmdb_id${
+              form.watchProviders.length > 0
+                ? ', wp: watch_provider!inner(provider_id)'
+                : ''
+            }`,
+            {
+              count: 'exact',
+            },
           )
           .ilike('title', `%${form.title || ''}%`)
           .gte('vote_count', form.minVotes || 0)
@@ -61,8 +67,18 @@ export const useFetchFilms = ({ page }: { page: number }) => {
           .order('tmdb_id', { ascending: true })
           .range(page * PAGE_SIZE, (page + 1) * PAGE_SIZE - 1);
 
-        const { data: films, count } = await query;
-        setData({ count: count || 0, films });
+        const { data, count } = await query;
+
+        const hydrationQuery = supabase
+          .from('movie')
+          .select('*, watch_provider(provider_id)')
+          .in('tmdb_id', data?.map((row) => row.tmdb_id) || [])
+          .order(form.sortColumn, { ascending: form.ascending })
+          .order('tmdb_id', { ascending: true });
+
+        const { data: films } = await hydrationQuery;
+
+        await setData({ count: count || 0, films });
       } catch (e) {
         setError(e);
       } finally {

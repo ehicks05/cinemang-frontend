@@ -9,7 +9,7 @@ interface PaginatorProps {
   count: number;
   page: number;
   pageSize: number;
-  setPage: React.Dispatch<React.SetStateAction<number>>;
+  setPage: (page: number) => void;
 }
 const Paginator: FC<PaginatorProps> = ({ pageSize, page, setPage, count }) => {
   const { links, hasNext, hasPrevious, from, to } = usePagination({
@@ -57,7 +57,7 @@ interface LinkProps {
   next?: boolean;
   page: number;
   prev?: boolean;
-  setPage: React.Dispatch<React.SetStateAction<number>>;
+  setPage: (page: number) => void;
 }
 const Link: FC<LinkProps> = ({ page, setPage, link, prev, next, children }) => {
   const newPage = prev ? page - 1 : next ? page + 1 : Number(link.label) - 1;
