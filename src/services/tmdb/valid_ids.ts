@@ -1,46 +1,43 @@
-import axios, { ResponseType } from 'axios';
-import { format, subDays } from 'date-fns';
+import axios from 'axios';
+import { format } from 'date-fns';
 import { TextDecoder } from 'util';
 import logger from '../logger';
 import zlib from 'zlib';
-import { DailyFileRow } from './types';
+import { DailyFileCategory, DailyFileRow } from './types';
+import { DAILY_FILE } from './constants';
 
-const host = 'https://files.tmdb.org';
-const path = '/p/exports/';
-const filenameBase = 'movie_ids_';
-const ext = '.json.gz';
-const getFilename = () =>
-  `${filenameBase}${format(subDays(new Date(), 1), 'MM_dd_yyyy')}${ext}`;
-
-/**
+/*
  * The daily ID files contain a list of the valid IDs you can find on TMDB
  * and some higher level attributes that are helpful for filtering items
  * like the adult, video and popularity values.
  *
- * All of the exported files are available for download from http://files.tmdb.org.
- * The export job runs every day starting at around 7:00 AM UTC, and all files are
- * available by 8:00 AM UTC.
+ * The export job runs every day and all files are available by 8:00 AM UTC.
  */
-export const getValidIdRows = async (): Promise<DailyFileRow[]> => {
-  const url = `${host}${path}${getFilename()}`;
-  const config = {
-    responseType: 'arraybuffer' as ResponseType,
-    maxBodyLength: 100_000_000,
-  };
 
-  const result = await axios.get(url, config);
+const { CONFIG, HOST, PATH, EXT, MIN_POPULARITY } = DAILY_FILE;
+
+const getUrl = (category: DailyFileCategory) => {
+  const today = format(new Date(), 'MM_dd_yyyy');
+  return `${HOST}${PATH}${category}_${today}${EXT}`;
+};
+
+export const getValidIdRows = async (category: DailyFileCategory) => {
+  const result = await axios.get(getUrl(category), CONFIG);
   const unzipped = zlib.gunzipSync(result.data);
   const decoded = new TextDecoder().decode(unzipped);
-  return decoded
+  const rows: DailyFileRow[] = decoded
     .split('\n')
     .filter((l) => l)
     .map((line) => JSON.parse(line));
+  return rows;
 };
 
-export const getValidIds = async () => {
+export const getValidIds = async (category: DailyFileCategory) => {
   try {
-    const rows = await getValidIdRows();
-    return rows.filter((row) => row.popularity >= 2.2).map((row) => row.id);
+    const rows = await getValidIdRows(category);
+    return rows
+      .filter((row) => row.popularity >= MIN_POPULARITY)
+      .map((row) => row.id);
   } catch (e) {
     logger.error(e);
   }

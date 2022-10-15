@@ -2,18 +2,29 @@ export interface Cast {
   name: string;
 }
 
+export type DailyFileCategory = 'movie_ids' | 'person_ids';
+
 export interface Crew {
   name: string;
   job: string;
 }
 
-export interface DailyFileRow {
+export interface DailyFileMovie {
   adult: boolean;
   id: number;
   original_title: string;
   popularity: number;
   video: boolean;
 }
+
+export interface DailyFilePerson {
+  adult: boolean;
+  id: number;
+  name: string;
+  popularity: number;
+}
+
+export type DailyFileRow = DailyFileMovie | DailyFilePerson;
 
 export interface Genre {
   id: number;

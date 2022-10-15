@@ -2,24 +2,42 @@ import _ from 'lodash';
 import { getValidIdRows } from './services/tmdb';
 import { DailyFileRow } from './services/tmdb/types';
 
-const processPopularity = (popularity: number, rows: DailyFileRow[]) => {
+const findItemsWithMinPopularity = (
+  popularity: number,
+  rows: DailyFileRow[],
+) => {
   const filtered = rows
     .filter((row) => row.popularity >= popularity)
     .sort((o1, o2) => o1.popularity - o2.popularity);
+  const lowestItem = filtered[0];
+  const lowestItemName =
+    'original_title' in lowestItem
+      ? lowestItem.original_title
+      : lowestItem.name;
   console.log(
-    `movies with popularity >= ${popularity}: ${filtered.length}. sample: ${filtered[0].original_title}`,
+    `items with popularity >= ${popularity}: ${filtered.length}. sample: ${lowestItemName}`,
   );
 };
 
-const calculate = async () => {
-  const dailyFileRows = await getValidIdRows();
+const analysePopularity = async () => {
+  const [movieRows, personRows] = await Promise.all([
+    getValidIdRows('movie_ids'),
+    getValidIdRows('person_ids'),
+  ]);
 
+  console.log({ personalExample: personRows[0] });
+
+  console.log('MOVIE POPULARITY');
   _.range(0, 10, 0.1).forEach((popularity) =>
-    processPopularity(popularity, dailyFileRows),
+    findItemsWithMinPopularity(popularity, movieRows),
+  );
+  console.log('PERSON POPULARITY');
+  _.range(0, 10, 0.1).forEach((popularity) =>
+    findItemsWithMinPopularity(popularity, personRows),
   );
 };
 
-calculate();
+analysePopularity();
 
 /*
 
