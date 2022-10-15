@@ -52,7 +52,7 @@ export const getRecentlyChangedMovieIds = async () => {
   try {
     const [recentlyChangedIds, validIds] = await Promise.all([
       _getRecentlyChangedMovieIds(),
-      getValidIds(),
+      getValidIds('movie_ids'),
     ]);
     return intersection(recentlyChangedIds, validIds);
   } catch (e) {
