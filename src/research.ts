@@ -1,26 +1,34 @@
-import _ from 'lodash';
+import _, { merge } from 'lodash';
 import { getValidIdRows } from './services/tmdb';
 import { DailyFileRow } from './services/tmdb/types';
 
 const nf = Intl.NumberFormat('en-US', { maximumFractionDigits: 1 });
+const nfInt = Intl.NumberFormat('en-US');
 
+// dataset rows must be pre-sorted
 const findItemsWithMinPopularity = (
   popularity: number,
-  rows: DailyFileRow[],
+  datasets: { rows: DailyFileRow[]; label: string }[],
 ) => {
-  const filtered = rows
-    .filter((row) => row.popularity >= popularity)
-    .sort((o1, o2) => o1.popularity - o2.popularity);
-  const lowestItem = filtered[0] || { original_title: 'N/A' };
-  const lowestItemName =
-    'original_title' in lowestItem
-      ? lowestItem.original_title
-      : lowestItem.name;
+  const results = datasets.map((dataset) => {
+    const filtered = dataset.rows.filter((row) => row.popularity >= popularity);
+    const lowestItem = filtered[0] || { original_title: 'N/A' };
+    const lowestItemName =
+      'original_title' in lowestItem
+        ? lowestItem.original_title
+        : lowestItem.name;
+
+    return {
+      [`${dataset.label} count`]: nfInt.format(filtered.length),
+      [`${dataset.label} sample`]: lowestItemName,
+    };
+  });
+
+  const result = merge({}, ...results);
 
   return {
     popularity: nf.format(popularity),
-    count: filtered.length,
-    sample: lowestItemName,
+    ...result,
   };
 };
 
@@ -33,33 +41,30 @@ const analysePopularity = async () => {
 
   console.log('crunching numbers');
 
-  const movieResults = [
+  const datasets = [
+    {
+      rows: movieRows.sort((o1, o2) => o1.popularity - o2.popularity),
+      label: 'movie',
+    },
+    {
+      rows: personRows.sort((o1, o2) => o1.popularity - o2.popularity),
+      label: 'person',
+    },
+  ];
+
+  const results = [
     ..._.range(0, 10, 0.2).map((popularity) =>
-      findItemsWithMinPopularity(popularity, movieRows),
+      findItemsWithMinPopularity(popularity, datasets),
     ),
     ..._.range(10, 100, 20).map((popularity) =>
-      findItemsWithMinPopularity(popularity, movieRows),
+      findItemsWithMinPopularity(popularity, datasets),
     ),
-    ..._.range(100, 1000, 200).map((popularity) =>
-      findItemsWithMinPopularity(popularity, movieRows),
+    ..._.range(100, 5000, 200).map((popularity) =>
+      findItemsWithMinPopularity(popularity, datasets),
     ),
   ];
   console.log('MOVIE POPULARITY');
-  console.table(movieResults);
-
-  const personResults = [
-    ..._.range(0, 10, 0.2).map((popularity) =>
-      findItemsWithMinPopularity(popularity, personRows),
-    ),
-    ..._.range(10, 100, 20).map((popularity) =>
-      findItemsWithMinPopularity(popularity, personRows),
-    ),
-    ..._.range(100, 1000, 200).map((popularity) =>
-      findItemsWithMinPopularity(popularity, personRows),
-    ),
-  ];
-  console.log('\nPERSON POPULARITY');
-  console.table(personResults);
+  console.table(results);
 };
 
 analysePopularity();
