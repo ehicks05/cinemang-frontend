@@ -1,7 +1,7 @@
 import { chunk } from 'lodash';
 import Promise from 'bluebird';
 import { isFirstDayOfMonth } from 'date-fns';
-import { getValidIds, getRecentlyChangedMovieIds } from '../services/tmdb';
+import { getValidIds, getRecentlyChangedValidIds } from '../services/tmdb';
 import {
   removeDeadMovies,
   updateGenres,
@@ -60,47 +60,44 @@ const processMovieIds = async (
 };
 
 const updateMovies = async (fullMode: boolean) => {
-  const movieIds = fullMode
-    ? await getValidIds('movie_ids')
-    : await getRecentlyChangedMovieIds();
+  const ids = fullMode
+    ? await getValidIds('MOVIE')
+    : await getRecentlyChangedValidIds('MOVIE');
 
-  if (!movieIds) {
-    throw new Error('Unable to fetch movieIds');
+  if (!ids) {
+    throw new Error('Unable to fetch ids');
   }
 
-  logger.info(`found ${movieIds?.length} movie ids to load`);
+  logger.info(`found ${ids?.length} ids to load`);
 
   if (fullMode) {
-    await removeDeadMovies(movieIds);
+    await removeDeadMovies(ids);
   }
 
   const watchProviders = (await prisma.watchProvider.findMany())
     .map((w) => Number(w.provider_id))
     .sort((o1, o2) => o1 - o2);
 
-  const chunks = chunk(movieIds, 10_000);
-  await Promise.each(chunks, (movieIds) =>
-    processMovieIds(movieIds, watchProviders),
-  );
+  const chunks = chunk(ids, 10_000);
+  await Promise.each(chunks, (ids) => processMovieIds(ids, watchProviders));
 };
 
 const updateDb = async () => {
   logger.info('starting tmdb_loader script');
 
   const isStartOfMonth = isFirstDayOfMonth(new Date());
-  logger.info(
-    isStartOfMonth
-      ? `start of month detected. defaulting to full load.`
-      : 'not start of month. defaulting to partial load.',
-  );
+  if (isStartOfMonth) {
+    logger.info('start of month detected.');
+  }
   if (argv.full) {
-    logger.info(
-      '--full arg detected: overriding defaults and running a full load.',
-    );
+    logger.info('--full arg detected.');
   }
 
   const fullMode = isStartOfMonth || argv.full;
 
+  console.log(`running ${fullMode ? 'full' : 'partial'} load`);
+
+  console.log('updating genres, languages, and watch providers...');
   await Promise.all([
     updateGenres(),
     updateLanguages(),
@@ -108,8 +105,10 @@ const updateDb = async () => {
   ]);
 
   // await updatePeople(fullMode);
+  console.log('updating movies...');
   await updateMovies(fullMode);
 
+  console.log('updating counts for languages and watch providers');
   await updateLanguageCounts();
   await updateWatchProviderCounts();
   logger.info('finished tmdb_loader script');

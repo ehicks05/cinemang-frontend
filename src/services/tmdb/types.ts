@@ -1,8 +1,8 @@
+import { RESOURCE_LOCATIONS } from './constants';
+
 export interface Cast {
   name: string;
 }
-
-export type DailyFileCategory = 'movie_ids' | 'person_ids';
 
 export interface Crew {
   name: string;
@@ -36,6 +36,8 @@ export interface Language {
   english_name: string;
   name: string;
 }
+
+export type ResourceLocationKey = keyof typeof RESOURCE_LOCATIONS;
 
 export interface WatchProvider {
   display_priorities: Record<string, number>;

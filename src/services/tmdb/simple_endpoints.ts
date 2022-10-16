@@ -1,8 +1,9 @@
 import { format, subDays } from 'date-fns';
 import { intersection } from 'lodash';
 import logger from '../logger';
+import { RESOURCE_LOCATIONS } from './constants';
 import tmdb from './tmdb';
-import { Genre, Language, WatchProvider } from './types';
+import { Genre, Language, ResourceLocationKey, WatchProvider } from './types';
 import { getValidIds } from './valid_ids';
 
 export const getMovie = async (id: number) => {
@@ -36,10 +37,12 @@ export const getWatchProviders = async () => {
   return providers;
 };
 
-const _getRecentlyChangedMovieIds = async (): Promise<number[]> => {
+const getRecentlyChangedIds = async (resource: ResourceLocationKey) => {
+  const path = RESOURCE_LOCATIONS[resource].RECENTLY_CHANGED_PATH;
   const start_date = format(subDays(new Date(), 1), 'yyyy-MM-dd');
+  const config = { params: { start_date } };
   try {
-    const result = await tmdb.get(`/movie/changes`, { params: { start_date } });
+    const result = await tmdb.get(`/${path}/changes`, config);
     const ids: number[] = result.data.results.map((r: { id: number }) => r.id);
     return ids;
   } catch (e) {
@@ -48,11 +51,13 @@ const _getRecentlyChangedMovieIds = async (): Promise<number[]> => {
   return [];
 };
 
-export const getRecentlyChangedMovieIds = async () => {
+export const getRecentlyChangedValidIds = async (
+  resource: ResourceLocationKey,
+) => {
   try {
     const [recentlyChangedIds, validIds] = await Promise.all([
-      _getRecentlyChangedMovieIds(),
-      getValidIds('movie_ids'),
+      getRecentlyChangedIds(resource),
+      getValidIds(resource),
     ]);
     return intersection(recentlyChangedIds, validIds);
   } catch (e) {

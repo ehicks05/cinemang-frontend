@@ -3,8 +3,8 @@ import { format } from 'date-fns';
 import { TextDecoder } from 'util';
 import logger from '../logger';
 import zlib from 'zlib';
-import { DailyFileCategory, DailyFileRow } from './types';
-import { DAILY_FILE } from './constants';
+import { DailyFileRow, ResourceLocationKey } from './types';
+import { DAILY_FILE, RESOURCE_LOCATIONS } from './constants';
 
 /*
  * The daily ID files contain a list of the valid IDs you can find on TMDB
@@ -16,13 +16,14 @@ import { DAILY_FILE } from './constants';
 
 const { CONFIG, HOST, PATH, EXT, MIN_POPULARITY } = DAILY_FILE;
 
-const getUrl = (category: DailyFileCategory) => {
+const getUrl = (resource: ResourceLocationKey) => {
+  const filename = RESOURCE_LOCATIONS[resource].DAILY_FILE_NAME;
   const today = format(new Date(), 'MM_dd_yyyy');
-  return `${HOST}${PATH}${category}_${today}${EXT}`;
+  return `${HOST}${PATH}${filename}_${today}${EXT}`;
 };
 
-export const getValidIdRows = async (category: DailyFileCategory) => {
-  const result = await axios.get(getUrl(category), CONFIG);
+export const getValidIdRows = async (resource: ResourceLocationKey) => {
+  const result = await axios.get(getUrl(resource), CONFIG);
   const unzipped = zlib.gunzipSync(result.data);
   const decoded = new TextDecoder().decode(unzipped);
   const rows: DailyFileRow[] = decoded
@@ -32,9 +33,9 @@ export const getValidIdRows = async (category: DailyFileCategory) => {
   return rows;
 };
 
-export const getValidIds = async (category: DailyFileCategory) => {
+export const getValidIds = async (resource: ResourceLocationKey) => {
   try {
-    const rows = await getValidIdRows(category);
+    const rows = await getValidIdRows(resource);
     return rows
       .filter((row) => row.popularity >= MIN_POPULARITY)
       .map((row) => row.id);

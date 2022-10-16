@@ -10,3 +10,14 @@ export const DAILY_FILE = {
   EXT: '.json.gz',
   MIN_POPULARITY: 2.2,
 };
+
+export const RESOURCE_LOCATIONS = {
+  MOVIE: {
+    DAILY_FILE_NAME: 'movie_ids',
+    RECENTLY_CHANGED_PATH: 'movie',
+  },
+  PERSON: {
+    DAILY_FILE_NAME: 'person_ids',
+    RECENTLY_CHANGED_PATH: 'person',
+  },
+} as const;
