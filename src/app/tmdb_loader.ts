@@ -59,21 +59,7 @@ const processMovieIds = async (
   );
 };
 
-const updateMovies = async () => {
-  const isStartOfMonth = isFirstDayOfMonth(new Date());
-  logger.info(
-    isStartOfMonth
-      ? `start of month detected. defaulting to full load.`
-      : 'not start of month. defaulting to partial load.',
-  );
-  if (argv.full) {
-    logger.info(
-      '--full arg detected: overriding defaults and running a full load.',
-    );
-  }
-
-  const fullMode = isStartOfMonth || argv.full;
-
+const updateMovies = async (fullMode: boolean) => {
   const movieIds = fullMode
     ? await getValidIds('movie_ids')
     : await getRecentlyChangedMovieIds();
@@ -82,11 +68,7 @@ const updateMovies = async () => {
     throw new Error('Unable to fetch movieIds');
   }
 
-  logger.info(
-    `${fullMode ? 'daily file' : 'changes endpoint'} returned ${
-      movieIds?.length
-    } movie ids`,
-  );
+  logger.info(`found ${movieIds?.length} movie ids to load`);
 
   if (fullMode) {
     await removeDeadMovies(movieIds);
@@ -104,13 +86,29 @@ const updateMovies = async () => {
 
 const updateDb = async () => {
   logger.info('starting tmdb_loader script');
+
+  const isStartOfMonth = isFirstDayOfMonth(new Date());
+  logger.info(
+    isStartOfMonth
+      ? `start of month detected. defaulting to full load.`
+      : 'not start of month. defaulting to partial load.',
+  );
+  if (argv.full) {
+    logger.info(
+      '--full arg detected: overriding defaults and running a full load.',
+    );
+  }
+
+  const fullMode = isStartOfMonth || argv.full;
+
   await Promise.all([
     updateGenres(),
     updateLanguages(),
     updateWatchProviders(),
   ]);
 
-  await updateMovies();
+  // await updatePeople(fullMode);
+  await updateMovies(fullMode);
 
   await updateLanguageCounts();
   await updateWatchProviderCounts();
