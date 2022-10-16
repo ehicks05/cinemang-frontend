@@ -38,7 +38,7 @@ const processMovieIds = async (
   movieIds: number[],
   knownWatchProviders: number[],
 ) => {
-  await prisma.movie.deleteMany({ where: { tmdbId: { in: movieIds } } });
+  await prisma.movie.deleteMany({ where: { id: { in: movieIds } } });
 
   const result = await Promise.map(
     movieIds,

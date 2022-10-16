@@ -62,8 +62,8 @@ export const removeDeadMovies = async (validIds: number[]) => {
   );
 
   const existingIds = (
-    await prisma.movie.findMany({ select: { tmdbId: true } })
-  ).map((m) => m.tmdbId);
+    await prisma.movie.findMany({ select: { id: true } })
+  ).map((m) => m.id);
   const deadIds = existingIds.filter((e) => !validIds?.includes(e));
   logger.info(`identified ${deadIds.length} dead movies`);
 
@@ -71,7 +71,7 @@ export const removeDeadMovies = async (validIds: number[]) => {
 
   await Promise.each(chunks, (ids) =>
     prisma.movie.deleteMany({
-      where: { tmdbId: { in: ids } },
+      where: { id: { in: ids } },
     }),
   );
 

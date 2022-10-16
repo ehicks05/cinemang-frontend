@@ -49,8 +49,7 @@ export const movieIdToParsedMovie = async (
     }));
 
   return {
-    ...pick(data, ['title', 'overview', 'runtime']),
-    tmdbId: data.id,
+    ...pick(data, ['id', 'title', 'overview', 'runtime']),
     imdbId: data.imdb_id,
     releasedAt: new Date(data.release_date),
     languageId: data.original_language,

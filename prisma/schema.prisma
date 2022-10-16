@@ -8,7 +8,7 @@ datasource db {
 }
 
 model Movie {
-  tmdbId        Int       @id @map("tmdb_id")
+  id            Int       @id
   cast          String
   certification String?
   director      String
@@ -25,6 +25,8 @@ model Movie {
   updatedAt     DateTime? @updatedAt @map("updated_at") @db.Date
 
   watchProviders WatchProvider[]
+  castCredits    CastCredit[]
+  crewCredits    CrewCredit[]
 
   @@index([title])
   @@index([languageId])
@@ -32,6 +34,53 @@ model Movie {
   @@index([voteAverage])
   @@index([voteCount])
   @@map("movie")
+}
+
+model Person {
+  id                 Int          @id
+  imdbId             String?      @map("imdb_id")
+  biography          String
+  birthday           DateTime     @db.Date
+  deathday           DateTime     @db.Date
+  gender             String
+  knownForDepartment String       @map("known_for_department")
+  name               String
+  placeOfBirth       String       @map("place_of_birth")
+  popularity         Float
+  profilePath        String       @map("profile_path")
+  castCredits        CastCredit[]
+  crewCredits        CrewCredit[]
+
+  @@map("person")
+}
+
+model CastCredit {
+  movie    Movie  @relation(fields: [movieId], references: [id])
+  movieId  Int
+  person   Person @relation(fields: [personId], references: [id])
+  personId Int
+
+  castId    Int    @map("cast_id")
+  creditId  String @map("credit_id")
+  character String
+  order     Int
+
+  @@id([movieId, personId])
+  @@map("cast_credit")
+}
+
+model CrewCredit {
+  movie    Movie  @relation(fields: [movieId], references: [id])
+  movieId  Int
+  person   Person @relation(fields: [personId], references: [id])
+  personId Int
+
+  creditId   String @map("credit_id")
+  department String
+  job        String
+
+  @@id([movieId, personId])
+  @@map("crew_credit")
 }
 
 model Genre {
