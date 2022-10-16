@@ -1,3 +1,5 @@
+import { chunk } from 'lodash';
+import Promise from 'bluebird';
 import logger from '../../services/logger';
 import prisma from '../../services/prisma';
 import {
@@ -50,4 +52,28 @@ export const updateWatchProviders = async () => {
   );
 
   logger.info(`upserted ${watchProviders.length} watch providers`);
+};
+
+// TODO: chunk and process the validIds instead of fetching all ids
+export const removeDeadMovies = async (validIds: number[]) => {
+  logger.info(
+    `Deleting dead movies before continuing. Dead movies are movies 
+      that exist in the db, but are missing from the valid ids file.`,
+  );
+
+  const existingIds = (
+    await prisma.movie.findMany({ select: { tmdbId: true } })
+  ).map((m) => m.tmdbId);
+  const deadIds = existingIds.filter((e) => !validIds?.includes(e));
+  logger.info(`identified ${deadIds.length} dead movies`);
+
+  const chunks = chunk(deadIds, 10_000);
+
+  await Promise.each(chunks, (ids) =>
+    prisma.movie.deleteMany({
+      where: { tmdbId: { in: ids } },
+    }),
+  );
+
+  logger.info(`finished deleting dead movies`);
 };

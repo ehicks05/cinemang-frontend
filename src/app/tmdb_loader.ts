@@ -3,10 +3,12 @@ import Promise from 'bluebird';
 import { isFirstDayOfMonth } from 'date-fns';
 import { getValidIds, getRecentlyChangedMovieIds } from '../services/tmdb';
 import {
+  removeDeadMovies,
   updateGenres,
   updateLanguages,
   updateWatchProviders,
 } from './helpers/helpers';
+import { argv } from '../services/args';
 import logger from '../services/logger';
 import prisma from '../services/prisma';
 import {
@@ -14,7 +16,6 @@ import {
   updateWatchProviderCounts,
 } from './helpers/update_counts';
 import { movieIdToParsedMovie } from './helpers/parse_movie';
-import { argv } from '../services/args';
 
 const fetchParseAndLoadMovie = async (
   movieId: number,
@@ -74,8 +75,12 @@ const updateMovies = async () => {
   const fullMode = isStartOfMonth || argv.full;
 
   const movieIds = fullMode
-    ? await getValidIds()
+    ? await getValidIds('movie_ids')
     : await getRecentlyChangedMovieIds();
+
+  if (!movieIds) {
+    throw new Error('Unable to fetch movieIds');
+  }
 
   logger.info(
     `${fullMode ? 'daily file' : 'changes endpoint'} returned ${
@@ -84,23 +89,7 @@ const updateMovies = async () => {
   );
 
   if (fullMode) {
-    logger.info('running in full mode. deleting dead movies before loading.');
-
-    const existingIds = (
-      await prisma.movie.findMany({ select: { tmdbId: true } })
-    ).map((m) => m.tmdbId);
-    const deadIds = existingIds.filter((e) => !movieIds?.includes(e));
-    logger.info(`identified ${deadIds.length} dead movies`);
-
-    const chunks = chunk(deadIds, 10_000);
-
-    await Promise.each(chunks, (ids) =>
-      prisma.movie.deleteMany({
-        where: { tmdbId: { in: ids } },
-      }),
-    );
-
-    logger.info(`finished deleting dead movies`);
+    await removeDeadMovies(movieIds);
   }
 
   const watchProviders = (await prisma.watchProvider.findMany())
