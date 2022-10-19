@@ -27,9 +27,9 @@ export interface Language {
 export interface WatchProvider {
   count: number;
   display_priority: number;
+  id: number;
   logo_path: string;
-  provider_id: number;
-  provider_name: string;
+  name: string;
 }
 
 export interface ISearchForm {

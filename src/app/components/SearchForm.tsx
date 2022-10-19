@@ -79,9 +79,9 @@ const FormFields: FC<Props> = ({ languages, genres, watchProviders }) => {
               form={form}
               formKey="watchProviders"
               mapper={(provider) => ({
-                id: provider.provider_id,
+                id: provider.id,
                 imageUrl: `https://image.tmdb.org/t/p/original${provider.logo_path}`,
-                label: provider.provider_name,
+                label: provider.name,
               })}
               onChange={setForm}
               options={watchProviders

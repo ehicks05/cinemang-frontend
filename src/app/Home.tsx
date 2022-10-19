@@ -65,7 +65,7 @@ const Films: FC<{
             <Film
               film={film}
               genres={genres}
-              key={film.tmdb_id}
+              key={film.id}
               languages={languages}
               watchProviders={watchProviders}
             />

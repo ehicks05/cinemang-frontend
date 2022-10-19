@@ -33,9 +33,9 @@ export const useFetchFilms = ({ page }: { page: number }) => {
         const query = supabase
           .from('movie')
           .select(
-            `tmdb_id${
+            `id${
               form.watchProviders.length > 0
-                ? ', wp: watch_provider!inner(provider_id)'
+                ? ', wp: watch_provider!inner(id)'
                 : ''
             }`,
             {
@@ -59,22 +59,22 @@ export const useFetchFilms = ({ page }: { page: number }) => {
         }
 
         if (form.watchProviders.length > 0) {
-          query.in('wp.provider_id', form.watchProviders);
+          query.in('wp.id', form.watchProviders);
         }
 
         query
           .order(form.sortColumn, { ascending: form.ascending })
-          .order('tmdb_id', { ascending: true })
+          .order('id', { ascending: true })
           .range(page * PAGE_SIZE, (page + 1) * PAGE_SIZE - 1);
 
         const { data, count } = await query;
 
         const hydrationQuery = supabase
           .from('movie')
-          .select('*, watch_provider(provider_id)')
-          .in('tmdb_id', data?.map((row) => row.tmdb_id) || [])
+          .select('*, watch_provider(id)')
+          .in('id', data?.map((row) => row.id) || [])
           .order(form.sortColumn, { ascending: form.ascending })
-          .order('tmdb_id', { ascending: true });
+          .order('id', { ascending: true });
 
         const { data: films } = await hydrationQuery;
 
