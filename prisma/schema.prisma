@@ -8,21 +8,20 @@ datasource db {
 }
 
 model Movie {
-  id            Int       @id
+  id            Int      @id
   cast          String
   certification String?
   director      String
-  genreId       Int       @map("genre_id")
-  imdbId        String?   @map("imdb_id")
-  languageId    String    @map("language_id")
+  genreId       Int      @map("genre_id")
+  imdbId        String?  @map("imdb_id")
+  languageId    String   @map("language_id")
   overview      String
-  posterPath    String    @map("poster_path")
-  releasedAt    DateTime  @map("released_at") @db.Date
+  posterPath    String   @map("poster_path")
+  releasedAt    DateTime @map("released_at") @db.Date
   runtime       Int
   title         String
-  voteAverage   Float     @map("vote_average")
-  voteCount     Int       @map("vote_count")
-  updatedAt     DateTime? @updatedAt @map("updated_at") @db.Date
+  voteAverage   Float    @map("vote_average")
+  voteCount     Int      @map("vote_count")
 
   watchProviders WatchProvider[]
   castCredits    CastCredit[]
@@ -41,11 +40,11 @@ model Person {
   imdbId             String?      @map("imdb_id")
   biography          String
   birthday           DateTime     @db.Date
-  deathday           DateTime     @db.Date
-  gender             String
+  deathday           DateTime?    @db.Date
+  gender             Int
   knownForDepartment String       @map("known_for_department")
   name               String
-  placeOfBirth       String       @map("place_of_birth")
+  placeOfBirth       String?      @map("place_of_birth")
   popularity         Float
   profilePath        String       @map("profile_path")
   castCredits        CastCredit[]
@@ -55,9 +54,9 @@ model Person {
 }
 
 model CastCredit {
-  movie    Movie  @relation(fields: [movieId], references: [id])
+  movie    Movie  @relation(fields: [movieId], references: [id], onDelete: Cascade)
   movieId  Int
-  person   Person @relation(fields: [personId], references: [id])
+  person   Person @relation(fields: [personId], references: [id], onDelete: Cascade)
   personId Int
 
   castId    Int    @map("cast_id")
@@ -70,9 +69,9 @@ model CastCredit {
 }
 
 model CrewCredit {
-  movie    Movie  @relation(fields: [movieId], references: [id])
+  movie    Movie  @relation(fields: [movieId], references: [id], onDelete: Cascade)
   movieId  Int
-  person   Person @relation(fields: [personId], references: [id])
+  person   Person @relation(fields: [personId], references: [id], onDelete: Cascade)
   personId Int
 
   creditId   String @map("credit_id")
@@ -99,12 +98,12 @@ model Language {
 }
 
 model WatchProvider {
-  provider_id      Int     @id
-  display_priority Int
-  provider_name    String
-  logo_path        String
-  count            Int     @default(0)
-  movies           Movie[]
+  id              Int     @id
+  displayPriority Int     @map("display_priority")
+  name            String
+  logoPath        String  @map("logo_path")
+  count           Int     @default(0)
+  movies          Movie[]
 
   @@map("watch_provider")
 }

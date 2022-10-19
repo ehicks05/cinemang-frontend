@@ -1,4 +1,4 @@
-import { RESOURCE_LOCATIONS } from './constants';
+import { RESOURCES } from './constants';
 
 export interface Cast {
   name: string;
@@ -37,7 +37,24 @@ export interface Language {
   name: string;
 }
 
-export type ResourceLocationKey = keyof typeof RESOURCE_LOCATIONS;
+export type ResourceKey = keyof typeof RESOURCES;
+
+export interface TmdbPerson {
+  adult: boolean;
+  also_known_as: string[];
+  biography: string;
+  birthday: string;
+  deathday?: string;
+  gender: number;
+  homepage?: string;
+  id: number;
+  imdb_id: string;
+  known_for_department: string;
+  name: string;
+  place_of_birth: string;
+  popularity: number;
+  profile_path: string;
+}
 
 export interface WatchProvider {
   display_priorities: Record<string, number>;

@@ -1,9 +1,13 @@
 import { chunk } from 'lodash';
 import Promise from 'bluebird';
 import { isFirstDayOfMonth } from 'date-fns';
-import { getValidIds, getRecentlyChangedValidIds } from '../services/tmdb';
 import {
-  removeDeadMovies,
+  getPopularValidIds,
+  getRecentlyChangedValidIds,
+} from '../services/tmdb';
+import {
+  removeInvalidMovies,
+  removeInvalidPeople,
   updateGenres,
   updateLanguages,
   updateWatchProviders,
@@ -16,17 +20,26 @@ import {
   updateWatchProviderCounts,
 } from './helpers/update_counts';
 import { movieIdToParsedMovie } from './helpers/parse_movie';
+import { ResourceKey } from '../services/tmdb/types';
+import { idToParsedPerson } from './helpers/parse_person';
 
-const fetchParseAndLoadMovie = async (
-  movieId: number,
+const fetchParseAndLoad = async (
+  id: number,
+  resource: ResourceKey,
   knownWatchProviders: number[],
 ) => {
   try {
-    const movie = await movieIdToParsedMovie(movieId, knownWatchProviders);
-    if (!movie) {
+    const data =
+      resource === 'MOVIE'
+        ? await movieIdToParsedMovie(id, knownWatchProviders)
+        : await idToParsedPerson(id);
+
+    if (!data) {
       return { loaded: 0, failed: 1 };
     }
-    await prisma.movie.create({ data: movie });
+
+    if ('title' in data) await prisma.movie.create({ data });
+    if ('name' in data) await prisma.person.create({ data });
     return { loaded: 1, failed: 0 };
   } catch (e) {
     logger.error(e);
@@ -34,15 +47,21 @@ const fetchParseAndLoadMovie = async (
   }
 };
 
-const processMovieIds = async (
-  movieIds: number[],
+const processIdChunk = async (
+  ids: number[],
+  resource: ResourceKey,
   knownWatchProviders: number[],
 ) => {
-  await prisma.movie.deleteMany({ where: { id: { in: movieIds } } });
+  if (resource === 'MOVIE') {
+    await prisma.movie.deleteMany({ where: { id: { in: ids } } });
+  }
+  if (resource === 'PERSON') {
+    await prisma.person.deleteMany({ where: { id: { in: ids } } });
+  }
 
   const result = await Promise.map(
-    movieIds,
-    (movieId) => fetchParseAndLoadMovie(movieId, knownWatchProviders),
+    ids,
+    (id) => fetchParseAndLoad(id, resource, knownWatchProviders),
     { concurrency: 64 },
   );
 
@@ -59,10 +78,10 @@ const processMovieIds = async (
   );
 };
 
-const updateMovies = async (fullMode: boolean) => {
+const updateResource = async (resource: ResourceKey, fullMode: boolean) => {
   const ids = fullMode
-    ? await getValidIds('MOVIE')
-    : await getRecentlyChangedValidIds('MOVIE');
+    ? await getPopularValidIds(resource)
+    : await getRecentlyChangedValidIds(resource);
 
   if (!ids) {
     throw new Error('Unable to fetch ids');
@@ -70,16 +89,20 @@ const updateMovies = async (fullMode: boolean) => {
 
   logger.info(`found ${ids?.length} ids to load`);
 
+  // todo: this could be a top level process at the end of the script?
   if (fullMode) {
-    await removeDeadMovies(ids);
+    if (resource === 'MOVIE') await removeInvalidMovies(ids);
+    if (resource === 'PERSON') await removeInvalidPeople(ids);
   }
 
   const watchProviders = (await prisma.watchProvider.findMany())
-    .map((w) => Number(w.provider_id))
+    .map((w) => Number(w.id))
     .sort((o1, o2) => o1 - o2);
 
   const chunks = chunk(ids, 10_000);
-  await Promise.each(chunks, (ids) => processMovieIds(ids, watchProviders));
+  await Promise.each(chunks, (ids) =>
+    processIdChunk(ids, resource, watchProviders),
+  );
 };
 
 const updateDb = async () => {
@@ -95,20 +118,22 @@ const updateDb = async () => {
 
   const fullMode = isStartOfMonth || argv.full;
 
-  console.log(`running ${fullMode ? 'full' : 'partial'} load`);
+  logger.info(`running ${fullMode ? 'full' : 'partial'} load`);
 
-  console.log('updating genres, languages, and watch providers...');
+  logger.info('updating genres, languages, and watch providers...');
   await Promise.all([
     updateGenres(),
     updateLanguages(),
     updateWatchProviders(),
   ]);
 
-  // await updatePeople(fullMode);
-  console.log('updating movies...');
-  await updateMovies(fullMode);
+  logger.info('updating people...');
+  await updateResource('PERSON', fullMode);
 
-  console.log('updating counts for languages and watch providers');
+  logger.info('updating movies...');
+  await updateResource('MOVIE', fullMode);
+
+  logger.info('updating counts for languages and watch providers');
   await updateLanguageCounts();
   await updateWatchProviderCounts();
   logger.info('finished tmdb_loader script');

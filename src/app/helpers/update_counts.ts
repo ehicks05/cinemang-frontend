@@ -29,7 +29,7 @@ export const updateWatchProviderCounts = async () => {
   const getCountsForProvider = async (p: WatchProvider) => {
     const count = await prisma.movie.count({
       where: {
-        watchProviders: { some: { provider_id: { equals: p.provider_id } } },
+        watchProviders: { some: { id: { equals: p.id } } },
       },
     });
     return { ...p, count };
@@ -42,7 +42,7 @@ export const updateWatchProviderCounts = async () => {
       await prisma.watchProvider.upsert({
         create: p,
         update: p,
-        where: { provider_id: p.provider_id },
+        where: { id: p.id },
       });
     }),
   );

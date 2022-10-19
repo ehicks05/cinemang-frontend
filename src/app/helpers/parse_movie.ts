@@ -1,6 +1,7 @@
 import { Movie } from '@prisma/client';
 import { pick } from 'lodash';
 import { getMovie } from '../../services/tmdb';
+import { RESOURCES } from '../../services/tmdb/constants';
 import { Cast, Crew } from '../../services/tmdb/types';
 
 export const movieIdToParsedMovie = async (
@@ -45,8 +46,36 @@ export const movieIdToParsedMovie = async (
     // so filter out providers that aren't in the watch_provider table
     .filter((wp) => knownWatchProviders.includes(wp.provider_id))
     .map((provider) => ({
-      provider_id: Number(provider.provider_id),
+      id: Number(provider.provider_id),
     }));
+
+  const castCredits = data.credits.cast
+    .filter(
+      (c: { popularity: number }) =>
+        c.popularity >= RESOURCES['PERSON'].MIN_POPULARITY,
+    )
+    .map(
+      (c: {
+        id: number;
+        cast_id: number;
+        character: string;
+        credit_id: string;
+        order: number;
+      }) => ({
+        castId: c.cast_id,
+        creditId: c.credit_id,
+        character: c.character,
+        order: c.order,
+        person: {
+          connect: { id: c.id },
+        },
+      }),
+    );
+
+  if (data.id === 507086) {
+    console.log({ 'data.credits.cast': data.credits.cast });
+    console.log(JSON.stringify({ castCredits }, null, 2));
+  }
 
   return {
     ...pick(data, ['id', 'title', 'overview', 'runtime']),
@@ -61,6 +90,7 @@ export const movieIdToParsedMovie = async (
     voteAverage: data.vote_average,
     genreId,
     watchProviders: { connect: watchProviderIds },
-    updatedAt: new Date(),
+    castCredits: { create: [castCredits[0]] },
+    // crewCredits: { create: crewIds },
   } as Movie;
 };

@@ -1,10 +1,10 @@
 import axios from 'axios';
-import { format } from 'date-fns';
+import { format, isBefore, subDays } from 'date-fns';
 import { TextDecoder } from 'util';
 import logger from '../logger';
 import zlib from 'zlib';
-import { DailyFileRow, ResourceLocationKey } from './types';
-import { DAILY_FILE, RESOURCE_LOCATIONS } from './constants';
+import { DailyFileRow, ResourceKey } from './types';
+import { DAILY_FILE, RESOURCES } from './constants';
 
 /*
  * The daily ID files contain a list of the valid IDs you can find on TMDB
@@ -14,15 +14,22 @@ import { DAILY_FILE, RESOURCE_LOCATIONS } from './constants';
  * The export job runs every day and all files are available by 8:00 AM UTC.
  */
 
-const { CONFIG, HOST, PATH, EXT, MIN_POPULARITY } = DAILY_FILE;
+const { CONFIG, HOST, PATH, EXT } = DAILY_FILE;
 
-const getUrl = (resource: ResourceLocationKey) => {
-  const filename = RESOURCE_LOCATIONS[resource].DAILY_FILE_NAME;
-  const today = format(new Date(), 'MM_dd_yyyy');
-  return `${HOST}${PATH}${filename}_${today}${EXT}`;
+const getFormattedDate = () => {
+  const daysToSub = isBefore(new Date(), new Date().setUTCHours(8, 0, 0, 0))
+    ? 1
+    : 0;
+  return format(subDays(new Date(), daysToSub), 'MM_dd_yyyy');
 };
 
-export const getValidIdRows = async (resource: ResourceLocationKey) => {
+const getUrl = (resource: ResourceKey) => {
+  const filename = RESOURCES[resource].DAILY_FILE_NAME;
+  const date = getFormattedDate();
+  return `${HOST}${PATH}${filename}_${date}${EXT}`;
+};
+
+export const getValidIdRows = async (resource: ResourceKey) => {
   const result = await axios.get(getUrl(resource), CONFIG);
   const unzipped = zlib.gunzipSync(result.data);
   const decoded = new TextDecoder().decode(unzipped);
@@ -33,11 +40,11 @@ export const getValidIdRows = async (resource: ResourceLocationKey) => {
   return rows;
 };
 
-export const getValidIds = async (resource: ResourceLocationKey) => {
+export const getPopularValidIds = async (resource: ResourceKey) => {
   try {
     const rows = await getValidIdRows(resource);
     return rows
-      .filter((row) => row.popularity >= MIN_POPULARITY)
+      .filter((row) => row.popularity >= RESOURCES[resource].MIN_POPULARITY)
       .map((row) => row.id);
   } catch (e) {
     logger.error(e);

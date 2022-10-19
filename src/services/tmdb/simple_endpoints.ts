@@ -1,16 +1,33 @@
 import { format, subDays } from 'date-fns';
 import { intersection } from 'lodash';
 import logger from '../logger';
-import { RESOURCE_LOCATIONS } from './constants';
+import { RESOURCES } from './constants';
 import tmdb from './tmdb';
-import { Genre, Language, ResourceLocationKey, WatchProvider } from './types';
-import { getValidIds } from './valid_ids';
+import {
+  Genre,
+  Language,
+  ResourceKey,
+  TmdbPerson,
+  WatchProvider,
+} from './types';
+import { getPopularValidIds } from './valid_ids';
 
 export const getMovie = async (id: number) => {
   try {
     const append = 'append_to_response=releases,credits,watch/providers,images';
     const result = await tmdb.get(`/movie/${id}?${append}`);
     return result.data;
+  } catch (e) {
+    // if (axios.isAxiosError(e)) logger.error(e.message, { id });
+  }
+  return undefined;
+};
+
+export const getPerson = async (id: number) => {
+  try {
+    const append = 'append_to_response=';
+    const person: TmdbPerson = (await tmdb.get(`/person/${id}?${append}`)).data;
+    return person;
   } catch (e) {
     // if (axios.isAxiosError(e)) logger.error(e.message, { id });
   }
@@ -37,8 +54,8 @@ export const getWatchProviders = async () => {
   return providers;
 };
 
-const getRecentlyChangedIds = async (resource: ResourceLocationKey) => {
-  const path = RESOURCE_LOCATIONS[resource].RECENTLY_CHANGED_PATH;
+const getRecentlyChangedIds = async (resource: ResourceKey) => {
+  const path = RESOURCES[resource].RECENTLY_CHANGED_PATH;
   const start_date = format(subDays(new Date(), 1), 'yyyy-MM-dd');
   const config = { params: { start_date } };
   try {
@@ -51,13 +68,11 @@ const getRecentlyChangedIds = async (resource: ResourceLocationKey) => {
   return [];
 };
 
-export const getRecentlyChangedValidIds = async (
-  resource: ResourceLocationKey,
-) => {
+export const getRecentlyChangedValidIds = async (resource: ResourceKey) => {
   try {
     const [recentlyChangedIds, validIds] = await Promise.all([
       getRecentlyChangedIds(resource),
-      getValidIds(resource),
+      getPopularValidIds(resource),
     ]);
     return intersection(recentlyChangedIds, validIds);
   } catch (e) {

@@ -35,8 +35,8 @@ const findItemsWithMinPopularity = (
 const analysePopularity = async () => {
   console.log('fetching daily id files');
   const [movieRows, personRows] = await Promise.all([
-    getValidIdRows('movie_ids'),
-    getValidIdRows('person_ids'),
+    getValidIdRows('MOVIE'),
+    getValidIdRows('PERSON'),
   ]);
 
   console.log('crunching numbers');
