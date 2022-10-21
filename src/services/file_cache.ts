@@ -1,20 +1,38 @@
 import { existsSync, mkdirSync, realpathSync } from 'fs';
-import { readFile, rm, writeFile } from 'fs/promises';
+import { readdir, readFile, rm, unlink, writeFile } from 'fs/promises';
+import logger from './logger';
 
 const TEMP_DIR = './temp';
 
-if (!existsSync) mkdirSync(TEMP_DIR);
-console.log(realpathSync(TEMP_DIR));
+const getPath = (file: string) => `${TEMP_DIR}/${file}`;
 
-export const set = async (name: string, data: any) => {
+if (!existsSync) mkdirSync(TEMP_DIR);
+logger.info('file cache: ' + realpathSync(TEMP_DIR));
+
+const set = async (name: string, data: any) => {
   await writeFile(`${TEMP_DIR}/${name}`, data, { flag: 'w' });
 };
 
-export const get = async (name: string) => {
-  const path = `${TEMP_DIR}/${name}`;
-  if (existsSync(path)) return await readFile(path);
+const get = async (name: string) => {
+  const path = getPath(name);
+  if (existsSync(path)) return (await readFile(path)).toString();
 };
 
-export const clear = async () => {
-  await rm(TEMP_DIR);
+const clear = async () => {
+  const dir = await readdir(TEMP_DIR);
+  await Promise.all(
+    dir.map((file) => {
+      logger.info('cleaning up file cache: ' + realpathSync(getPath(file)));
+      unlink(realpathSync(getPath(file)));
+    }),
+  );
 };
+
+const fileCache = {
+  clear,
+  get,
+  set,
+  TEMP_DIR,
+};
+
+export default fileCache;

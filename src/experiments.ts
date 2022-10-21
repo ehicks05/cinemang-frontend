@@ -1,28 +1,30 @@
-import { clear, get, set } from './services/file_cache';
+import fileCache from './services/file_cache';
 import logger from './services/logger';
 import { fetchDailyFile, getFilename } from './services/tmdb';
 import { ResourceKey } from './services/tmdb/types';
 
-// export const getDailyFile = async (resource: ResourceKey) => {
-//   const filename = getFilename(resource);
+export const getDailyFile = async (resource: ResourceKey) => {
+  const filename = getFilename(resource);
 
-//   logger.info('checking file cache');
-//   const fromCache = await get(filename);
-//   if (fromCache) {
-//     logger.info('retrieving from file cache');
-//     return fromCache;
-//   }
-//   logger.info('retrieving from tmdb');
+  logger.info('checking file cache');
+  const fromCache = await fileCache.get(filename);
+  if (fromCache) {
+    logger.info('retrieving from file cache');
+    return fromCache;
+  }
+  logger.info('retrieving from tmdb');
 
-//   const fromTmdb = await fetchDailyFile(resource);
+  const fromTmdb = await fetchDailyFile(resource);
 
-//   // clear();
-//   set(filename, fromTmdb);
+  await fileCache.set(filename, fromTmdb);
 
-//   logger.info('done');
-//   return fromTmdb;
-// };
+  logger.info('done');
+  return fromTmdb;
+};
 
-// getDailyFile('MOVIE');
+const main = async () => {
+  const file = await getDailyFile('MOVIE');
+  logger.info(file.split('\n')[0]);
+};
 
-clear();
+main();

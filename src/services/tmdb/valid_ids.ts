@@ -5,6 +5,7 @@ import logger from '../logger';
 import zlib from 'zlib';
 import { DailyFileRow, ResourceKey } from './types';
 import { DAILY_FILE, RESOURCES } from './constants';
+import fileCache from '../file_cache';
 
 /*
  * The daily ID files contain a list of the valid IDs you can find on TMDB
@@ -41,13 +42,29 @@ export const fetchDailyFile = async (resource: ResourceKey) => {
   return decoded;
 };
 
-export const getDailyFile = async (resource: ResourceKey) => {};
+export const getDailyFile = async (resource: ResourceKey) => {
+  const filename = getFilename(resource);
+
+  logger.info('checking file cache');
+  const fromCache = await fileCache.get(filename);
+  if (fromCache) {
+    logger.info('retrieving from file cache');
+    return fromCache;
+  }
+  logger.info('retrieving from tmdb');
+
+  const fromTmdb = await fetchDailyFile(resource);
+
+  await fileCache.set(filename, fromTmdb);
+
+  logger.info('done');
+  return fromTmdb;
+};
 
 export const getValidIdRows = async (resource: ResourceKey) => {
-  const result = await axios.get(getUrl(resource), CONFIG);
-  const unzipped = zlib.gunzipSync(result.data);
-  const decoded = new TextDecoder().decode(unzipped);
-  const rows: DailyFileRow[] = decoded
+  const dailyFile = await getDailyFile(resource);
+
+  const rows: DailyFileRow[] = dailyFile
     .split('\n')
     .filter((l) => l)
     .map((line) => JSON.parse(line));
