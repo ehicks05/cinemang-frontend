@@ -63,7 +63,7 @@ model CastCredit {
   personId Int
 
   castId    Int    @map("cast_id")
-  character String
+  character String?
   order     Int
 
   @@map("cast_credit")

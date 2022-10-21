@@ -1,14 +1,6 @@
 {
-  "compilerOptions": {
-    "target": "ES2018",
-    "module": "commonjs",
-    "lib": ["esnext"],
-    "strict": true,
-    "rootDir": ".",
-    "outDir": "dist",
-    "sourceMap": true,
-    "esModuleInterop": true,
-    "allowJs": true,
-    "skipLibCheck": true
-  }
+  "extends": "@tsconfig/node16/tsconfig.json",
+  "compilerOptions": {},
+  "include": ["src"],
+  "exclude": ["node_modules"]
 }

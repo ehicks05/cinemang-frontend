@@ -52,20 +52,3 @@ export const removeInvalidMovies = async (validIds: number[]) => {
   );
   logger.info(`removed ${invalidIds.length} invalid records`);
 };
-
-// TODO: chunk and process the validIds instead of fetching all ids
-// TODO deduplicate against removeDeadMovies
-export const removeInvalidPeople = async (validIds: number[]) => {
-  logger.info(`Removing records in the db that aren't in the valid ids file.`);
-  const existingIds = (
-    await prisma.person.findMany({ select: { id: true } })
-  ).map((m) => m.id);
-  const invalidIds = existingIds.filter((e) => !validIds?.includes(e));
-  const chunks = chunk(invalidIds, 10_000);
-  await Promise.each(chunks, (ids) =>
-    prisma.person.deleteMany({
-      where: { id: { in: ids } },
-    }),
-  );
-  logger.info(`removed ${invalidIds.length} invalid records`);
-};

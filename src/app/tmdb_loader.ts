@@ -1,10 +1,9 @@
-import { chunk } from 'lodash';
+import { chunk, pick, uniq } from 'lodash';
 import Promise from 'bluebird';
 import { isFirstDayOfMonth } from 'date-fns';
 import { getPopularValidIds } from '../services/tmdb';
 import {
   removeInvalidMovies,
-  removeInvalidPeople,
   updateGenres,
   updateLanguages,
   updateWatchProviders,
@@ -17,48 +16,24 @@ import {
   updateWatchProviderCounts,
 } from './helpers/update_counts';
 import { idToParsedMovie } from './helpers/parse_movie';
-import { ResourceKey } from '../services/tmdb/types';
+import { MovieResponse, ResourceKey } from '../services/tmdb/types';
 import { idToParsedPerson } from './helpers/parse_person';
 import { getRecentlyChangedValidIds } from '../services/tmdb/recent_changes';
+import { Prisma } from '@prisma/client';
+import cache from '../services/cache';
+import { filesize } from 'filesize';
 
-const fetchParseAndLoad = async (
-  id: number,
-  resource: ResourceKey,
-  knownWatchProviders: number[],
-) => {
+const fetchAndParse = async (id: number, resource: ResourceKey) => {
   try {
-    const data =
-      resource === 'MOVIE'
-        ? await idToParsedMovie(id, knownWatchProviders)
-        : await idToParsedPerson(id);
-
-    if (!data) {
-      return { loaded: 0, failed: 1 };
-    }
-
-    try {
-      if ('title' in data) {
-        await prisma.movie.create({ data });
-      }
-      if ('name' in data) {
-        await prisma.person.create({ data });
-      }
-    } catch (e) {
-      logger.error('failed to save', data);
-      throw e;
-    }
-    return { loaded: 1, failed: 0 };
+    return resource === 'MOVIE'
+      ? await idToParsedMovie(id)
+      : await idToParsedPerson(id);
   } catch (e) {
     logger.error(e);
-    return { loaded: 0, failed: 1 };
   }
 };
 
-const processIdChunk = async (
-  ids: number[],
-  resource: ResourceKey,
-  knownWatchProviders: number[],
-) => {
+const processIdChunk = async (ids: number[], resource: ResourceKey) => {
   if (resource === 'MOVIE') {
     await prisma.movie.deleteMany({ where: { id: { in: ids } } });
   }
@@ -66,48 +41,149 @@ const processIdChunk = async (
     await prisma.person.deleteMany({ where: { id: { in: ids } } });
   }
 
-  const result = await Promise.map(
-    ids,
-    (id) => fetchParseAndLoad(id, resource, knownWatchProviders),
-    { concurrency: 4 },
-  );
+  const parsed = await Promise.map(ids, (id) => fetchAndParse(id, resource), {
+    concurrency: 64,
+  });
 
-  const status = result.reduce(
-    (agg, curr) => ({
-      loaded: agg.loaded + curr.loaded,
-      failed: agg.failed + curr.failed,
-    }),
-    { loaded: 0, failed: 0 },
-  );
+  let createResult;
+  try {
+    if (resource === 'MOVIE') {
+      const data = parsed.filter((r): r is Prisma.MovieCreateInput => !!r);
+      createResult = await prisma.movie.createMany({ data });
+    }
+    if (resource === 'PERSON') {
+      const data = parsed.filter((r): r is Prisma.PersonCreateInput => !!r);
+      createResult = await prisma.person.createMany({ data });
+    }
+  } catch (e) {
+    logger.error('error while saving');
+  }
 
-  logger.info(`  loaded: ${status.loaded}, failed: (${status.failed})`);
+  logger.info(
+    `  loaded: ${createResult?.count}, failed: (${
+      ids.length - (createResult?.count || 0)
+    })`,
+  );
+  if (resource === 'MOVIE') {
+    const stats = cache.getStats();
+    logger.info({
+      cache: {
+        keys: stats.keys,
+        ksize: filesize(stats.ksize),
+        vsize: filesize(stats.vsize),
+        vAvg: filesize(stats.vsize / stats.keys),
+      },
+    });
+  }
+};
+
+const getPersonIds = () => {
+  const personIds = uniq(
+    cache
+      .keys()
+      .map((k) => cache.get(k))
+      .map((v) => {
+        const movie = v as MovieResponse;
+
+        return uniq([
+          ...movie.credits.cast.map((c) => c.id),
+          ...movie.credits.crew.map((c) => c.id),
+        ]);
+      })
+      .flat(),
+  );
+  return personIds;
 };
 
 const updateResource = async (resource: ResourceKey, fullMode: boolean) => {
-  const ids = fullMode
-    ? await getPopularValidIds(resource)
-    : await getRecentlyChangedValidIds(resource);
+  const ids =
+    resource === 'PERSON'
+      ? getPersonIds()
+      : fullMode
+      ? await getPopularValidIds(resource)
+      : // :  [629];
+        await getRecentlyChangedValidIds(resource);
 
   if (!ids) {
     throw new Error('Unable to fetch ids');
   }
 
-  logger.info(`found ${ids?.length} ids to load`);
+  logger.info(`found ${ids?.length} ${resource.toLowerCase()} ids to load`);
 
   // todo: this could be a top level process at the end of the script?
-  if (fullMode) {
-    if (resource === 'MOVIE') await removeInvalidMovies(ids);
-    if (resource === 'PERSON') await removeInvalidPeople(ids);
+  if (fullMode && resource === 'MOVIE') {
+    await removeInvalidMovies(ids);
   }
 
-  const watchProviders = (await prisma.watchProvider.findMany())
-    .map((w) => Number(w.id))
-    .sort((o1, o2) => o1 - o2);
+  const chunks = chunk(ids, 10_000);
+  await Promise.each(chunks, (ids) => processIdChunk(ids, resource));
+};
 
-  const chunks = chunk(ids, 100);
-  await Promise.each(chunks, (ids) =>
-    processIdChunk(ids, resource, watchProviders),
-  );
+const updateRelationships = async () => {
+  logger.info('updating relationships...');
+  const castCreateInputs: Prisma.CastCreditUncheckedCreateInput[] = cache
+    .keys()
+    .map((k) => cache.get(k))
+    .map((v) => {
+      const movie = v as MovieResponse;
+      return movie.credits.cast.map((c) => ({
+        movieId: movie.id,
+        personId: c.id,
+        ...pick(c, ['character', 'order']),
+        castId: c.cast_id,
+        creditId: c.credit_id,
+      }));
+    })
+    .flat();
+
+  // console.log({ castCreateInputs });
+
+  const castResult = await prisma.castCredit.createMany({
+    data: castCreateInputs,
+  });
+  logger.info(`created ${castResult.count} castCredits`);
+
+  const crewCreateInputs: Prisma.CrewCreditUncheckedCreateInput[] = cache
+    .keys()
+    .map((k) => cache.get(k))
+    .map((v) => {
+      const movie = v as MovieResponse;
+      return movie.credits.crew.map((c) => ({
+        movieId: movie.id,
+        personId: c.id,
+        ...pick(c, ['department', 'job']),
+        creditId: c.credit_id,
+      }));
+    })
+    .flat();
+  const crewResult = await prisma.crewCredit.createMany({
+    data: crewCreateInputs,
+  });
+  logger.info(`created ${crewResult.count} crewCredits`);
+
+  const movieWatchProviderCreateInputs: Prisma.MovieWatchProviderUncheckedCreateInput[] =
+    cache
+      .keys()
+      .map((k) => cache.get(k))
+      .map((v) => {
+        const movie = v as MovieResponse;
+        const providers = movie['watch/providers'].results.US?.flatrate || [];
+        return (
+          providers
+            // // CBS (provider_id:78) seems to be sneaking in to US results
+            .filter((p) => p.provider_id !== 78)
+            .map((p) => ({
+              movieId: movie.id,
+              watchProviderId: p.provider_id,
+            }))
+        );
+      })
+      .flat();
+
+  const movieWatchProviderResult = await prisma.movieWatchProvider.createMany({
+    data: movieWatchProviderCreateInputs,
+  });
+  logger.info(`created ${movieWatchProviderResult.count} movieWatchProviders`);
 };
 
 const updateDb = async () => {
@@ -132,15 +208,14 @@ const updateDb = async () => {
     updateWatchProviders(),
   ]);
 
-  // logger.info('updating people...');
-  // await updateResource('PERSON', fullMode);
-
-  logger.info('updating movies...');
   await updateResource('MOVIE', fullMode);
+  await updateResource('PERSON', fullMode);
+  await updateRelationships();
 
   logger.info('updating counts for languages and watch providers');
   await updateLanguageCounts();
   await updateWatchProviderCounts();
+
   logger.info('finished tmdb_loader script');
 };
 

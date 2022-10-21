@@ -4,7 +4,7 @@ import { getPerson } from '../../services/tmdb';
 import { PersonResponse } from '../../services/tmdb/types';
 
 const isValidPerson = (person: PersonResponse) => {
-  return !person.adult;
+  return true;
 };
 
 export const idToParsedPerson = async (id: number) => {
