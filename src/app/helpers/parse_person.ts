@@ -1,18 +1,22 @@
-import { Person } from '@prisma/client';
+import { Prisma } from '@prisma/client';
 import { pick } from 'lodash';
-import logger from '../../services/logger';
 import { getPerson } from '../../services/tmdb';
+import { PersonResponse } from '../../services/tmdb/types';
+
+const isValidPerson = (person: PersonResponse) => {
+  return !person.adult;
+};
 
 export const idToParsedPerson = async (id: number) => {
   const data = await getPerson(id);
-
-  // ignore people missing required data
-  if (!data || !data.name || !data.profile_path) {
-    logger.error(`failed on person:`, data?.id);
+  if (!data) {
+    return undefined;
+  }
+  if (!isValidPerson(data)) {
     return undefined;
   }
 
-  return {
+  const create: Prisma.PersonCreateInput = {
     ...pick(data, ['id', 'biography', 'name', 'popularity']),
     birthday: new Date(data.birthday),
     deathday: data.deathday ? new Date(data.deathday) : undefined,
@@ -21,5 +25,6 @@ export const idToParsedPerson = async (id: number) => {
     knownForDepartment: data.known_for_department,
     placeOfBirth: data.place_of_birth,
     profilePath: data.profile_path,
-  } as Person;
+  };
+  return create;
 };

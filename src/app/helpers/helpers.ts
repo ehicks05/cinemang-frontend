@@ -7,7 +7,6 @@ import {
   getLanguages,
   getWatchProviders,
 } from '../../services/tmdb';
-import { WatchProvider } from '../../services/tmdb/types';
 
 export const updateGenres = async () => {
   const data = await getGenres();
@@ -17,89 +16,56 @@ export const updateGenres = async () => {
 };
 
 export const updateLanguages = async () => {
-  const data = await getLanguages();
-  const languages = data.map((lang) => ({
+  const data = (await getLanguages()).map((lang) => ({
     id: lang.iso_639_1,
     name: lang.english_name,
   }));
   await prisma.language.deleteMany();
-  await prisma.language.createMany({ data: languages });
+  await prisma.language.createMany({ data });
   logger.info(`loaded ${data.length} languages`);
 };
 
 export const updateWatchProviders = async () => {
-  const data = await getWatchProviders();
-
-  const mapper = (p: WatchProvider) => {
-    const usPriority = p.display_priorities['US'];
-    return {
-      displayPriority: usPriority,
-      id: p.provider_id,
-      logoPath: p.logo_path,
-      name: p.provider_name,
-    };
-  };
-
-  const watchProviders = data.map(mapper);
-
-  await Promise.all(
-    watchProviders.map(async (p) => {
-      await prisma.watchProvider.upsert({
-        create: p,
-        update: p,
-        where: { id: p.id },
-      });
-    }),
-  );
-
-  logger.info(`upserted ${watchProviders.length} watch providers`);
+  const data = (await getWatchProviders()).map((p) => ({
+    displayPriority: p.display_priorities['US'],
+    id: p.provider_id,
+    logoPath: p.logo_path,
+    name: p.provider_name,
+  }));
+  await prisma.watchProvider.deleteMany();
+  await prisma.watchProvider.createMany({ data });
+  logger.info(`loaded ${data.length} watch providers`);
 };
 
 // TODO: chunk and process the validIds instead of fetching all ids
 export const removeInvalidMovies = async (validIds: number[]) => {
-  logger.info(
-    `Deleting invalid records before continuing. Invalid = items in 
-    the db that are missing from the valid ids file.`,
-  );
-
+  logger.info(`Removing records in the db that aren't in the valid ids file.`);
   const existingIds = (
     await prisma.movie.findMany({ select: { id: true } })
   ).map((m) => m.id);
   const invalidIds = existingIds.filter((e) => !validIds?.includes(e));
-  logger.info(`identified ${invalidIds.length} invalid records`);
-
   const chunks = chunk(invalidIds, 10_000);
-
   await Promise.each(chunks, (ids) =>
     prisma.movie.deleteMany({
       where: { id: { in: ids } },
     }),
   );
-
-  logger.info(`finished deleting invalid records`);
+  logger.info(`removed ${invalidIds.length} invalid records`);
 };
 
 // TODO: chunk and process the validIds instead of fetching all ids
 // TODO deduplicate against removeDeadMovies
 export const removeInvalidPeople = async (validIds: number[]) => {
-  logger.info(
-    `Deleting invalid records before continuing. Invalid = items in 
-    the db that are missing from the valid ids file.`,
-  );
-
+  logger.info(`Removing records in the db that aren't in the valid ids file.`);
   const existingIds = (
     await prisma.person.findMany({ select: { id: true } })
   ).map((m) => m.id);
   const invalidIds = existingIds.filter((e) => !validIds?.includes(e));
-  logger.info(`identified ${invalidIds.length} invalid records`);
-
   const chunks = chunk(invalidIds, 10_000);
-
   await Promise.each(chunks, (ids) =>
     prisma.person.deleteMany({
       where: { id: { in: ids } },
     }),
   );
-
-  logger.info(`finished deleting invalid records`);
+  logger.info(`removed ${invalidIds.length} invalid records`);
 };

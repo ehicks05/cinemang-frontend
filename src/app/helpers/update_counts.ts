@@ -1,4 +1,4 @@
-import { WatchProvider } from '@prisma/client';
+import { omit } from 'lodash';
 import logger from '../../services/logger';
 import prisma from '../../services/prisma';
 
@@ -24,18 +24,20 @@ export const updateLanguageCounts = async () => {
 };
 
 export const updateWatchProviderCounts = async () => {
-  const providers = await prisma.watchProvider.findMany();
-
-  const getCountsForProvider = async (p: WatchProvider) => {
-    const count = await prisma.movie.count({
-      where: {
-        watchProviders: { some: { id: { equals: p.id } } },
+  const watchProvidersWithCounts = await prisma.watchProvider.findMany({
+    include: {
+      _count: {
+        select: {
+          movies: true,
+        },
       },
-    });
-    return { ...p, count };
-  };
+    },
+  });
 
-  const watchProviders = await Promise.all(providers.map(getCountsForProvider));
+  const watchProviders = watchProvidersWithCounts.map((wp) => ({
+    ...omit(wp, ['_count']),
+    count: wp._count.movies,
+  }));
 
   await Promise.all(
     watchProviders.map(async (p) => {

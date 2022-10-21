@@ -1,96 +1,140 @@
-import { Movie } from '@prisma/client';
-import { pick } from 'lodash';
+import { Prisma } from '@prisma/client';
+import { pick, uniq } from 'lodash';
+import prisma from '../../services/prisma';
 import { getMovie } from '../../services/tmdb';
 import { RESOURCES } from '../../services/tmdb/constants';
-import { Cast, Crew } from '../../services/tmdb/types';
+import { Credit, MovieResponse, ResourceKey } from '../../services/tmdb/types';
+import { idToParsedPerson } from './parse_person';
 
-export const movieIdToParsedMovie = async (
+export const isValidMovie = (
+  movie: MovieResponse,
+  director?: string,
+  cast?: string,
+) => {
+  return !!(
+    !movie.adult &&
+    movie.credits &&
+    movie.genres[0] &&
+    movie.poster_path &&
+    movie.release_date &&
+    movie.releases &&
+    movie.runtime &&
+    movie.vote_count >= 3 &&
+    director?.length &&
+    cast?.length
+  );
+};
+
+export const isValidCredit = (credit: Credit, resource: ResourceKey) => {
+  return (
+    !credit.adult && credit.popularity >= RESOURCES[resource].MIN_POPULARITY
+  );
+};
+
+export const idToParsedMovie = async (
   id: number,
   knownWatchProviders: number[],
 ) => {
   const data = await getMovie(id);
+  if (!data) return undefined;
+
+  const director: string | undefined = data.credits.crew.find(
+    (c) => c.job === 'Director',
+  )?.name;
+  const cast = data.credits.cast
+    .slice(0, 3)
+    .map((c) => c.name)
+    .join(', ');
 
   // ignore movies missing required data
-  if (
-    !data ||
-    !data.credits ||
-    !data.genres[0] ||
-    !data.poster_path ||
-    !data.release_date ||
-    !data.releases ||
-    !data.runtime ||
-    data.vote_count < 3
-  ) {
-    return undefined;
-  }
-
-  const director = data.credits.crew.filter(
-    (c: Crew) => c.job === 'Director',
-  )[0]?.name;
-  const cast = data.credits.cast.slice(0, 3).map((c: Cast) => c.name);
-
-  // round two of ignore movies missing required data
-  if (!director || !cast) {
+  if (!isValidMovie(data, director, cast)) {
     return undefined;
   }
 
   const certification = data.releases.countries.find(
-    (r: { iso_3166_1: string; certification: string }) =>
-      r.iso_3166_1 === 'US' && r.certification,
+    (r) => r.iso_3166_1 === 'US' && r.certification,
   )?.certification;
   const genreId = data.genres[0].id;
-  const watchProviders: { provider_id: number }[] =
-    data['watch/providers']?.results?.US?.flatrate || [];
-  const watchProviderIds = watchProviders
-    // cbs (provider_id:78) seems to be sneaking in to US results
-    // so filter out providers that aren't in the watch_provider table
+
+  // cbs (provider_id:78) seems to be sneaking in to US results
+  // so filter out providers that aren't in the watch_provider table
+  const watchProviders = (data['watch/providers'].results.US?.flatrate || [])
     .filter((wp) => knownWatchProviders.includes(wp.provider_id))
     .map((provider) => ({
-      id: Number(provider.provider_id),
+      watchProvider: { connect: { id: provider.provider_id } },
     }));
 
   const castCredits = data.credits.cast
-    .filter(
-      (c: { popularity: number }) =>
-        c.popularity >= RESOURCES['PERSON'].MIN_POPULARITY,
-    )
-    .map(
-      (c: {
-        id: number;
-        cast_id: number;
-        character: string;
-        credit_id: string;
-        order: number;
-      }) => ({
-        castId: c.cast_id,
-        creditId: c.credit_id,
-        character: c.character,
-        order: c.order,
-        person: {
-          connect: { id: c.id },
+    .filter((c) => isValidCredit(c, 'PERSON'))
+    .map((c) => ({
+      ...pick(c, ['character', 'order']),
+      castId: c.cast_id,
+      creditId: c.credit_id,
+      person: {
+        connect: { id: c.id },
+      },
+    }));
+  const crewCredits = data.credits.crew
+    .filter((c) => isValidCredit(c, 'PERSON'))
+    .map((c) => ({
+      ...pick(c, ['department', 'job']),
+      creditId: c.credit_id,
+      person: {
+        connect: { id: c.id },
+      },
+    }));
+
+  const peopleIdsInMovie = [...castCredits, ...crewCredits].map(
+    (c) => c.person.connect.id,
+  );
+  const peopleIdsInDb = (
+    await prisma.person.findMany({
+      where: {
+        id: {
+          in: peopleIdsInMovie,
         },
+      },
+      select: { id: true },
+    })
+  ).map((p) => p.id);
+
+  const peopleIdsToAdd = uniq(
+    peopleIdsInMovie.filter((p) => !peopleIdsInDb.includes(p)),
+  );
+
+  const peopleData = (
+    await Promise.all(peopleIdsToAdd.map((p) => idToParsedPerson(p)))
+  ).filter((p): p is Prisma.PersonCreateInput => !!p);
+
+  // await prisma.person.createMany({
+  //   data: peopleData,
+  // });
+
+  await Promise.all(
+    peopleData.map((p) =>
+      prisma.person.upsert({
+        where: { id: p.id },
+        create: p,
+        update: p,
       }),
-    );
+    ),
+  );
 
-  if (data.id === 507086) {
-    console.log({ 'data.credits.cast': data.credits.cast });
-    console.log(JSON.stringify({ castCredits }, null, 2));
-  }
-
-  return {
-    ...pick(data, ['id', 'title', 'overview', 'runtime']),
+  const create: Prisma.MovieCreateInput = {
+    ...pick(data, ['id', 'popularity', 'title']),
+    ...{ cast, certification, director, genreId },
+    director: director!,
     imdbId: data.imdb_id,
     releasedAt: new Date(data.release_date),
     languageId: data.original_language,
-    director,
-    cast: cast.join(', '),
-    posterPath: data.poster_path,
-    certification,
+    overview: data.overview!,
+    posterPath: data.poster_path!,
+    runtime: data.runtime!,
     voteCount: data.vote_count,
     voteAverage: data.vote_average,
-    genreId,
-    watchProviders: { connect: watchProviderIds },
-    castCredits: { create: [castCredits[0]] },
-    // crewCredits: { create: crewIds },
-  } as Movie;
+    watchProviders: { create: watchProviders },
+    castCredits: { create: castCredits },
+    crewCredits: { create: crewCredits },
+  };
+  return create;
 };

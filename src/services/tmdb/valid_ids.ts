@@ -44,7 +44,10 @@ export const getPopularValidIds = async (resource: ResourceKey) => {
   try {
     const rows = await getValidIdRows(resource);
     return rows
-      .filter((row) => row.popularity >= RESOURCES[resource].MIN_POPULARITY)
+      .filter((row) => {
+        if (row.id === 1771 && resource === 'PERSON') console.log(row);
+        return row.popularity >= RESOURCES[resource].MIN_POPULARITY;
+      })
       .map((row) => row.id);
   } catch (e) {
     logger.error(e);

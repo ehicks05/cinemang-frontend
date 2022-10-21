@@ -1,10 +1,7 @@
 import { chunk } from 'lodash';
 import Promise from 'bluebird';
 import { isFirstDayOfMonth } from 'date-fns';
-import {
-  getPopularValidIds,
-  getRecentlyChangedValidIds,
-} from '../services/tmdb';
+import { getPopularValidIds } from '../services/tmdb';
 import {
   removeInvalidMovies,
   removeInvalidPeople,
@@ -19,9 +16,10 @@ import {
   updateLanguageCounts,
   updateWatchProviderCounts,
 } from './helpers/update_counts';
-import { movieIdToParsedMovie } from './helpers/parse_movie';
+import { idToParsedMovie } from './helpers/parse_movie';
 import { ResourceKey } from '../services/tmdb/types';
 import { idToParsedPerson } from './helpers/parse_person';
+import { getRecentlyChangedValidIds } from '../services/tmdb/recent_changes';
 
 const fetchParseAndLoad = async (
   id: number,
@@ -31,15 +29,24 @@ const fetchParseAndLoad = async (
   try {
     const data =
       resource === 'MOVIE'
-        ? await movieIdToParsedMovie(id, knownWatchProviders)
+        ? await idToParsedMovie(id, knownWatchProviders)
         : await idToParsedPerson(id);
 
     if (!data) {
       return { loaded: 0, failed: 1 };
     }
 
-    if ('title' in data) await prisma.movie.create({ data });
-    if ('name' in data) await prisma.person.create({ data });
+    try {
+      if ('title' in data) {
+        await prisma.movie.create({ data });
+      }
+      if ('name' in data) {
+        await prisma.person.create({ data });
+      }
+    } catch (e) {
+      logger.error('failed to save', data);
+      throw e;
+    }
     return { loaded: 1, failed: 0 };
   } catch (e) {
     logger.error(e);
@@ -62,7 +69,7 @@ const processIdChunk = async (
   const result = await Promise.map(
     ids,
     (id) => fetchParseAndLoad(id, resource, knownWatchProviders),
-    { concurrency: 64 },
+    { concurrency: 4 },
   );
 
   const status = result.reduce(
@@ -73,9 +80,7 @@ const processIdChunk = async (
     { loaded: 0, failed: 0 },
   );
 
-  logger.info(
-    `chunk done: loaded: ${status.loaded}, failed: (${status.failed})`,
-  );
+  logger.info(`  loaded: ${status.loaded}, failed: (${status.failed})`);
 };
 
 const updateResource = async (resource: ResourceKey, fullMode: boolean) => {
@@ -99,7 +104,7 @@ const updateResource = async (resource: ResourceKey, fullMode: boolean) => {
     .map((w) => Number(w.id))
     .sort((o1, o2) => o1 - o2);
 
-  const chunks = chunk(ids, 10_000);
+  const chunks = chunk(ids, 100);
   await Promise.each(chunks, (ids) =>
     processIdChunk(ids, resource, watchProviders),
   );
@@ -127,8 +132,8 @@ const updateDb = async () => {
     updateWatchProviders(),
   ]);
 
-  logger.info('updating people...');
-  await updateResource('PERSON', fullMode);
+  // logger.info('updating people...');
+  // await updateResource('PERSON', fullMode);
 
   logger.info('updating movies...');
   await updateResource('MOVIE', fullMode);

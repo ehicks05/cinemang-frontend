@@ -16,6 +16,7 @@ model Movie {
   imdbId        String?  @map("imdb_id")
   languageId    String   @map("language_id")
   overview      String
+  popularity    Float
   posterPath    String   @map("poster_path")
   releasedAt    DateTime @map("released_at") @db.Date
   runtime       Int
@@ -23,9 +24,9 @@ model Movie {
   voteAverage   Float    @map("vote_average")
   voteCount     Int      @map("vote_count")
 
-  watchProviders WatchProvider[]
   castCredits    CastCredit[]
   crewCredits    CrewCredit[]
+  watchProviders MovieWatchProvider[]
 
   @@index([title])
   @@index([languageId])
@@ -39,14 +40,14 @@ model Person {
   id                 Int          @id
   imdbId             String?      @map("imdb_id")
   biography          String
-  birthday           DateTime     @db.Date
+  birthday           DateTime?    @db.Date
   deathday           DateTime?    @db.Date
   gender             Int
   knownForDepartment String       @map("known_for_department")
   name               String
   placeOfBirth       String?      @map("place_of_birth")
   popularity         Float
-  profilePath        String       @map("profile_path")
+  profilePath        String?      @map("profile_path")
   castCredits        CastCredit[]
   crewCredits        CrewCredit[]
 
@@ -54,31 +55,31 @@ model Person {
 }
 
 model CastCredit {
+  creditId String @id @map("credit_id")
+
   movie    Movie  @relation(fields: [movieId], references: [id], onDelete: Cascade)
   movieId  Int
   person   Person @relation(fields: [personId], references: [id], onDelete: Cascade)
   personId Int
 
   castId    Int    @map("cast_id")
-  creditId  String @map("credit_id")
   character String
   order     Int
 
-  @@id([movieId, personId])
   @@map("cast_credit")
 }
 
 model CrewCredit {
+  creditId String @id @map("credit_id")
+
   movie    Movie  @relation(fields: [movieId], references: [id], onDelete: Cascade)
   movieId  Int
   person   Person @relation(fields: [personId], references: [id], onDelete: Cascade)
   personId Int
 
-  creditId   String @map("credit_id")
   department String
   job        String
 
-  @@id([movieId, personId])
   @@map("crew_credit")
 }
 
@@ -98,12 +99,22 @@ model Language {
 }
 
 model WatchProvider {
-  id              Int     @id
-  displayPriority Int     @map("display_priority")
+  id              Int                  @id
+  displayPriority Int                  @map("display_priority")
   name            String
-  logoPath        String  @map("logo_path")
-  count           Int     @default(0)
-  movies          Movie[]
+  logoPath        String               @map("logo_path")
+  count           Int                  @default(0)
+  movies          MovieWatchProvider[]
 
   @@map("watch_provider")
+}
+
+model MovieWatchProvider {
+  movie           Movie         @relation(fields: [movieId], references: [id], onDelete: Cascade)
+  movieId         Int
+  watchProvider   WatchProvider @relation(fields: [watchProviderId], references: [id], onDelete: Cascade)
+  watchProviderId Int
+
+  @@id([movieId, watchProviderId])
+  @@map("movie_watch_provider")
 }
