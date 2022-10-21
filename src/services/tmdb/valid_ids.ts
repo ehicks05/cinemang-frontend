@@ -23,11 +23,25 @@ const getFormattedDate = () => {
   return format(subDays(new Date(), daysToSub), 'MM_dd_yyyy');
 };
 
-const getUrl = (resource: ResourceKey) => {
+export const getFilename = (resource: ResourceKey) => {
   const filename = RESOURCES[resource].DAILY_FILE_NAME;
   const date = getFormattedDate();
-  return `${HOST}${PATH}${filename}_${date}${EXT}`;
+  return `${filename}_${date}${EXT}`;
 };
+
+const getUrl = (resource: ResourceKey) => {
+  const filename = getFilename(resource);
+  return `${HOST}${PATH}${filename}`;
+};
+
+export const fetchDailyFile = async (resource: ResourceKey) => {
+  const result = await axios.get(getUrl(resource), CONFIG);
+  const unzipped = zlib.gunzipSync(result.data);
+  const decoded = new TextDecoder().decode(unzipped);
+  return decoded;
+};
+
+export const getDailyFile = async (resource: ResourceKey) => {};
 
 export const getValidIdRows = async (resource: ResourceKey) => {
   const result = await axios.get(getUrl(resource), CONFIG);

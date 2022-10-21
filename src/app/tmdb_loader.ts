@@ -100,7 +100,7 @@ const updateResource = async (resource: ResourceKey, fullMode: boolean) => {
     resource === 'PERSON'
       ? getPersonIds()
       : fullMode
-      ? await getPopularValidIds(resource)
+      ? (await getPopularValidIds(resource))?.slice(0, 1_000)
       : // :  [629];
         await getRecentlyChangedValidIds(resource);
 
@@ -119,71 +119,80 @@ const updateResource = async (resource: ResourceKey, fullMode: boolean) => {
   await Promise.each(chunks, (ids) => processIdChunk(ids, resource));
 };
 
+const movieToCastCredits = (movie: MovieResponse) => {
+  return movie.credits.cast.map((c) => ({
+    movieId: movie.id,
+    personId: c.id,
+    ...pick(c, ['character', 'order']),
+    castId: c.cast_id,
+    creditId: c.credit_id,
+  }));
+};
+const movieToCrewCredits = (movie: MovieResponse) => {
+  return movie.credits.crew.map((c) => ({
+    movieId: movie.id,
+    personId: c.id,
+    ...pick(c, ['department', 'job']),
+    creditId: c.credit_id,
+  }));
+};
+const movieToMovieWatchProviders = (movie: MovieResponse) => {
+  const providers = movie['watch/providers'].results.US?.flatrate || [];
+  return (
+    providers
+      // // CBS (provider_id:78) seems to be sneaking in to US results
+      .filter((p) => p.provider_id !== 78)
+      .map((p) => ({
+        movieId: movie.id,
+        watchProviderId: p.provider_id,
+      }))
+  );
+};
+
 const updateRelationships = async () => {
   logger.info('updating relationships...');
-  const castCreateInputs: Prisma.CastCreditUncheckedCreateInput[] = cache
-    .keys()
-    .map((k) => cache.get(k))
-    .map((v) => {
-      const movie = v as MovieResponse;
-      return movie.credits.cast.map((c) => ({
-        movieId: movie.id,
-        personId: c.id,
-        ...pick(c, ['character', 'order']),
-        castId: c.cast_id,
-        creditId: c.credit_id,
-      }));
-    })
-    .flat();
 
-  // console.log({ castCreateInputs });
+  const keyChunks = chunk(cache.keys(), 10_000);
 
-  const castResult = await prisma.castCredit.createMany({
-    data: castCreateInputs,
-  });
-  logger.info(`created ${castResult.count} castCredits`);
-
-  const crewCreateInputs: Prisma.CrewCreditUncheckedCreateInput[] = cache
-    .keys()
-    .map((k) => cache.get(k))
-    .map((v) => {
-      const movie = v as MovieResponse;
-      return movie.credits.crew.map((c) => ({
-        movieId: movie.id,
-        personId: c.id,
-        ...pick(c, ['department', 'job']),
-        creditId: c.credit_id,
-      }));
-    })
-    .flat();
-  const crewResult = await prisma.crewCredit.createMany({
-    data: crewCreateInputs,
-  });
-  logger.info(`created ${crewResult.count} crewCredits`);
-
-  const movieWatchProviderCreateInputs: Prisma.MovieWatchProviderUncheckedCreateInput[] =
-    cache
-      .keys()
+  let count = 0;
+  await Promise.each(keyChunks, async (keyChunk) => {
+    const data: Prisma.CastCreditUncheckedCreateInput[] = keyChunk
       .map((k) => cache.get(k))
-      .map((v) => {
-        const movie = v as MovieResponse;
-        const providers = movie['watch/providers'].results.US?.flatrate || [];
-        return (
-          providers
-            // // CBS (provider_id:78) seems to be sneaking in to US results
-            .filter((p) => p.provider_id !== 78)
-            .map((p) => ({
-              movieId: movie.id,
-              watchProviderId: p.provider_id,
-            }))
-        );
-      })
+      .map((v) => movieToCastCredits(v as MovieResponse))
       .flat();
 
-  const movieWatchProviderResult = await prisma.movieWatchProvider.createMany({
-    data: movieWatchProviderCreateInputs,
+    const result = await prisma.castCredit.createMany({ data });
+    count += result.count;
   });
-  logger.info(`created ${movieWatchProviderResult.count} movieWatchProviders`);
+
+  logger.info(`created ${count} castCredits`);
+  count = 0;
+
+  await Promise.each(keyChunks, async (keyChunk) => {
+    const data: Prisma.CrewCreditUncheckedCreateInput[] = keyChunk
+      .map((k) => cache.get(k))
+      .map((v) => movieToCrewCredits(v as MovieResponse))
+      .flat();
+
+    const result = await prisma.crewCredit.createMany({ data });
+    count += result.count;
+  });
+
+  logger.info(`created ${count} crewCredits`);
+  count = 0;
+
+  await Promise.each(keyChunks, async (keyChunk) => {
+    const data: Prisma.MovieWatchProviderUncheckedCreateInput[] = keyChunk
+      .map((k) => cache.get(k))
+      .map((v) => movieToMovieWatchProviders(v as MovieResponse))
+      .flat();
+
+    const result = await prisma.movieWatchProvider.createMany({ data });
+    count += result.count;
+  });
+
+  logger.info(`created ${count} movieWatchProviders`);
+  count = 0;
 };
 
 const updateDb = async () => {
