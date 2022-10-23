@@ -2,6 +2,7 @@ export interface Film {
   cast: string;
   director: string;
   genre_id: number;
+  id: number;
   language_id: number;
   overview: string;
   poster_path: string;

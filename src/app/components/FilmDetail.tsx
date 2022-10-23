@@ -7,7 +7,9 @@ import chroma from 'chroma-js';
 import Stats from './Stats';
 import WatchProviders from './WatchProviders';
 import { Film as IFilm, Genre, Language, WatchProvider } from '../../types';
-import { Link } from 'react-router-dom';
+import { useFetchSystemData } from '../hooks/useFetchSystemData';
+import { useFetchFilm } from '../hooks/useFetchFilms';
+import { useParams } from 'react-router-dom';
 
 const nf = Intl.NumberFormat('en-US', { maximumFractionDigits: 1 });
 
@@ -17,7 +19,7 @@ const SCALED_IMAGE = {
   w: IMAGE_WIDTH / 2,
 };
 
-const Film = ({
+const FilmDetail = ({
   film,
   genres,
   languages,
@@ -89,9 +91,7 @@ const Film = ({
         </div>
         <div className="flex flex-col gap-1">
           <div>
-            <Link className="text-lg font-bold" to={`/films/${film.id}`}>
-              {film.title}
-            </Link>{' '}
+            <span className="text-lg font-bold">{film.title}</span>{' '}
             <span className="text-xs text-gray-300" title={releasedAt}>
               ({year})
             </span>
@@ -108,7 +108,7 @@ const Film = ({
           )}
         </div>
       </div>
-      <div className="flex h-full flex-col justify-between gap-4">
+      <div className="flex flex-col justify-between gap-4">
         <div
           className="text-justify text-sm"
           onClick={() => setTruncateOverview(!truncateOverview)}
@@ -124,4 +124,40 @@ const Film = ({
   );
 };
 
-export default Film;
+const FilmDetailWrapper = () => {
+  const { id } = useParams();
+
+  const systemDataQuery = useFetchSystemData();
+  const filmQuery = useFetchFilm(Number(id) || 0);
+
+  const error = systemDataQuery.error || filmQuery.error;
+  const isLoading = systemDataQuery.isLoading || filmQuery.isLoading;
+  const systemData = systemDataQuery.data;
+  const filmData = filmQuery.data;
+
+  if (error || isLoading) return <Loading error={error} loading={isLoading} />;
+  if (!systemData) {
+    return <Loading error={'systemData is undefined'} loading={isLoading} />;
+  }
+  const { genres, languages, watchProviders } = systemData;
+  if (!genres?.length || !languages?.length || !watchProviders?.length)
+    return <div>Missing system data</div>;
+
+  if (!filmData) {
+    return <Loading error={'films are not defined'} loading={isLoading} />;
+  }
+  const film = filmData;
+
+  if (!film) return <div>Missing film</div>;
+
+  return (
+    <FilmDetail
+      film={film}
+      genres={genres}
+      languages={languages}
+      watchProviders={watchProviders}
+    />
+  );
+};
+
+export default FilmDetailWrapper;

@@ -68,7 +68,7 @@ const hydrationQuery = async (
     .order('id', { ascending: true });
 };
 
-export const useFetchFilms = ({ page }: { page: number }) => {
+export const useSearchFilms = ({ page }: { page: number }) => {
   const [formParams] = useQueryParams();
 
   // a local, debounced copy of the form
@@ -91,5 +91,24 @@ export const useFetchFilms = ({ page }: { page: number }) => {
     const { data: films } = await hydrationQuery(ids, form);
 
     return { count: count || 0, films };
+  });
+};
+
+const fetchFilmQuery = async (id: number) => {
+  const select = [
+    '*',
+    'watch_provider(id)',
+    'cast_credit(*, person(*))',
+    'crew_credit(*, person(*))',
+  ].join(',');
+
+  return supabase.from('movie').select(select).eq('id', id).single();
+};
+
+export const useFetchFilm = (id: number) => {
+  return useQuery(['films', id], async () => {
+    const { data: film } = await fetchFilmQuery(id);
+
+    return film;
   });
 };

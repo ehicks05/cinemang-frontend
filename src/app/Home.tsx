@@ -4,7 +4,7 @@ import { PAGE_SIZE } from '../constants';
 import { Language, Genre, WatchProvider } from '../types';
 import { Film, Paginator, SearchForm } from './components';
 import { useFetchSystemData } from './hooks/useFetchSystemData';
-import { useFetchFilms } from './hooks/useFetchFilms';
+import { useSearchFilms } from './hooks/useFetchFilms';
 import { useQueryParams } from 'use-query-params';
 
 const Home: FC = () => {
@@ -45,7 +45,7 @@ const Films: FC<{
   const { page } = form;
   const setPage = (page: number) => setForm({ ...form, page });
 
-  const { data, error, isLoading } = useFetchFilms({ page });
+  const { data, error, isLoading } = useSearchFilms({ page });
 
   if (error || isLoading) return <Loading error={error} loading={isLoading} />;
   if (!data) {
