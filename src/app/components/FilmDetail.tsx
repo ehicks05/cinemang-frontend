@@ -80,7 +80,7 @@ const FilmDetail = ({
 
   return (
     <div className="flex flex-col gap-4 rounded-lg p-4" style={cardStyle}>
-      <div className="flex gap-4">
+      {/* <div className="flex gap-4">
         <div className="flex-shrink-0">
           <img
             alt="poster"
@@ -119,6 +119,61 @@ const FilmDetail = ({
           })}
         </div>
         <Stats bgColor={palette.darkVibrant || ''} data={statData} />
+      </div> */}
+      {/* <div>trailers</div> */}
+      {/* <div>more like this</div> */}
+      <div>
+        <h1 className="font-bold">cast and crew</h1>
+        <h1 className="font-bold">cast</h1>
+        <div className="grid grid-cols-2 justify-center gap-4 sm:grid-cols-3 md:grid-cols-4 lg:sm:grid-cols-5 xl:sm:grid-cols-6 2xl:grid-cols-7">
+          {film.cast_credit
+            .sort((c1, c2) => c1.order - c2.order)
+            .map((c) => (
+              <div
+                className="flex w-full flex-col gap-2 rounded p-2"
+                key={c.credit_id}
+                style={{ backgroundColor: palette.darkVibrant }}
+              >
+                <img
+                  alt="cast"
+                  src={
+                    c.person.profile_path
+                      ? `https://images.tmdb.org/t/p/w${IMAGE_WIDTH}/${c.person.profile_path}`
+                      : `https://ui-avatars.com/api/?name=${c.person.name}&background=${palette.darkVibrant}&color=`
+                  }
+                  // style={{ width: SCALED_IMAGE.w / 1.25 }}
+                />
+                <div>{c.person.name}</div>
+                <div>{c.character}</div>
+                {/* <pre>{JSON.stringify(c, null, 2)}</pre> */}
+              </div>
+            ))}
+        </div>
+        <h1 className="font-bold">crew</h1>
+        <div className="grid grid-cols-2 justify-center gap-4 sm:grid-cols-3 md:grid-cols-4 lg:sm:grid-cols-5 xl:sm:grid-cols-6 2xl:grid-cols-7">
+          {film.crew_credit
+            .sort((c1, c2) => c2.person.popularity - c1.person.popularity)
+            .map((c) => (
+              <div
+                className="flex w-full flex-col gap-2 rounded p-2"
+                key={c.credit_id}
+                style={{ backgroundColor: palette.darkVibrant }}
+              >
+                <img
+                  alt="cast"
+                  src={
+                    c.person.profile_path
+                      ? `https://images.tmdb.org/t/p/w${IMAGE_WIDTH}/${c.person.profile_path}`
+                      : `https://ui-avatars.com/api/?name=${c.person.name}&background=${palette.darkVibrant}&color=`
+                  }
+                  // style={{ width: SCALED_IMAGE.w / 1.25 }}
+                />
+                <div>{c.person.name}</div>
+                <div>{c.job}</div>
+                <pre>{JSON.stringify(c, null, 2)}</pre>
+              </div>
+            ))}
+        </div>
       </div>
     </div>
   );

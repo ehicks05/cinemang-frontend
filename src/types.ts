@@ -1,5 +1,7 @@
 export interface Film {
   cast: string;
+  cast_credit: any[];
+  crew_credit: any[];
   director: string;
   genre_id: number;
   id: number;
