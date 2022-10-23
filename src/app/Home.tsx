@@ -11,7 +11,9 @@ const Home: FC = () => {
   const { data, error, isLoading } = useFetchSystemData();
 
   if (error || isLoading) return <Loading error={error} loading={isLoading} />;
-  if (!data) return <Loading error={error} loading={isLoading} />;
+  if (!data) {
+    return <Loading error={'systemData is undefined'} loading={isLoading} />;
+  }
   const { genres, languages, watchProviders } = data;
   if (!genres?.length || !languages?.length || !watchProviders?.length)
     return <div>Missing system data</div>;
@@ -43,10 +45,14 @@ const Films: FC<{
   const { page } = form;
   const setPage = (page: number) => setForm({ ...form, page });
 
-  const { data, error, loading } = useFetchFilms({ page });
+  const { data, error, isLoading } = useFetchFilms({ page });
+
+  if (error || isLoading) return <Loading error={error} loading={isLoading} />;
+  if (!data) {
+    return <Loading error={'films are not defined'} loading={isLoading} />;
+  }
   const { films, count } = data;
 
-  if (error || loading) return <Loading error={error} loading={loading} />;
   if (!films || films.length === 0) return <div>No films</div>;
 
   return (

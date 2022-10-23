@@ -1,4 +1,5 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
+import { useQuery } from 'react-query';
 import { useDebounce } from 'react-use';
 import {
   DecodedValueMap,
@@ -17,16 +18,12 @@ const idQuery = async (
   form: DecodedValueMap<QueryParamConfigMap>,
   page: number,
 ) => {
+  const select = `id${
+    form.watchProviders.length > 0 ? ', wp: watch_provider!inner(id)' : ''
+  }`;
   const query = supabase
     .from('movie')
-    .select(
-      `id${
-        form.watchProviders.length > 0 ? ', wp: watch_provider!inner(id)' : ''
-      }`,
-      {
-        count: 'exact',
-      },
-    )
+    .select(select, { count: 'exact' })
     .ilike('title', `%${form.title || ''}%`)
     .gte('vote_count', form.minVotes || 0)
     .lte('vote_count', form.maxVotes || 100_000_000)
@@ -76,9 +73,6 @@ export const useFetchFilms = ({ page }: { page: number }) => {
 
   // a local, debounced copy of the form
   const [form, setForm] = useState(formParams);
-  const [data, setData] = useState<Data>({ count: 0, films: [] });
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<unknown>();
 
   useDebounce(
     () => {
@@ -88,28 +82,14 @@ export const useFetchFilms = ({ page }: { page: number }) => {
     [formParams],
   );
 
-  useEffect(() => {
-    setLoading(true);
+  return useQuery<Data>(['films', form, page], async () => {
+    // query 1: identify the ids for our search results
+    const { data, count } = await idQuery(form, page);
+    const ids = data?.map((row) => row.id) || [];
 
-    const fetchFilms = async () => {
-      try {
-        // query 1: identify the ids for our search results
-        const { data, count } = await idQuery(form, page);
-        const ids = data?.map((row) => row.id) || [];
+    // query 2: fetch data for the ids
+    const { data: films } = await hydrationQuery(ids, form);
 
-        // query 2: fetch data for the ids
-        const { data: films } = await hydrationQuery(ids, form);
-
-        setData({ count: count || 0, films });
-      } catch (e) {
-        setError(e);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchFilms();
-  }, [form, page]);
-
-  return { data, error, loading };
+    return { count: count || 0, films };
+  });
 };
