@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useQuery } from 'react-query';
 import { supabase } from '../../supabase';
 import { Genre, Language, WatchProvider } from '../../types';
 
@@ -36,35 +36,12 @@ const fetchData = async () => {
   return { genres, languages, watchProviders };
 };
 
+export interface SystemData {
+  genres: Genre[];
+  languages: Language[];
+  watchProviders: WatchProvider[];
+}
+
 export const useFetchSystemData = () => {
-  const [data, setData] = useState<{
-    genres: Genre[];
-    languages: Language[];
-    watchProviders: WatchProvider[];
-  }>({
-    genres: [],
-    languages: [],
-    watchProviders: [],
-  });
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<unknown>();
-
-  useEffect(() => {
-    setLoading(true);
-
-    const doIt = async () => {
-      try {
-        const data = await fetchData();
-        setData(data);
-      } catch (e) {
-        setError(e);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    doIt();
-  }, []);
-
-  return { data, error, loading };
+  return useQuery<SystemData, Error>(['systemData'], fetchData);
 };

@@ -8,13 +8,11 @@ import { useFetchFilms } from './hooks/useFetchFilms';
 import { useQueryParams } from 'use-query-params';
 
 const Home: FC = () => {
-  const {
-    data: { genres, languages, watchProviders },
-    error,
-    loading,
-  } = useFetchSystemData();
+  const { data, error, isLoading } = useFetchSystemData();
 
-  if (error || loading) return <Loading error={error} loading={loading} />;
+  if (error || isLoading) return <Loading error={error} loading={isLoading} />;
+  if (!data) return <Loading error={error} loading={isLoading} />;
+  const { genres, languages, watchProviders } = data;
   if (!genres?.length || !languages?.length || !watchProviders?.length)
     return <div>Missing system data</div>;
 
