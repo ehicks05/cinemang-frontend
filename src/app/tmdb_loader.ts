@@ -68,10 +68,10 @@ const processIdChunk = async (ids: number[], resource: ResourceKey) => {
     const stats = cache.getStats();
     logger.info({
       cache: {
-        keys: stats.keys,
-        ksize: filesize(stats.ksize),
-        vsize: filesize(stats.vsize),
-        vAvg: filesize(stats.vsize / stats.keys),
+        n: stats.keys,
+        ksize: filesize(stats.ksize, { round: 0 }),
+        vsize: filesize(stats.vsize, { round: 0 }),
+        vAvg: filesize(stats.vsize / stats.keys, { round: 0 }),
       },
     });
   }
@@ -100,7 +100,7 @@ const updateResource = async (resource: ResourceKey, fullMode: boolean) => {
     resource === 'PERSON'
       ? getPersonIds()
       : fullMode
-      ? (await getPopularValidIds(resource))?.slice(0, 1_000)
+      ? (await getPopularValidIds(resource))?.slice(0, 100)
       : // :  [629];
         await getRecentlyChangedValidIds(resource);
 
