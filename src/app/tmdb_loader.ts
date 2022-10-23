@@ -20,8 +20,7 @@ import { MovieResponse, ResourceKey } from '../services/tmdb/types';
 import { idToParsedPerson } from './helpers/parse_person';
 import { getRecentlyChangedValidIds } from '../services/tmdb/recent_changes';
 import { Prisma } from '@prisma/client';
-import cache from '../services/cache';
-import { filesize } from 'filesize';
+import cacheMan from '../services/cache';
 
 const fetchAndParse = async (id: number, resource: ResourceKey) => {
   try {
@@ -64,20 +63,11 @@ const processIdChunk = async (ids: number[], resource: ResourceKey) => {
       ids.length - (createResult?.count || 0)
     })`,
   );
-  if (resource === 'MOVIE') {
-    const stats = cache.getStats();
-    logger.info({
-      cache: {
-        n: stats.keys,
-        ksize: filesize(stats.ksize, { round: 0 }),
-        vsize: filesize(stats.vsize, { round: 0 }),
-        vAvg: filesize(stats.vsize / stats.keys, { round: 0 }),
-      },
-    });
-  }
+  cacheMan.log(resource);
 };
 
 const getPersonIds = () => {
+  const cache = cacheMan.get('MOVIE');
   const personIds = uniq(
     cache
       .keys()
@@ -119,7 +109,7 @@ const updateResource = async (resource: ResourceKey, fullMode: boolean) => {
   await Promise.each(chunks, (ids) => processIdChunk(ids, resource));
 };
 
-const movieToCastCredits = (movie: MovieResponse) => {
+const toCastCreditCreateInput = (movie: MovieResponse) => {
   return movie.credits.cast.map((c) => ({
     movieId: movie.id,
     personId: c.id,
@@ -128,7 +118,7 @@ const movieToCastCredits = (movie: MovieResponse) => {
     creditId: c.credit_id,
   }));
 };
-const movieToCrewCredits = (movie: MovieResponse) => {
+const toCrewCreditCreateInput = (movie: MovieResponse) => {
   return movie.credits.crew.map((c) => ({
     movieId: movie.id,
     personId: c.id,
@@ -136,7 +126,7 @@ const movieToCrewCredits = (movie: MovieResponse) => {
     creditId: c.credit_id,
   }));
 };
-const movieToMovieWatchProviders = (movie: MovieResponse) => {
+const toMovieWatchProviderCreateInput = (movie: MovieResponse) => {
   const providers = movie['watch/providers'].results.US?.flatrate || [];
   return (
     providers
@@ -152,13 +142,14 @@ const movieToMovieWatchProviders = (movie: MovieResponse) => {
 const updateRelationships = async () => {
   logger.info('updating relationships...');
 
-  const keyChunks = chunk(cache.keys(), 10_000);
+  const movieCache = cacheMan.get('MOVIE');
+  const keyChunks = chunk(movieCache.keys(), 10_000);
 
   let count = 0;
   await Promise.each(keyChunks, async (keyChunk) => {
     const data: Prisma.CastCreditUncheckedCreateInput[] = keyChunk
-      .map((k) => cache.get(k))
-      .map((v) => movieToCastCredits(v as MovieResponse))
+      .map((k) => movieCache.get(k))
+      .map((v) => toCastCreditCreateInput(v as MovieResponse))
       .flat();
 
     const result = await prisma.castCredit.createMany({ data });
@@ -170,8 +161,8 @@ const updateRelationships = async () => {
 
   await Promise.each(keyChunks, async (keyChunk) => {
     const data: Prisma.CrewCreditUncheckedCreateInput[] = keyChunk
-      .map((k) => cache.get(k))
-      .map((v) => movieToCrewCredits(v as MovieResponse))
+      .map((k) => movieCache.get(k))
+      .map((v) => toCrewCreditCreateInput(v as MovieResponse))
       .flat();
 
     const result = await prisma.crewCredit.createMany({ data });
@@ -183,8 +174,8 @@ const updateRelationships = async () => {
 
   await Promise.each(keyChunks, async (keyChunk) => {
     const data: Prisma.MovieWatchProviderUncheckedCreateInput[] = keyChunk
-      .map((k) => cache.get(k))
-      .map((v) => movieToMovieWatchProviders(v as MovieResponse))
+      .map((k) => movieCache.get(k))
+      .map((v) => toMovieWatchProviderCreateInput(v as MovieResponse))
       .flat();
 
     const result = await prisma.movieWatchProvider.createMany({ data });

@@ -1,6 +1,6 @@
 import { Prisma } from '@prisma/client';
 import { omit, pick } from 'lodash';
-import cache from '../../services/cache';
+import cacheMan from '../../services/cache';
 import { getMovie } from '../../services/tmdb';
 import { MovieResponse } from '../../services/tmdb/types';
 
@@ -37,7 +37,7 @@ export const idToParsedMovie = async (id: number) => {
   if (!isValidMovie(data, director, cast)) {
     return undefined;
   }
-  cache.set(data.id, omit(data, []));
+  cacheMan.get('movie').set(data.id, omit(data, []));
 
   const certification = data.releases.countries.find(
     (r) => r.iso_3166_1 === 'US' && r.certification,
