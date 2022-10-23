@@ -18,9 +18,9 @@ import fileCache from '../file_cache';
 const { CONFIG, HOST, PATH, EXT } = DAILY_FILE;
 
 const getFormattedDate = () => {
-  const daysToSub = isBefore(new Date(), new Date().setUTCHours(8, 0, 0, 0))
-    ? 1
-    : 0;
+  const now = new Date();
+  const compareTo = new Date().setUTCHours(8, 0, 0, 0);
+  const daysToSub = isBefore(now, compareTo) ? 1 : 0;
   return format(subDays(new Date(), daysToSub), 'MM_dd_yyyy');
 };
 
@@ -75,10 +75,7 @@ export const getPopularValidIds = async (resource: ResourceKey) => {
   try {
     const rows = await getValidIdRows(resource);
     return rows
-      .filter((row) => {
-        if (row.id === 1771 && resource === 'PERSON') console.log(row);
-        return row.popularity >= RESOURCES[resource].MIN_POPULARITY;
-      })
+      .filter((row) => row.popularity >= RESOURCES[resource].MIN_POPULARITY)
       .map((row) => row.id);
   } catch (e) {
     logger.error(e);

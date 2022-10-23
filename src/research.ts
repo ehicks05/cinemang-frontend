@@ -1,4 +1,5 @@
 import _, { merge } from 'lodash';
+import logger from './services/logger';
 import { getValidIdRows } from './services/tmdb';
 import { DailyFileRow } from './services/tmdb/types';
 
@@ -20,7 +21,7 @@ const findItemsWithMinPopularity = (
 
     return {
       [`${dataset.label} count`]: nfInt.format(filtered.length),
-      [`${dataset.label} sample`]: lowestItemName,
+      [`${dataset.label} sample`]: lowestItemName.slice(0, 28),
     };
   });
 
@@ -33,13 +34,13 @@ const findItemsWithMinPopularity = (
 };
 
 const analysePopularity = async () => {
-  console.log('fetching daily id files');
+  logger.info('fetching daily id files');
   const [movieRows, personRows] = await Promise.all([
     getValidIdRows('MOVIE'),
     getValidIdRows('PERSON'),
   ]);
 
-  console.log('crunching numbers');
+  logger.info('crunching numbers');
 
   const datasets = [
     {
@@ -63,7 +64,7 @@ const analysePopularity = async () => {
       findItemsWithMinPopularity(popularity, datasets),
     ),
   ];
-  console.log('MOVIE POPULARITY');
+  logger.info('MOVIE POPULARITY');
   console.table(results);
 };
 

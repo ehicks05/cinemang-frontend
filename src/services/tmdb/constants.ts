@@ -13,12 +13,12 @@ export const DAILY_FILE = {
 export const RESOURCES = {
   MOVIE: {
     DAILY_FILE_NAME: 'movie_ids',
-    MIN_POPULARITY: 2.2,
+    MIN_POPULARITY: 2.6,
     RECENTLY_CHANGED_PATH: 'movie',
   },
   PERSON: {
     DAILY_FILE_NAME: 'person_ids',
-    MIN_POPULARITY: 2.2,
+    MIN_POPULARITY: 2.6,
     RECENTLY_CHANGED_PATH: 'person',
   },
 } as const;
