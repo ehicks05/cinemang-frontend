@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Loading } from '../../core-components';
 import { addMinutes, intervalToDuration, parseISO, format } from 'date-fns';
 import { usePalette } from '@lauriys/react-palette';
-import { truncate } from 'lodash';
+import { groupBy, truncate } from 'lodash';
 import chroma from 'chroma-js';
 import Stats from './Stats';
 import WatchProviders from './WatchProviders';
@@ -78,6 +78,8 @@ const FilmDetail = ({
         : String(film.vote_count),
   };
 
+  const grouped = groupBy(film.crew_credit, (c) => c.personId);
+
   return (
     <div className="flex flex-col gap-4 rounded-lg p-4" style={cardStyle}>
       {/* <div className="flex gap-4">
@@ -151,26 +153,32 @@ const FilmDetail = ({
         </div>
         <h1 className="font-bold">crew</h1>
         <div className="grid grid-cols-2 justify-center gap-4 sm:grid-cols-3 md:grid-cols-4 lg:sm:grid-cols-5 xl:sm:grid-cols-6 2xl:grid-cols-7">
-          {film.crew_credit
-            .sort((c1, c2) => c2.person.popularity - c1.person.popularity)
+          {Object.values(grouped)
+            .sort((c1, c2) => c2[0].person.popularity - c1[0].person.popularity)
             .map((c) => (
               <div
                 className="flex w-full flex-col gap-2 rounded p-2"
-                key={c.credit_id}
+                key={c[0].personId}
                 style={{ backgroundColor: palette.darkVibrant }}
               >
                 <img
                   alt="cast"
                   src={
-                    c.person.profile_path
-                      ? `https://images.tmdb.org/t/p/w${IMAGE_WIDTH}/${c.person.profile_path}`
-                      : `https://ui-avatars.com/api/?name=${c.person.name}&background=${palette.darkVibrant}&color=`
+                    c[0].person.profile_path
+                      ? `https://images.tmdb.org/t/p/w${IMAGE_WIDTH}/${c[0].person.profile_path}`
+                      : `https://via.placeholder.com/300x450/${palette.darkVibrant?.slice(
+                          1,
+                        )}/?text=${c[0].person.name}`
                   }
                   // style={{ width: SCALED_IMAGE.w / 1.25 }}
                 />
-                <div>{c.person.name}</div>
-                <div>{c.job}</div>
-                <pre>{JSON.stringify(c, null, 2)}</pre>
+                <div>{c[0].person.name}</div>
+                <div>
+                  {c.map((c) => (
+                    <div key={c.job}>{c.job}</div>
+                  ))}
+                </div>
+                {/* <pre>{JSON.stringify(c, null, 2)}</pre> */}
               </div>
             ))}
         </div>
