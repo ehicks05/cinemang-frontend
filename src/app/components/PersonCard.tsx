@@ -21,12 +21,12 @@ const toInitials = (name: string) => {
 const PersonCard = ({
   palette,
   character,
-  creditId,
+  // creditId,
   jobs,
   name,
   profilePath,
 }: Props) => {
-  console.log({ creditId });
+  // console.log({ creditId });
   const profile = profilePath
     ? `https://images.tmdb.org/t/p/w${IMAGE_WIDTH}/${profilePath}`
     : `https://via.placeholder.com/300x450/${palette.darkMuted?.slice(

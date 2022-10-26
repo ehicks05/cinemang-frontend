@@ -1,4 +1,5 @@
 import { PaletteColors } from '@lauriys/react-palette';
+import { format } from 'date-fns';
 import React from 'react';
 import { Video } from '../../types';
 import { useFetchTrailers } from '../hooks/useFetchFilms';
@@ -26,7 +27,10 @@ interface TrailerCardProps {
   trailer: Video;
 }
 
-const TrailerCard = ({ trailer: { name, key }, palette }: TrailerCardProps) => {
+const TrailerCard = ({
+  trailer: { name, key, published_at },
+  palette,
+}: TrailerCardProps) => {
   return (
     <div
       className="flex w-full flex-col gap-2 rounded-lg p-1"
@@ -35,7 +39,7 @@ const TrailerCard = ({ trailer: { name, key }, palette }: TrailerCardProps) => {
       <YoutubeEmbed embedId={key} />
 
       <div className="flex-grow p-2">
-        <div>{name}</div>
+        <div>{`${name}: ${format(new Date(published_at), 'MM-dd-yyyy')}`}</div>
       </div>
     </div>
   );

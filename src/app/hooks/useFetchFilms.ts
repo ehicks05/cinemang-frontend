@@ -1,3 +1,4 @@
+import { isBefore } from 'date-fns';
 import { useState } from 'react';
 import { useQuery } from 'react-query';
 import { useDebounce } from 'react-use';
@@ -125,7 +126,9 @@ export const useFetchTrailers = (id: number) => {
   return useQuery<Video[]>(['films', id, 'trailers'], async () => {
     const { data: film } = await fetchTrailers(id);
     const videos: Video[] = film.videos.results;
-    const trailers = videos.filter((v) => v.official && v.type === 'Trailer');
+    const trailers = videos
+      .filter((v) => v.official && v.type === 'Trailer')
+      .sort((v1, v2) => (isBefore(v1.published_at, v2.published_at) ? 1 : -1));
 
     return trailers;
   });
