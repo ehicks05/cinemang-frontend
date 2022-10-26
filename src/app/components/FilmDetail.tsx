@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Loading } from '../../core-components';
 import { addMinutes, intervalToDuration, parseISO, format } from 'date-fns';
 import { usePalette } from '@lauriys/react-palette';
-import { groupBy, truncate } from 'lodash';
+import { truncate } from 'lodash';
 import chroma from 'chroma-js';
 import Stats from './Stats';
 import WatchProviders from './WatchProviders';
@@ -11,8 +11,8 @@ import { useFetchSystemData } from '../hooks/useFetchSystemData';
 import { useFetchFilm } from '../hooks/useFetchFilms';
 import { useParams } from 'react-router-dom';
 import { GENRE_NAMES, IMAGE_WIDTH, SCALED_IMAGE } from '../../constants';
-import PersonCard from './PersonCard';
 import Trailers from './Trailers';
+import Credits from './Credits';
 
 const nf = Intl.NumberFormat('en-US', { maximumFractionDigits: 1 });
 
@@ -68,8 +68,6 @@ const FilmDetail = ({
         : String(film.vote_count),
   };
 
-  const grouped = groupBy(film.crew_credit, (c) => c.personId);
-
   return (
     <div className="flex flex-col gap-4 rounded-lg p-4" style={cardStyle}>
       <div className="flex gap-4">
@@ -119,39 +117,7 @@ const FilmDetail = ({
       <div>
         <h1 className="font-bold">more like this</h1>
       </div>
-      <div>
-        <h1 className="font-bold">cast and crew</h1>
-        <h1 className="font-bold">cast</h1>
-        <div className="grid grid-cols-2 justify-center gap-4 sm:grid-cols-3 md:grid-cols-4 lg:sm:grid-cols-5 xl:sm:grid-cols-6 2xl:grid-cols-7">
-          {film.cast_credit
-            .sort((c1, c2) => c1.order - c2.order)
-            .map((c) => (
-              <PersonCard
-                character={c.character}
-                creditId={c.credit_id}
-                key={c.credit_id}
-                name={c.person.name}
-                palette={palette}
-                profilePath={c.person.profile_path}
-              />
-            ))}
-        </div>
-        <h1 className="font-bold">crew</h1>
-        <div className="grid grid-cols-2 justify-center gap-4 sm:grid-cols-3 md:grid-cols-4 lg:sm:grid-cols-5 xl:sm:grid-cols-6 2xl:grid-cols-7">
-          {Object.values(grouped)
-            .sort((c1, c2) => c2[0].person.popularity - c1[0].person.popularity)
-            .map((c) => (
-              <PersonCard
-                creditId={c[0].credit_id}
-                jobs={c.map((c) => c.job)}
-                key={c[0].credit_id}
-                name={c[0].person.name}
-                palette={palette}
-                profilePath={c[0].person.profile_path}
-              />
-            ))}
-        </div>
-      </div>
+      <Credits film={film} palette={palette} />
     </div>
   );
 };
