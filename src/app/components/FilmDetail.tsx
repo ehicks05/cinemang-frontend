@@ -1,8 +1,7 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { Loading } from '../../core-components';
 import { addMinutes, intervalToDuration, parseISO, format } from 'date-fns';
 import { usePalette } from '@lauriys/react-palette';
-import { truncate } from 'lodash';
 import chroma from 'chroma-js';
 import Stats from './Stats';
 import WatchProviders from './WatchProviders';
@@ -10,7 +9,7 @@ import { Film as IFilm, Genre, Language, WatchProvider } from '../../types';
 import { useFetchSystemData } from '../hooks/useFetchSystemData';
 import { useFetchFilm } from '../hooks/useFetchFilms';
 import { useParams } from 'react-router-dom';
-import { GENRE_NAMES, IMAGE_WIDTH, SCALED_IMAGE } from '../../constants';
+import { GENRE_NAMES } from '../../constants';
 import Trailers from './Trailers';
 import Credits from './Credits';
 
@@ -37,7 +36,7 @@ const FilmDetail = ({
     GENRE_NAMES[genreName] || genreName;
 
   const posterUrl = film.poster_path
-    ? `https://image.tmdb.org/t/p/w${IMAGE_WIDTH}${film.poster_path}`
+    ? `https://image.tmdb.org/t/p/original${film.poster_path}`
     : '/92x138.png';
   const releasedAt = format(parseISO(film.released_at), 'MM-dd-yyyy');
   const year = format(parseISO(film.released_at), 'yyyy');
@@ -47,7 +46,6 @@ const FilmDetail = ({
   });
 
   const { data: palette, loading, error } = usePalette(posterUrl);
-  const [truncateOverview, setTruncateOverview] = useState(true);
 
   if (error) return <Loading error={error} loading={loading} />;
   if (loading) return <div className="h-full w-full bg-slate-700" />;
@@ -69,15 +67,13 @@ const FilmDetail = ({
   };
 
   return (
-    <div className="flex flex-col gap-4 rounded-lg p-4" style={cardStyle}>
-      <div className="flex gap-4">
+    <div
+      className="m-auto flex max-w-screen-lg flex-col gap-4 rounded-lg p-4"
+      style={cardStyle}
+    >
+      <div className="flex flex-col gap-4 sm:flex-row">
         <div className="flex-shrink-0">
-          <img
-            alt="poster"
-            height={SCALED_IMAGE.h}
-            src={posterUrl}
-            width={SCALED_IMAGE.w}
-          />
+          <img alt="poster" className="sm:h-96 sm:w-64" src={posterUrl} />
         </div>
         <div className="flex flex-col gap-1">
           <div>
@@ -89,7 +85,13 @@ const FilmDetail = ({
           <div className="text-xs text-gray-300">{`${runtime.hours}h ${runtime.minutes}m`}</div>
           <div>{film.director}</div>
           <div>{film.cast}</div>
-          <div className="flex-grow"></div>
+          <div className="max-w-prose text-justify text-sm">
+            {film.overview}
+          </div>
+          <div className="mt-4 flex flex-col justify-between gap-4">
+            <Stats bgColor={palette.darkVibrant || ''} data={statData} />
+          </div>
+          <div className="mt-4">Watch on:</div>
           {film.watch_provider && (
             <WatchProviders
               selectedIds={film.watch_provider}
@@ -98,24 +100,14 @@ const FilmDetail = ({
           )}
         </div>
       </div>
-      <div className="flex flex-col justify-between gap-4">
-        <div
-          className="text-justify text-sm"
-          onClick={() => setTruncateOverview(!truncateOverview)}
-        >
-          {truncate(film.overview, {
-            length: truncateOverview ? 256 : 1024,
-            separator: ' ',
-          })}
-        </div>
-        <Stats bgColor={palette.darkVibrant || ''} data={statData} />
-      </div>
+
       <div>
         <h1 className="font-bold">trailers</h1>
         <Trailers movieId={film.id} palette={palette} />
       </div>
       <div>
         <h1 className="font-bold">more like this</h1>
+        TODO
       </div>
       <Credits film={film} palette={palette} />
     </div>

@@ -28,8 +28,8 @@ const PersonCard = ({
 }: Props) => {
   // console.log({ creditId });
   const profile = profilePath
-    ? `https://images.tmdb.org/t/p/w${IMAGE_WIDTH}/${profilePath}`
-    : `https://via.placeholder.com/300x450/${palette.darkMuted?.slice(
+    ? `https://images.tmdb.org/t/p/w${IMAGE_WIDTH}${profilePath}`
+    : `https://via.placeholder.com/300x450/${palette.darkVibrant?.slice(
         1,
       )}/fff/?text=${toInitials(name)}`;
 

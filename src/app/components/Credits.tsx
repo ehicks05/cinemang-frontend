@@ -14,8 +14,7 @@ const Credits = ({ film, palette }: Props) => {
   const grouped = groupBy(film.crew_credit, (c) => c.personId);
 
   return (
-    <div>
-      <h1 className="font-bold">cast and crew</h1>
+    <>
       <h1 className="font-bold">cast</h1>
       <div className="grid grid-cols-2 justify-center gap-4 sm:grid-cols-3 md:grid-cols-4 lg:sm:grid-cols-5 xl:sm:grid-cols-6 2xl:grid-cols-7">
         {film.cast_credit
@@ -46,7 +45,7 @@ const Credits = ({ film, palette }: Props) => {
             />
           ))}
       </div>
-    </div>
+    </>
   );
 };
 

@@ -1,5 +1,4 @@
 import { PaletteColors } from '@lauriys/react-palette';
-import { format } from 'date-fns';
 import React from 'react';
 import { Video } from '../../types';
 import { useFetchTrailers } from '../hooks/useFetchFilms';
@@ -39,7 +38,7 @@ const TrailerCard = ({
       <YoutubeEmbed embedId={key} />
 
       <div className="flex-grow p-2">
-        <div>{`${name}: ${format(new Date(published_at), 'MM-dd-yyyy')}`}</div>
+        <div>{name}</div>
       </div>
     </div>
   );
