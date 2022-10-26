@@ -59,8 +59,8 @@ const hydrationQuery = async (
   const select = [
     '*',
     'watch_provider(id)',
-    'cast_credit(*, person(*))',
-    'crew_credit(*, person(*))',
+    // 'cast_credit(*, person(*))',
+    // 'crew_credit(*, person(*))',
   ].join(',');
 
   return supabase
