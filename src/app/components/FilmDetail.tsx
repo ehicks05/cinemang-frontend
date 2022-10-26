@@ -10,14 +10,11 @@ import { Film as IFilm, Genre, Language, WatchProvider } from '../../types';
 import { useFetchSystemData } from '../hooks/useFetchSystemData';
 import { useFetchFilm } from '../hooks/useFetchFilms';
 import { useParams } from 'react-router-dom';
+import { GENRE_NAMES, IMAGE_WIDTH, SCALED_IMAGE } from '../../constants';
+import PersonCard from './PersonCard';
+import Trailers from './Trailers';
 
 const nf = Intl.NumberFormat('en-US', { maximumFractionDigits: 1 });
-
-const IMAGE_WIDTH = 300;
-const SCALED_IMAGE = {
-  h: (IMAGE_WIDTH / 2) * 1.5,
-  w: IMAGE_WIDTH / 2,
-};
 
 const FilmDetail = ({
   film,
@@ -30,21 +27,14 @@ const FilmDetail = ({
   languages: Language[];
   watchProviders: WatchProvider[];
 }) => {
-  const findLanguage = (languageId: number) => {
-    return languages.find((lang) => lang.id === languageId);
-  };
+  const findLanguage = (languageId: number) =>
+    languages.find((lang) => lang.id === languageId);
 
-  const findGenre = (genreId: number) => {
-    return genres.find((genre) => genre.id === genreId);
-  };
+  const findGenre = (genreId: number) =>
+    genres.find((genre) => genre.id === genreId);
 
-  const getGenreName = (genreName: string) => {
-    const CUSTOM_NAMES = { 'Science Fiction': 'Sci-Fi' } as Record<
-      string,
-      string
-    >;
-    return CUSTOM_NAMES[genreName] || genreName;
-  };
+  const getGenreName = (genreName: string) =>
+    GENRE_NAMES[genreName] || genreName;
 
   const posterUrl = film.poster_path
     ? `https://image.tmdb.org/t/p/w${IMAGE_WIDTH}${film.poster_path}`
@@ -82,7 +72,7 @@ const FilmDetail = ({
 
   return (
     <div className="flex flex-col gap-4 rounded-lg p-4" style={cardStyle}>
-      {/* <div className="flex gap-4">
+      <div className="flex gap-4">
         <div className="flex-shrink-0">
           <img
             alt="poster"
@@ -121,9 +111,14 @@ const FilmDetail = ({
           })}
         </div>
         <Stats bgColor={palette.darkVibrant || ''} data={statData} />
-      </div> */}
-      {/* <div>trailers</div> */}
-      {/* <div>more like this</div> */}
+      </div>
+      <div>
+        <h1 className="font-bold">trailers</h1>
+        <Trailers movieId={film.id} palette={palette} />
+      </div>
+      <div>
+        <h1 className="font-bold">more like this</h1>
+      </div>
       <div>
         <h1 className="font-bold">cast and crew</h1>
         <h1 className="font-bold">cast</h1>
@@ -131,24 +126,14 @@ const FilmDetail = ({
           {film.cast_credit
             .sort((c1, c2) => c1.order - c2.order)
             .map((c) => (
-              <div
-                className="flex w-full flex-col gap-2 rounded p-2"
+              <PersonCard
+                character={c.character}
+                creditId={c.credit_id}
                 key={c.credit_id}
-                style={{ backgroundColor: palette.darkVibrant }}
-              >
-                <img
-                  alt="cast"
-                  src={
-                    c.person.profile_path
-                      ? `https://images.tmdb.org/t/p/w${IMAGE_WIDTH}/${c.person.profile_path}`
-                      : `https://ui-avatars.com/api/?name=${c.person.name}&background=${palette.darkVibrant}&color=`
-                  }
-                  // style={{ width: SCALED_IMAGE.w / 1.25 }}
-                />
-                <div>{c.person.name}</div>
-                <div>{c.character}</div>
-                {/* <pre>{JSON.stringify(c, null, 2)}</pre> */}
-              </div>
+                name={c.person.name}
+                palette={palette}
+                profilePath={c.person.profile_path}
+              />
             ))}
         </div>
         <h1 className="font-bold">crew</h1>
@@ -156,30 +141,14 @@ const FilmDetail = ({
           {Object.values(grouped)
             .sort((c1, c2) => c2[0].person.popularity - c1[0].person.popularity)
             .map((c) => (
-              <div
-                className="flex w-full flex-col gap-2 rounded p-2"
-                key={c[0].personId}
-                style={{ backgroundColor: palette.darkVibrant }}
-              >
-                <img
-                  alt="cast"
-                  src={
-                    c[0].person.profile_path
-                      ? `https://images.tmdb.org/t/p/w${IMAGE_WIDTH}/${c[0].person.profile_path}`
-                      : `https://via.placeholder.com/300x450/${palette.darkVibrant?.slice(
-                          1,
-                        )}/?text=${c[0].person.name}`
-                  }
-                  // style={{ width: SCALED_IMAGE.w / 1.25 }}
-                />
-                <div>{c[0].person.name}</div>
-                <div>
-                  {c.map((c) => (
-                    <div key={c.job}>{c.job}</div>
-                  ))}
-                </div>
-                {/* <pre>{JSON.stringify(c, null, 2)}</pre> */}
-              </div>
+              <PersonCard
+                creditId={c[0].credit_id}
+                jobs={c.map((c) => c.job)}
+                key={c[0].credit_id}
+                name={c[0].person.name}
+                palette={palette}
+                profilePath={c[0].person.profile_path}
+              />
             ))}
         </div>
       </div>

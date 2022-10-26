@@ -8,14 +8,9 @@ import Stats from './Stats';
 import WatchProviders from './WatchProviders';
 import { Film as IFilm, Genre, Language, WatchProvider } from '../../types';
 import { Link } from 'react-router-dom';
+import { GENRE_NAMES, IMAGE_WIDTH, SCALED_IMAGE } from '../../constants';
 
 const nf = Intl.NumberFormat('en-US', { maximumFractionDigits: 1 });
-
-const IMAGE_WIDTH = 300;
-const SCALED_IMAGE = {
-  h: (IMAGE_WIDTH / 2) * 1.5,
-  w: IMAGE_WIDTH / 2,
-};
 
 const Film = ({
   film,
@@ -28,21 +23,14 @@ const Film = ({
   languages: Language[];
   watchProviders: WatchProvider[];
 }) => {
-  const findLanguage = (languageId: number) => {
-    return languages.find((lang) => lang.id === languageId);
-  };
+  const findLanguage = (languageId: number) =>
+    languages.find((lang) => lang.id === languageId);
 
-  const findGenre = (genreId: number) => {
-    return genres.find((genre) => genre.id === genreId);
-  };
+  const findGenre = (genreId: number) =>
+    genres.find((genre) => genre.id === genreId);
 
-  const getGenreName = (genreName: string) => {
-    const CUSTOM_NAMES = { 'Science Fiction': 'Sci-Fi' } as Record<
-      string,
-      string
-    >;
-    return CUSTOM_NAMES[genreName] || genreName;
-  };
+  const getGenreName = (genreName: string) =>
+    GENRE_NAMES[genreName] || genreName;
 
   const posterUrl = film.poster_path
     ? `https://image.tmdb.org/t/p/w${IMAGE_WIDTH}${film.poster_path}`

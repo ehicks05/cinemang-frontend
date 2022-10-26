@@ -8,6 +8,8 @@ import {
 } from 'use-query-params';
 import { PAGE_SIZE } from '../../constants';
 import { supabase } from '../../supabase';
+import { tmdb } from '../../tmdb';
+import { Video } from '../../types';
 
 interface Data {
   count: number;
@@ -110,5 +112,21 @@ export const useFetchFilm = (id: number) => {
     const { data: film } = await fetchFilmQuery(id);
 
     return film;
+  });
+};
+
+const fetchTrailers = async (id: number) => {
+  return tmdb.get(`/movie/${id}`, {
+    params: { append_to_response: 'videos' },
+  });
+};
+
+export const useFetchTrailers = (id: number) => {
+  return useQuery<Video[]>(['films', id, 'trailers'], async () => {
+    const { data: film } = await fetchTrailers(id);
+    const videos: Video[] = film.videos.results;
+    const trailers = videos.filter((v) => v.official && v.type === 'Trailer');
+
+    return trailers;
   });
 };
