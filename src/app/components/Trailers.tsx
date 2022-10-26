@@ -26,10 +26,7 @@ interface TrailerCardProps {
   trailer: Video;
 }
 
-const TrailerCard = ({
-  trailer: { name, key, published_at },
-  palette,
-}: TrailerCardProps) => {
+const TrailerCard = ({ trailer: { name, key }, palette }: TrailerCardProps) => {
   return (
     <div
       className="flex w-full flex-col gap-2 rounded-lg p-1"
@@ -51,9 +48,7 @@ interface Props {
 
 const Trailers = ({ movieId, palette }: Props) => {
   const { data: trailers } = useFetchTrailers(movieId);
-  console.log({ key: import.meta.env.VITE_TMDB_API_KEY });
-  if (!trailers) return <div>no trailers</div>;
-
+  if (!trailers || trailers.length === 0) return <div>no trailers</div>;
   return (
     <div className="grid grid-cols-1 justify-center gap-4 md:grid-cols-2 xl:sm:grid-cols-3">
       {trailers.map((trailer) => (

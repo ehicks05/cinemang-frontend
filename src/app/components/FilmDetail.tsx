@@ -79,10 +79,9 @@ const FilmDetail = ({
           <div>
             <span className="text-lg font-bold">{film.title}</span>{' '}
             <span className="text-xs text-gray-300" title={releasedAt}>
-              ({year})
+              {year} {`${runtime.hours}h ${runtime.minutes}m`}
             </span>
           </div>
-          <div className="text-xs text-gray-300">{`${runtime.hours}h ${runtime.minutes}m`}</div>
           <div>{film.director}</div>
           <div>{film.cast}</div>
           <div className="max-w-prose text-justify text-sm">

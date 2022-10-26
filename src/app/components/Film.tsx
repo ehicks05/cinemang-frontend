@@ -79,12 +79,13 @@ const Film = ({
           <div>
             <Link className="text-lg font-bold" to={`/films/${film.id}`}>
               {film.title}
-            </Link>{' '}
+            </Link>
             <span className="text-xs text-gray-300" title={releasedAt}>
-              ({year})
+              {' '}
+              {year}{' '}
+              <span className="whitespace-nowrap">{`${runtime.hours}h ${runtime.minutes}m`}</span>
             </span>
           </div>
-          <div className="text-xs text-gray-300">{`${runtime.hours}h ${runtime.minutes}m`}</div>
           <div>{film.director}</div>
           <div>{film.cast}</div>
           <div className="flex-grow"></div>
