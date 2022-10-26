@@ -35,12 +35,12 @@ const PersonCard = ({
 
   return (
     <div
-      className="flex w-full flex-col gap-2 rounded-lg p-1"
+      className="flex w-full flex-col gap-2 rounded-lg p-0.5"
       style={{ backgroundColor: palette.darkVibrant }}
     >
       <img alt="cast" className="rounded-t-lg" src={profile} />
 
-      <div className="flex-grow p-2">
+      <div className="flex-grow p-1.5">
         <div>{name}</div>
         {character && <div>{character}</div>}
         {jobs && (
