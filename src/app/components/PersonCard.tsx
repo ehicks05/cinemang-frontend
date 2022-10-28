@@ -1,6 +1,6 @@
 import { PaletteColors } from '@lauriys/react-palette';
 import React from 'react';
-import { IMAGE_WIDTH } from '../../constants';
+import { getTmdbImage } from '../../utils';
 
 interface Props {
   character?: string;
@@ -26,9 +26,8 @@ const PersonCard = ({
   name,
   profilePath,
 }: Props) => {
-  // console.log({ creditId });
   const profile = profilePath
-    ? `https://images.tmdb.org/t/p/w${IMAGE_WIDTH}${profilePath}`
+    ? getTmdbImage(profilePath)
     : `https://via.placeholder.com/300x450/${palette.darkVibrant?.slice(
         1,
       )}/fff/?text=${toInitials(name)}`;
@@ -51,7 +50,6 @@ const PersonCard = ({
           </div>
         )}
       </div>
-      {/* <pre>{JSON.stringify(c, null, 2)}</pre> */}
     </div>
   );
 };

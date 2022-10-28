@@ -43,5 +43,7 @@ export interface SystemData {
 }
 
 export const useFetchSystemData = () => {
-  return useQuery<SystemData, Error>(['systemData'], fetchData);
+  return useQuery<SystemData, Error>(['systemData'], fetchData, {
+    keepPreviousData: true,
+  });
 };

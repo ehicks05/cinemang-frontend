@@ -5,27 +5,21 @@ import { usePalette } from '@lauriys/react-palette';
 import chroma from 'chroma-js';
 import Stats from './Stats';
 import WatchProviders from './WatchProviders';
-import { Film as IFilm, Genre, Language, WatchProvider } from '../../types';
-import { useFetchSystemData } from '../hooks/useFetchSystemData';
+import { Film as IFilm } from '../../types';
 import { useFetchFilm } from '../hooks/useFetchFilms';
 import { useParams } from 'react-router-dom';
 import { GENRE_NAMES } from '../../constants';
 import Trailers from './Trailers';
 import Credits from './Credits';
+import { useAtom } from 'jotai';
+import { systemDataAtom } from '../../atoms';
+import { getTmdbImage } from '../../utils';
 
 const nf = Intl.NumberFormat('en-US', { maximumFractionDigits: 1 });
 
-const FilmDetail = ({
-  film,
-  genres,
-  languages,
-  watchProviders,
-}: {
-  film: IFilm;
-  genres: Genre[];
-  languages: Language[];
-  watchProviders: WatchProvider[];
-}) => {
+const FilmDetail = ({ film }: { film: IFilm }) => {
+  const [{ genres, languages }] = useAtom(systemDataAtom);
+
   const findLanguage = (languageId: number) =>
     languages.find((lang) => lang.id === languageId);
 
@@ -36,7 +30,7 @@ const FilmDetail = ({
     GENRE_NAMES[genreName] || genreName;
 
   const posterUrl = film.poster_path
-    ? `https://image.tmdb.org/t/p/original${film.poster_path}`
+    ? getTmdbImage(film.poster_path, 'original')
     : '/92x138.png';
   const releasedAt = format(parseISO(film.released_at), 'MM-dd-yyyy');
   const year = format(parseISO(film.released_at), 'yyyy');
@@ -92,10 +86,7 @@ const FilmDetail = ({
           </div>
           <div className="mt-4">Watch on:</div>
           {film.watch_provider && (
-            <WatchProviders
-              selectedIds={film.watch_provider}
-              watchProviders={watchProviders}
-            />
+            <WatchProviders selectedIds={film.watch_provider} />
           )}
         </div>
       </div>
@@ -116,22 +107,9 @@ const FilmDetail = ({
 const FilmDetailWrapper = () => {
   const { id } = useParams();
 
-  const systemDataQuery = useFetchSystemData();
-  const filmQuery = useFetchFilm(Number(id) || 0);
-
-  const error = systemDataQuery.error || filmQuery.error;
-  const isLoading = systemDataQuery.isLoading || filmQuery.isLoading;
-  const systemData = systemDataQuery.data;
-  const filmData = filmQuery.data;
+  const { data: filmData, error, isLoading } = useFetchFilm(Number(id) || 0);
 
   if (error || isLoading) return <Loading error={error} loading={isLoading} />;
-  if (!systemData) {
-    return <Loading error={'systemData is undefined'} loading={isLoading} />;
-  }
-  const { genres, languages, watchProviders } = systemData;
-  if (!genres?.length || !languages?.length || !watchProviders?.length)
-    return <div>Missing system data</div>;
-
   if (!filmData) {
     return <Loading error={'films are not defined'} loading={isLoading} />;
   }
@@ -139,14 +117,7 @@ const FilmDetailWrapper = () => {
 
   if (!film) return <div>Missing film</div>;
 
-  return (
-    <FilmDetail
-      film={film}
-      genres={genres}
-      languages={languages}
-      watchProviders={watchProviders}
-    />
-  );
+  return <FilmDetail film={film} />;
 };
 
 export default FilmDetailWrapper;

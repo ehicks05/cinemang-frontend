@@ -1,28 +1,22 @@
 import React, { useState } from 'react';
-import { Loading } from '../../core-components';
 import { addMinutes, intervalToDuration, parseISO, format } from 'date-fns';
-import { usePalette } from '@lauriys/react-palette';
+import { PaletteColors } from '@lauriys/react-palette';
 import { truncate } from 'lodash';
 import chroma from 'chroma-js';
 import Stats from './Stats';
 import WatchProviders from './WatchProviders';
-import { Film as IFilm, Genre, Language, WatchProvider } from '../../types';
+import { Film as IFilm } from '../../types';
 import { Link } from 'react-router-dom';
-import { GENRE_NAMES, IMAGE_WIDTH, SCALED_IMAGE } from '../../constants';
+import { GENRE_NAMES, SCALED_IMAGE } from '../../constants';
+import { useAtom } from 'jotai';
+import { systemDataAtom } from '../../atoms';
+import { getTmdbImage } from '../../utils';
 
 const nf = Intl.NumberFormat('en-US', { maximumFractionDigits: 1 });
 
-const Film = ({
-  film,
-  genres,
-  languages,
-  watchProviders,
-}: {
-  film: IFilm;
-  genres: Genre[];
-  languages: Language[];
-  watchProviders: WatchProvider[];
-}) => {
+const Film = ({ film, palette }: { film: IFilm; palette?: PaletteColors }) => {
+  const [{ genres, languages }] = useAtom(systemDataAtom);
+
   const findLanguage = (languageId: number) =>
     languages.find((lang) => lang.id === languageId);
 
@@ -33,7 +27,7 @@ const Film = ({
     GENRE_NAMES[genreName] || genreName;
 
   const posterUrl = film.poster_path
-    ? `https://image.tmdb.org/t/p/w${IMAGE_WIDTH}${film.poster_path}`
+    ? getTmdbImage(film.poster_path)
     : '/92x138.png';
   const releasedAt = format(parseISO(film.released_at), 'MM-dd-yyyy');
   const year = format(parseISO(film.released_at), 'yyyy');
@@ -42,14 +36,14 @@ const Film = ({
     start: new Date(),
   });
 
-  const { data: palette, loading, error } = usePalette(posterUrl);
   const [truncateOverview, setTruncateOverview] = useState(true);
 
-  if (error) return <Loading error={error} loading={loading} />;
-  if (loading) return <div className="h-full w-full bg-slate-700" />;
-
-  const lessMuted = chroma.mix(palette.darkVibrant || '', 'rgb(38,38,38)', 0.7);
-  const muted = chroma.mix(palette.darkVibrant || '', 'rgb(38,38,38)', 0.95);
+  const lessMuted = chroma.mix(
+    palette?.darkVibrant || '',
+    'rgb(38,38,38)',
+    0.7,
+  );
+  const muted = chroma.mix(palette?.darkVibrant || '', 'rgb(38,38,38)', 0.95);
   const cardStyle = {
     background: `linear-gradient(45deg, ${muted} 5%, ${muted} 45%, ${lessMuted} 95%)`,
   };
@@ -82,7 +76,7 @@ const Film = ({
             </Link>
             <span className="text-xs text-gray-300" title={releasedAt}>
               {' '}
-              {year}{' '}
+              <span className="font-semibold">{year}</span>{' '}
               <span className="whitespace-nowrap">{`${runtime.hours}h ${runtime.minutes}m`}</span>
             </span>
           </div>
@@ -90,10 +84,7 @@ const Film = ({
           <div>{film.cast}</div>
           <div className="flex-grow"></div>
           {film.watch_provider && (
-            <WatchProviders
-              selectedIds={film.watch_provider}
-              watchProviders={watchProviders}
-            />
+            <WatchProviders selectedIds={film.watch_provider} />
           )}
         </div>
       </div>
@@ -107,7 +98,7 @@ const Film = ({
             separator: ' ',
           })}
         </div>
-        <Stats bgColor={palette.darkVibrant || ''} data={statData} />
+        <Stats bgColor={palette?.darkVibrant || ''} data={statData} />
       </div>
     </div>
   );

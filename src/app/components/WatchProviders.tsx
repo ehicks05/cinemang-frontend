@@ -1,22 +1,25 @@
+import { useAtom } from 'jotai';
 import { FC } from 'react';
 import { WatchProvider as IWatchProvider } from '../../types';
+import { systemDataAtom } from '../../atoms';
+import { getTmdbImage } from '../../utils';
 
 const WatchProvider: FC<{ provider: IWatchProvider }> = ({
   provider: { name, logo_path },
 }) => (
   <img
     className="h-10 w-10 rounded-lg"
-    src={`https://image.tmdb.org/t/p/original${logo_path}`}
+    src={getTmdbImage(logo_path, 'original')}
     title={name}
   />
 );
 
 interface Props {
   selectedIds: { id: number }[];
-  watchProviders: IWatchProvider[];
 }
 
-const WatchProviders: FC<Props> = ({ watchProviders, selectedIds }) => {
+const WatchProviders: FC<Props> = ({ selectedIds }) => {
+  const [{ watchProviders }] = useAtom(systemDataAtom);
   const providers = selectedIds
     .map((id) => watchProviders.find((wp) => wp.id === id.id))
     .filter((p): p is IWatchProvider => p !== null && p !== undefined)

@@ -1,5 +1,5 @@
 import { Button, ComboBox } from '../../core-components';
-import { useState, FC } from 'react';
+import { useState } from 'react';
 
 import { UnmountClosed } from 'react-collapse';
 import { FaChevronDown, FaChevronUp } from 'react-icons/fa';
@@ -10,19 +10,15 @@ import {
   useQueryParams,
 } from 'use-query-params';
 import { DEFAULT_SEARCH_FORM } from '../../constants';
-import { Genre, Language, WatchProvider } from '../../types';
+import { systemDataAtom } from '../../atoms';
+import { useAtom } from 'jotai';
+import { getTmdbImage } from '../../utils';
 
-interface Props {
-  genres: Genre[];
-  languages: Language[];
-  watchProviders: WatchProvider[];
-}
-
-const SearchForm: FC<Props> = ({ languages, genres, watchProviders }) => {
-  const [isOpen, setIsOpen] = useState(process.env.NODE_ENV !== 'production');
+const SearchForm = () => {
+  const [isOpen, setIsOpen] = useState(false);
   const Icon = isOpen ? FaChevronUp : FaChevronDown;
   return (
-    <div className="mx-auto flex flex-col gap-4 rounded-lg bg-gray-800 p-4">
+    <div className="flex w-full flex-col gap-4 rounded-lg bg-gray-800 p-4">
       <div
         className="flex cursor-pointer justify-between gap-32"
         onClick={() => setIsOpen(!isOpen)}
@@ -33,18 +29,15 @@ const SearchForm: FC<Props> = ({ languages, genres, watchProviders }) => {
         </span>
       </div>
       <UnmountClosed isOpened={isOpen}>
-        <FormFields
-          genres={genres}
-          languages={languages}
-          watchProviders={watchProviders}
-        />
+        <FormFields />
       </UnmountClosed>
     </div>
   );
 };
 
-const FormFields: FC<Props> = ({ languages, genres, watchProviders }) => {
+const FormFields = () => {
   const [form, setFormInner] = useQueryParams();
+  const [{ genres, languages, watchProviders }] = useAtom(systemDataAtom);
 
   const setForm = (updatedForm: DecodedValueMap<QueryParamConfigMap>) => {
     if (updatedForm.page === form.page) {
@@ -80,7 +73,7 @@ const FormFields: FC<Props> = ({ languages, genres, watchProviders }) => {
               formKey="watchProviders"
               mapper={(provider) => ({
                 id: provider.id,
-                imageUrl: `https://image.tmdb.org/t/p/original${provider.logo_path}`,
+                imageUrl: getTmdbImage(provider.logo_path, 'original'),
                 label: provider.name,
               })}
               onChange={setForm}
