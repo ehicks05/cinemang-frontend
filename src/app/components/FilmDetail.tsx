@@ -84,9 +84,11 @@ const FilmDetail = ({ film }: { film: IFilm }) => {
           <div className="mt-4 flex flex-col justify-between gap-4">
             <Stats bgColor={palette.darkVibrant || ''} data={statData} />
           </div>
-          <div className="mt-4">Watch on:</div>
-          {film.watch_provider && (
-            <WatchProviders selectedIds={film.watch_provider} />
+          {film.watch_provider.length > 0 && (
+            <>
+              <div className="mt-4">Watch on:</div>
+              <WatchProviders selectedIds={film.watch_provider} />
+            </>
           )}
         </div>
       </div>
