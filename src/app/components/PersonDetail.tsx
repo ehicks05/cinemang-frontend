@@ -4,9 +4,10 @@ import { intervalToDuration, parseISO, format, parse } from 'date-fns';
 import { usePalette } from '@lauriys/react-palette';
 import chroma from 'chroma-js';
 import { useFetchPerson } from '../hooks/useFetchPersons';
-import { useParams } from 'react-router-dom';
+import { Link, useParams } from 'react-router-dom';
 import { getTmdbImage } from '../../utils';
 import PersonStats from './PersonStats';
+import { Film } from '../../types';
 
 const nf = Intl.NumberFormat('en-US', { maximumFractionDigits: 1 });
 
@@ -32,7 +33,6 @@ const PersonDetail = ({ person }: { person: any }) => {
   };
 
   const statData = {
-    age: String(age.years),
     knownForDepartment: person.known_for_department,
     popularity: nf.format(person.popularity),
   };
@@ -49,9 +49,8 @@ const PersonDetail = ({ person }: { person: any }) => {
         <div className="flex flex-col gap-1">
           <div className="text-lg font-bold">{person.name}</div>
           <div>
-            Born {birthday} in {person.place_of_birth}
+            Born {birthday} ({age.years}) {person.place_of_birth && `in ${person.place_of_birth}`}
           </div>
-          <div>Age {age.years}</div>
           <div>{person.deathday}</div>
           <div className="max-w-prose text-justify text-sm">
             {person.biography}
@@ -64,14 +63,20 @@ const PersonDetail = ({ person }: { person: any }) => {
       </div>
 
       {/* <Credits film={film} palette={palette} /> */}
-      {person.cast_credit.map((c) => (
-        <div>
-          {c.movie.title} {c.movie.released_at}
+      {(person.cast_credit as {character: string; id: string; movie: Film}[])
+      .sort((c1, c2) => c2.movie.released_at.localeCompare(c1.movie.released_at))
+      .map((c) => (
+        <div key={c.credit_id}>
+          <div>
+            <Link className='text-lg font-bold' to={`/films/${c.movie.id}`}>{c.movie.title}</Link>{" "}
+            <span className='text-sm'>{format(parse(c.movie.released_at, 'yyyy-MM-dd', new Date()), 'yyyy')}</span>
+          </div>
+          <div>{c.character}</div>
         </div>
       ))}
-      {person.cast_credit.map((c) => (
-        <pre className="text-xs">{JSON.stringify(c, null, 2)}</pre>
-      ))}
+      {/* {person.cast_credit.slice(0, 1).map((c) => (
+        <pre className="text-xs" key={c.id}>{JSON.stringify(c, null, 2)}</pre>
+      ))} */}
     </div>
   );
 };

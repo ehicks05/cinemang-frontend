@@ -1,11 +1,10 @@
 import React, { FC } from 'react';
-import { FaClock, FaMask, FaStar } from 'react-icons/fa';
+import { FaMask, FaStar } from 'react-icons/fa';
 import Stat from './Stat';
 
 interface Props {
   bgColor: string;
   data: {
-    age: string;
     knownForDepartment: string;
     popularity: string;
   };
@@ -17,11 +16,6 @@ const FilmStats: FC<Props> = ({ bgColor, data }) => {
       color: 'text-yellow-300',
       icon: FaStar,
       value: data.popularity,
-    },
-    {
-      color: 'text-green-500',
-      icon: FaClock,
-      value: data.age,
     },
     {
       color: 'text-blue-400',
