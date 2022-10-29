@@ -26,6 +26,7 @@ const Credits = ({ film, palette }: Props) => {
               key={c.credit_id}
               name={c.person.name}
               palette={palette}
+              personId={c.personId}
               profilePath={c.person.profile_path}
             />
           ))}
@@ -41,6 +42,7 @@ const Credits = ({ film, palette }: Props) => {
               key={c[0].credit_id}
               name={c[0].person.name}
               palette={palette}
+              personId={c[0].personId}
               profilePath={c[0].person.profile_path}
             />
           ))}

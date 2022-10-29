@@ -3,7 +3,7 @@ import { Route, Routes } from 'react-router-dom';
 
 import { Header, Footer, Loading } from './core-components';
 import { Home } from './app/index';
-import { FilmDetail } from './app/components';
+import { FilmDetail, PersonDetail } from './app/components';
 import { useAtom } from 'jotai';
 import { useFetchSystemData } from './app/hooks/useFetchSystemData';
 import { systemDataAtom } from './atoms';
@@ -33,6 +33,7 @@ function App() {
         <Routes>
           <Route element={<Home />} path={'/'} />
           <Route element={<FilmDetail />} path={'/films/:id'} />
+          <Route element={<PersonDetail />} path={'/people/:id'} />
         </Routes>
       </div>
       <Footer />

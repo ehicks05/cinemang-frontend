@@ -1,5 +1,6 @@
 import { PaletteColors } from '@lauriys/react-palette';
 import React from 'react';
+import { Link } from 'react-router-dom';
 import { getTmdbImage } from '../../utils';
 
 interface Props {
@@ -8,6 +9,7 @@ interface Props {
   jobs?: string[];
   name: string;
   palette: PaletteColors;
+  personId: string;
   profilePath?: string;
 }
 
@@ -19,11 +21,12 @@ const toInitials = (name: string) => {
 };
 
 const PersonCard = ({
-  palette,
   character,
   // creditId,
   jobs,
   name,
+  palette,
+  personId,
   profilePath,
 }: Props) => {
   const profile = profilePath
@@ -33,9 +36,10 @@ const PersonCard = ({
       )}/fff/?text=${toInitials(name)}`;
 
   return (
-    <div
+    <Link
       className="flex w-full flex-col gap-2 rounded-lg p-0.5"
       style={{ backgroundColor: palette.darkVibrant }}
+      to={`/people/${personId}`}
     >
       <img alt="cast" className="rounded-t-lg" src={profile} />
 
@@ -50,7 +54,7 @@ const PersonCard = ({
           </div>
         )}
       </div>
-    </div>
+    </Link>
   );
 };
 

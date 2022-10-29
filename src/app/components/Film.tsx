@@ -3,7 +3,7 @@ import { addMinutes, intervalToDuration, parseISO, format } from 'date-fns';
 import { PaletteColors } from '@lauriys/react-palette';
 import { truncate } from 'lodash';
 import chroma from 'chroma-js';
-import Stats from './Stats';
+import FilmStats from './FilmStats';
 import WatchProviders from './WatchProviders';
 import { Film as IFilm } from '../../types';
 import { Link } from 'react-router-dom';
@@ -98,7 +98,7 @@ const Film = ({ film, palette }: { film: IFilm; palette?: PaletteColors }) => {
             separator: ' ',
           })}
         </div>
-        <Stats bgColor={palette?.darkVibrant || ''} data={statData} />
+        <FilmStats bgColor={palette?.darkVibrant || ''} data={statData} />
       </div>
     </div>
   );

@@ -1,29 +1,6 @@
 import React, { FC } from 'react';
 import { FaHeart, FaStar } from 'react-icons/fa';
-import { IconType } from 'react-icons';
-
-interface StatProps {
-  Icon?: IconType;
-  bgColor: string;
-  color: string;
-  value: string;
-}
-
-const FilmStat: FC<StatProps> = ({ Icon, color, bgColor, value }) => {
-  return (
-    <div
-      className="flex items-center gap-1 rounded-lg bg-gray-700 px-2 py-1 sm:px-4 sm:py-2"
-      style={{ backgroundColor: bgColor }}
-    >
-      {Icon && (
-        <div>
-          <Icon className={color} />
-        </div>
-      )}
-      <div className="text-xs sm:text-sm">{value}</div>
-    </div>
-  );
-};
+import Stat from './Stat';
 
 interface Props {
   bgColor: string;
@@ -35,7 +12,7 @@ interface Props {
   };
 }
 
-const Stats: FC<Props> = ({ bgColor, data }) => {
+const FilmStats: FC<Props> = ({ bgColor, data }) => {
   const stats = [
     {
       color: 'text-red-600',
@@ -60,7 +37,7 @@ const Stats: FC<Props> = ({ bgColor, data }) => {
   return (
     <div className="flex flex-wrap gap-2">
       {stats.map((stat) => (
-        <FilmStat
+        <Stat
           Icon={stat.icon}
           bgColor={bgColor}
           color={stat.color}
@@ -72,4 +49,4 @@ const Stats: FC<Props> = ({ bgColor, data }) => {
   );
 };
 
-export default Stats;
+export default FilmStats;

@@ -3,7 +3,7 @@ import { Loading } from '../../core-components';
 import { addMinutes, intervalToDuration, parseISO, format } from 'date-fns';
 import { usePalette } from '@lauriys/react-palette';
 import chroma from 'chroma-js';
-import Stats from './Stats';
+import FilmStats from './FilmStats';
 import WatchProviders from './WatchProviders';
 import { Film as IFilm } from '../../types';
 import { useFetchFilm } from '../hooks/useFetchFilms';
@@ -82,7 +82,7 @@ const FilmDetail = ({ film }: { film: IFilm }) => {
             {film.overview}
           </div>
           <div className="mt-4 flex flex-col justify-between gap-4">
-            <Stats bgColor={palette.darkVibrant || ''} data={statData} />
+            <FilmStats bgColor={palette.darkVibrant || ''} data={statData} />
           </div>
           {film.watch_provider.length > 0 && (
             <>
@@ -109,15 +109,12 @@ const FilmDetail = ({ film }: { film: IFilm }) => {
 const FilmDetailWrapper = () => {
   const { id } = useParams();
 
-  const { data: filmData, error, isLoading } = useFetchFilm(Number(id) || 0);
+  const { data: film, error, isLoading } = useFetchFilm(Number(id) || 0);
 
   if (error || isLoading) return <Loading error={error} loading={isLoading} />;
-  if (!filmData) {
+  if (!film) {
     return <Loading error={'films are not defined'} loading={isLoading} />;
   }
-  const film = filmData;
-
-  if (!film) return <div>Missing film</div>;
 
   return <FilmDetail film={film} />;
 };
