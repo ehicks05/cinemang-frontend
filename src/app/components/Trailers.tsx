@@ -2,24 +2,8 @@ import { PaletteColors } from '@lauriys/react-palette';
 import React from 'react';
 import { Video } from '../../types';
 import { useFetchTrailers } from '../hooks/useFetchFilms';
-
-const YoutubeEmbed = ({ embedId }: { embedId: string }) => {
-  return (
-    <div className="relative h-0 overflow-hidden pb-64">
-      <iframe
-        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-        // eslint-disable-next-line react/no-unknown-property
-        allowFullScreen
-        className="absolute left-0 top-0 h-full w-full"
-        frameBorder="0"
-        height="480"
-        src={`https://www.youtube.com/embed/${embedId}`}
-        title="Embedded youtube"
-        width="853"
-      />
-    </div>
-  );
-};
+import LiteYouTubeEmbed from 'react-lite-youtube-embed';
+import 'react-lite-youtube-embed/dist/LiteYouTubeEmbed.css';
 
 interface TrailerCardProps {
   palette: PaletteColors;
@@ -32,7 +16,7 @@ const TrailerCard = ({ trailer: { name, key }, palette }: TrailerCardProps) => {
       className="flex w-full flex-col gap-2 rounded-lg p-1"
       style={{ backgroundColor: palette.darkVibrant }}
     >
-      <YoutubeEmbed embedId={key} />
+      <LiteYouTubeEmbed id={key} title={name} />
 
       <div className="flex-grow p-2">
         <div>{name}</div>
