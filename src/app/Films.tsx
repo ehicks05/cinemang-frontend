@@ -7,6 +7,7 @@ import { useQueryParams } from 'use-query-params';
 import Vibrant from 'node-vibrant';
 import { PaletteColors } from '@lauriys/react-palette';
 import { getTmdbImage } from '../utils';
+import { useWindowSize } from 'react-use';
 
 const toPalette = async (url: string) => {
   const img = new Image();
@@ -48,9 +49,16 @@ const Films = ({ films }: { films: IFilm[] }) => {
     if (films && films.length !== 0) doIt();
   }, [films]);
 
+  const { width } = useWindowSize();
+
+  const minColumnWidth = width < 400 ? width - 16 - 16 - 16 - 16 : 360;
+
   return (
     <div
-      className={`grid gap-4 md:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 3xl:grid-cols-5`}
+      className={`grid gap-4`}
+      style={{
+        gridTemplateColumns: `repeat( auto-fill, minmax(${minColumnWidth}px, 1fr) )`,
+      }}
     >
       {loading &&
         films.map((film) => {
