@@ -17,9 +17,8 @@ const PersonDetail = ({ person }: { person: any }) => {
     : '/92x138.png';
   const { data: palette, loading, error } = usePalette(posterUrl);
 
-  const birthday = format(parseISO(person.birthday), 'MM-dd-yyyy');
   const age = intervalToDuration({
-    end: new Date(),
+    end: person.deathday ? parseISO(person.deathday) : new Date(),
     start: parseISO(person.birthday),
   });
 
@@ -49,9 +48,9 @@ const PersonDetail = ({ person }: { person: any }) => {
         <div className="flex flex-col gap-1">
           <div className="text-lg font-bold">{person.name}</div>
           <div>
-            Born {birthday} ({age.years}) {person.place_of_birth && `in ${person.place_of_birth}`}
+            Born {person.birthday} {!person.deathday && `(${age.years})`} {person.place_of_birth && `in ${person.place_of_birth}`}
           </div>
-          <div>{person.deathday}</div>
+          {person.deathday && <div>Died {person.deathday} at {age.years}</div>}
           <div className="max-w-prose text-justify text-sm">
             {person.biography}
           </div>
@@ -72,6 +71,17 @@ const PersonDetail = ({ person }: { person: any }) => {
             <span className='text-sm'>{format(parse(c.movie.released_at, 'yyyy-MM-dd', new Date()), 'yyyy')}</span>
           </div>
           <div>{c.character}</div>
+        </div>
+      ))}
+      {(person.crew_credit as {department: string; id: string; job: string; movie: Film}[])
+      .sort((c1, c2) => c2.movie.released_at.localeCompare(c1.movie.released_at))
+      .map((c) => (
+        <div key={c.credit_id}>
+          <div>
+            <Link className='text-lg font-bold' to={`/films/${c.movie.id}`}>{c.movie.title}</Link>{" "}
+            <span className='text-sm'>{format(parse(c.movie.released_at, 'yyyy-MM-dd', new Date()), 'yyyy')}</span>
+          </div>
+          <div>{c.department} - {c.job}</div>
         </div>
       ))}
       {/* {person.cast_credit.slice(0, 1).map((c) => (
