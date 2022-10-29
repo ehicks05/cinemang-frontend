@@ -59,7 +59,7 @@ export interface Video {
   key: string;
   name: string;
   official: boolean;
-  published_at: Date;
+  published_at: string;
   site: string;
   size: number;
   type: string;

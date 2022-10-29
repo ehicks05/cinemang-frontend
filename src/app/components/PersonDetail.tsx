@@ -20,7 +20,7 @@ const PersonDetail = ({ person }: { person: any }) => {
   const birthday = format(parseISO(person.birthday), 'MM-dd-yyyy');
   const age = intervalToDuration({
     end: new Date(),
-    start: parse(person.birthday, 'yyyy-MM-dd', new Date()),
+    start: parseISO(person.birthday),
   });
 
   if (error) return <Loading error={error} loading={loading} />;

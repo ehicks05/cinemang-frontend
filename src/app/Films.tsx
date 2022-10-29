@@ -31,9 +31,9 @@ const Films = ({ films }: { films: IFilm[] }) => {
       setLoading(true);
       const palettes = await Promise.all(
         films.map(async (film) => {
-          const url = `${getTmdbImage(
-            film.poster_path,
-          )}?cache-buster=${new Date().valueOf()}`;
+          const url = getTmdbImage(
+            film.poster_path, undefined, true
+          );
           const palette = await toPalette(url);
           return { id: film.id, palette };
         }),
