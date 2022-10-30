@@ -132,30 +132,36 @@ const Credit = ({
 }) => {
   return (
     <div
-      className="flex items-center gap-2 rounded border p-2"
+      className="flex flex-col items-center justify-between gap-2 rounded border p-2 sm:flex-row"
       key={credit.credit_id}
       style={{ borderColor: bgColor }}
     >
-      <FilmStats
-        autoWidth={false}
-        bgColor={bgColor}
-        data={pick(toStats(genres, languages, credit.movie), [
-          'voteAverage',
-          'voteCount',
-        ])}
-      />
-      <Link className="text-lg font-bold" to={`/films/${credit.movie.id}`}>
-        {credit.movie.title}
-      </Link>{' '}
-      <span className="text-sm">
-        {format(parseISO(credit.movie.released_at), 'yyyy')}
-      </span>{' '}
-      {'character' in credit && <span>{credit.character}</span>}
-      {'department' in credit && (
-        <span>
-          {credit.department} - {credit.job}
+      <div className="flex flex-col items-center gap-2 sm:flex-row">
+        <span className="flex items-center gap-2">
+          <span className="text-xs">
+            {format(parseISO(credit.movie.released_at), 'yyyy')}
+          </span>{' '}
+          <Link className="text-lg font-bold" to={`/films/${credit.movie.id}`}>
+            {credit.movie.title}
+          </Link>{' '}
         </span>
-      )}
+        {'character' in credit && <span>{credit.character}</span>}
+        {'department' in credit && (
+          <span>
+            {credit.department} - {credit.job}
+          </span>
+        )}
+      </div>
+      <div className="flex-shrink">
+        <FilmStats
+          autoWidth={false}
+          bgColor={bgColor}
+          data={pick(toStats(genres, languages, credit.movie), [
+            'voteAverage',
+            'voteCount',
+          ])}
+        />
+      </div>
     </div>
   );
 };
