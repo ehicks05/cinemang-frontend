@@ -8,10 +8,12 @@ import { Link, useParams } from 'react-router-dom';
 import { getTmdbImage } from '../../utils';
 import PersonStats from './PersonStats';
 import { Film } from '../../types';
+import { useTitle } from 'react-use';
 
 const nf = Intl.NumberFormat('en-US', { maximumFractionDigits: 1 });
 
 const PersonDetail = ({ person }: { person: any }) => {
+  useTitle(person.name, {restoreOnUnmount: true});
   const posterUrl = person.profile_path
     ? getTmdbImage(person.profile_path, 'original')
     : '/92x138.png';

@@ -7,7 +7,7 @@ import { useQueryParams } from 'use-query-params';
 import Vibrant from 'node-vibrant';
 import { PaletteColors } from '@lauriys/react-palette';
 import { getTmdbImage } from '../utils';
-import { useWindowSize } from 'react-use';
+import { useTitle, useWindowSize } from 'react-use';
 
 const toPalette = async (url: string) => {
   const img = new Image();
@@ -84,6 +84,7 @@ const Films = ({ films }: { films: IFilm[] }) => {
 };
 
 const FilmsWrapper = () => {
+  useTitle('Cinemang');
   const [form, setForm] = useQueryParams();
   const { page } = form;
   const setPage = (page: number) => setForm({ ...form, page });

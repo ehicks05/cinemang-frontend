@@ -14,10 +14,12 @@ import Credits from './Credits';
 import { useAtom } from 'jotai';
 import { systemDataAtom } from '../../atoms';
 import { getTmdbImage } from '../../utils';
+import { useTitle } from 'react-use';
 
 const nf = Intl.NumberFormat('en-US', { maximumFractionDigits: 1 });
 
 const FilmDetail = ({ film }: { film: IFilm }) => {
+  useTitle(film.title, {restoreOnUnmount: true});
   const [{ genres, languages }] = useAtom(systemDataAtom);
 
   const findLanguage = (languageId: number) =>
