@@ -1,15 +1,16 @@
 import React, { FC } from 'react';
 import { FaHeart, FaStar } from 'react-icons/fa';
 import Stat from './Stat';
+
 const nf = Intl.NumberFormat('en-US', { maximumFractionDigits: 1 });
 
 interface Props {
   bgColor: string;
   data: {
-    genre: string;
-    language: string;
-    voteAverage: number;
-    voteCount: number;
+    genre?: string;
+    language?: string;
+    voteAverage?: number;
+    voteCount?: number;
   };
 }
 
@@ -36,40 +37,57 @@ const starColor = (voteCount: number) =>
     ? 'text-yellow-500'
     : 'text-yellow-700';
 
-const FilmStats: FC<Props> = ({ bgColor, data }) => {
-  const stats = [
-    {
-      color: heartColor(data.voteAverage),
-      icon: FaHeart,
-      value: nf.format(data.voteAverage),
-    },
-    {
-      color: starColor(data.voteCount),
-      icon: FaStar,
-      value: toShort(data.voteCount),
-    },
-    {
-      color: 'text-green-500',
-      value: data.language,
-    },
-    {
+const FilmStats: FC<Props> = ({
+  bgColor,
+  data,
+  data: { genre, language, voteAverage = 0, voteCount = 0 },
+}) => {
+  const stats = {
+    genre: {
       color: 'text-blue-400',
-      value: data.genre,
+      icon: undefined,
+      label: genre,
+      order: 2,
     },
-  ];
+    language: {
+      color: 'text-green-500',
+      icon: undefined,
+      label: language,
+      order: 3,
+    },
+    voteAverage: {
+      color: heartColor(voteAverage),
+      icon: FaHeart,
+      label: nf.format(voteAverage),
+      order: 0,
+    },
+    voteCount: {
+      color: starColor(voteCount),
+      icon: FaStar,
+      label: toShort(voteCount),
+      order: 1,
+    },
+  } as const;
 
   return (
-    <div className="flex flex-wrap gap-2">
-      {stats.map((stat) => (
-        <Stat
-          Icon={stat.icon}
-          bgColor={bgColor}
-          color={stat.color}
-          key={stat.value}
-          value={stat.value}
-        />
-      ))}
-    </div>
+    <span className="flex flex-wrap gap-2">
+      {Object.entries(data)
+        .filter(([key, val]) => key !== 'language' && val !== 'English')
+        .map(([key]) => {
+          const stat = stats[key as keyof typeof stats];
+          return stat;
+        })
+        .sort((s1, s2) => s1.order - s2.order)
+        .map((stat) => (
+          <Stat
+            Icon={stat.icon}
+            bgColor={bgColor}
+            color={stat.color}
+            key={stat.label}
+            label={stat.label || ''}
+          />
+        ))}
+    </span>
   );
 };
 

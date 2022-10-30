@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Loading } from '../../core-components';
 import { intervalToDuration, parseISO, format } from 'date-fns';
 import { usePalette } from '@lauriys/react-palette';
@@ -13,6 +13,7 @@ import FilmStats from './FilmStats';
 import { toStats } from './utils';
 import { useAtom } from 'jotai';
 import { systemDataAtom } from '../../atoms';
+import { pick, truncate } from 'lodash';
 
 const nf = Intl.NumberFormat('en-US', { maximumFractionDigits: 1 });
 
@@ -23,6 +24,10 @@ const PersonDetail = ({ person }: { person: Person }) => {
     ? getTmdbImage(person.profile_path, 'original')
     : '/92x138.png';
   const { data: palette, loading, error } = usePalette(posterUrl);
+  const [truncateBio, setTruncateBio] = useState(true);
+  const bio = truncateBio
+    ? truncate(person.biography, { length: 1280 })
+    : person.biography;
 
   const age = intervalToDuration({
     end: person.deathday ? parseISO(person.deathday) : new Date(),
@@ -45,7 +50,7 @@ const PersonDetail = ({ person }: { person: Person }) => {
 
   return (
     <div
-      className="m-auto flex max-w-screen-lg flex-col gap-4 rounded-lg p-4"
+      className="m-auto flex max-w-screen-xl flex-col gap-4 rounded-lg p-4"
       style={cardStyle}
     >
       <div className="flex flex-col gap-4 sm:flex-row">
@@ -75,8 +80,11 @@ const PersonDetail = ({ person }: { person: Person }) => {
         </div>
         <div className="flex flex-col gap-1">
           <div className="text-lg font-bold">{person.name}</div>
-          <div className="max-w-prose text-justify text-sm">
-            {person.biography}
+          <div
+            className="max-w-prose cursor-pointer text-justify text-sm"
+            onClick={() => setTruncateBio(!truncateBio)}
+          >
+            {bio}
           </div>
         </div>
       </div>
@@ -138,7 +146,10 @@ const Credit = ({
       )}
       <FilmStats
         bgColor={bgColor}
-        data={toStats(genres, languages, credit.movie)}
+        data={pick(toStats(genres, languages, credit.movie), [
+          'voteAverage',
+          'voteCount',
+        ])}
       />
     </div>
   );

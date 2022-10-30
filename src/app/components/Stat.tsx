@@ -5,10 +5,10 @@ interface StatProps {
   Icon?: IconType;
   bgColor: string;
   color: string;
-  value: string;
+  label: string;
 }
 
-const Stat: FC<StatProps> = ({ Icon, color, bgColor, value }) => {
+const Stat: FC<StatProps> = ({ Icon, color, bgColor, label }) => {
   return (
     <div
       className="flex items-center gap-1 rounded-lg bg-gray-700 px-2 py-1 sm:px-4 sm:py-2"
@@ -19,7 +19,7 @@ const Stat: FC<StatProps> = ({ Icon, color, bgColor, value }) => {
           <Icon className={color} />
         </div>
       )}
-      <div className="text-xs sm:text-sm">{value}</div>
+      <div className="text-xs sm:text-sm">{label}</div>
     </div>
   );
 };

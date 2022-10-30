@@ -32,7 +32,7 @@ const FilmStats: FC<Props> = ({ bgColor, data }) => {
           bgColor={bgColor}
           color={stat.color}
           key={stat.value}
-          value={stat.value}
+          label={stat.value}
         />
       ))}
     </div>
