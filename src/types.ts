@@ -1,7 +1,7 @@
 export interface Film {
   cast: string;
-  cast_credit: any[];
-  crew_credit: any[];
+  cast_credit: CastCredit[];
+  crew_credit: CrewCredit[];
   director: string;
   genre_id: number;
   id: number;
@@ -63,4 +63,40 @@ export interface Video {
   site: string;
   size: number;
   type: string;
+}
+
+export interface CastCredit {
+  character: string;
+  credit_id: string;
+  id: string;
+  movie: Film;
+  movieId: number;
+  order: number;
+  person: Person;
+  personId: number;
+}
+
+export interface CrewCredit {
+  credit_id: string;
+  department: string;
+  id: string;
+  job: string;
+  movie: Film;
+  movieId: number;
+  person: Person;
+  personId: number;
+}
+
+export interface Person {
+  biography: string;
+  birthday: string;
+  cast_credit: CastCredit[];
+  crew_credit: CrewCredit[];
+  deathday: string;
+  imdb_id: string;
+  known_for_department: string;
+  name: string;
+  place_of_birth: string;
+  popularity: number;
+  profile_path: string;
 }

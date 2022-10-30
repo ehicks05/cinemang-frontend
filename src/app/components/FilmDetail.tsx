@@ -8,28 +8,17 @@ import WatchProviders from './WatchProviders';
 import { Film as IFilm } from '../../types';
 import { useFetchFilm } from '../hooks/useFetchFilms';
 import { useParams } from 'react-router-dom';
-import { GENRE_NAMES } from '../../constants';
 import Trailers from './Trailers';
 import Credits from './Credits';
 import { useAtom } from 'jotai';
 import { systemDataAtom } from '../../atoms';
 import { getTmdbImage } from '../../utils';
 import { useTitle } from 'react-use';
-
-const nf = Intl.NumberFormat('en-US', { maximumFractionDigits: 1 });
+import { toStats } from './utils';
 
 const FilmDetail = ({ film }: { film: IFilm }) => {
-  useTitle(film.title, {restoreOnUnmount: true});
+  useTitle(film.title, { restoreOnUnmount: true });
   const [{ genres, languages }] = useAtom(systemDataAtom);
-
-  const findLanguage = (languageId: number) =>
-    languages.find((lang) => lang.id === languageId);
-
-  const findGenre = (genreId: number) =>
-    genres.find((genre) => genre.id === genreId);
-
-  const getGenreName = (genreName: string) =>
-    GENRE_NAMES[genreName] || genreName;
 
   const posterUrl = film.poster_path
     ? getTmdbImage(film.poster_path, 'original')
@@ -50,16 +39,6 @@ const FilmDetail = ({ film }: { film: IFilm }) => {
   const muted = chroma.mix(palette.darkVibrant || '', 'rgb(38,38,38)', 0.95);
   const cardStyle = {
     background: `linear-gradient(45deg, ${muted} 5%, ${muted} 45%, ${lessMuted} 95%)`,
-  };
-
-  const statData = {
-    genre: getGenreName(findGenre(film.genre_id)?.name || '?'),
-    language: findLanguage(film.language_id)?.name || '?',
-    voteAverage: nf.format(film.vote_average),
-    voteCount:
-      Number(film.vote_count) > 1000
-        ? `${Math.round(film.vote_count / 1000)}k`
-        : String(film.vote_count),
   };
 
   return (
@@ -84,7 +63,10 @@ const FilmDetail = ({ film }: { film: IFilm }) => {
             {film.overview}
           </div>
           <div className="mt-4 flex flex-col justify-between gap-4">
-            <FilmStats bgColor={palette.darkVibrant || ''} data={statData} />
+            <FilmStats
+              bgColor={palette.darkVibrant || ''}
+              data={toStats(genres, languages, film)}
+            />
           </div>
           {film.watch_provider.length > 0 && (
             <>

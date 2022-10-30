@@ -7,24 +7,14 @@ import FilmStats from './FilmStats';
 import WatchProviders from './WatchProviders';
 import { Film as IFilm } from '../../types';
 import { Link } from 'react-router-dom';
-import { GENRE_NAMES, SCALED_IMAGE } from '../../constants';
+import { SCALED_IMAGE } from '../../constants';
 import { useAtom } from 'jotai';
 import { systemDataAtom } from '../../atoms';
 import { getTmdbImage } from '../../utils';
-
-const nf = Intl.NumberFormat('en-US', { maximumFractionDigits: 1 });
+import { toStats } from './utils';
 
 const Film = ({ film, palette }: { film: IFilm; palette?: PaletteColors }) => {
   const [{ genres, languages }] = useAtom(systemDataAtom);
-
-  const findLanguage = (languageId: number) =>
-    languages.find((lang) => lang.id === languageId);
-
-  const findGenre = (genreId: number) =>
-    genres.find((genre) => genre.id === genreId);
-
-  const getGenreName = (genreName: string) =>
-    GENRE_NAMES[genreName] || genreName;
 
   const posterUrl = film.poster_path
     ? getTmdbImage(film.poster_path)
@@ -46,16 +36,6 @@ const Film = ({ film, palette }: { film: IFilm; palette?: PaletteColors }) => {
   const muted = chroma.mix(palette?.darkVibrant || '', 'rgb(38,38,38)', 0.95);
   const cardStyle = {
     background: `linear-gradient(45deg, ${muted} 5%, ${muted} 45%, ${lessMuted} 95%)`,
-  };
-
-  const statData = {
-    genre: getGenreName(findGenre(film.genre_id)?.name || '?'),
-    language: findLanguage(film.language_id)?.name || '?',
-    voteAverage: nf.format(film.vote_average),
-    voteCount:
-      Number(film.vote_count) > 1000
-        ? `${Math.round(film.vote_count / 1000)}k`
-        : String(film.vote_count),
   };
 
   return (
@@ -98,7 +78,10 @@ const Film = ({ film, palette }: { film: IFilm; palette?: PaletteColors }) => {
             separator: ' ',
           })}
         </div>
-        <FilmStats bgColor={palette?.darkVibrant || ''} data={statData} />
+        <FilmStats
+          bgColor={palette?.darkVibrant || ''}
+          data={toStats(genres, languages, film)}
+        />
       </div>
     </div>
   );

@@ -9,7 +9,7 @@ interface Props {
   jobs?: string[];
   name: string;
   palette: PaletteColors;
-  personId: string;
+  personId: number;
   profilePath?: string;
 }
 

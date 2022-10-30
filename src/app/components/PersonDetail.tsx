@@ -1,19 +1,24 @@
 import React from 'react';
 import { Loading } from '../../core-components';
-import { intervalToDuration, parseISO, format, parse } from 'date-fns';
+import { intervalToDuration, parseISO, format } from 'date-fns';
 import { usePalette } from '@lauriys/react-palette';
 import chroma from 'chroma-js';
 import { useFetchPerson } from '../hooks/useFetchPersons';
 import { Link, useParams } from 'react-router-dom';
 import { getTmdbImage } from '../../utils';
 import PersonStats from './PersonStats';
-import { Film } from '../../types';
 import { useTitle } from 'react-use';
+import { CastCredit, CrewCredit, Genre, Language, Person } from '../../types';
+import FilmStats from './FilmStats';
+import { toStats } from './utils';
+import { useAtom } from 'jotai';
+import { systemDataAtom } from '../../atoms';
 
 const nf = Intl.NumberFormat('en-US', { maximumFractionDigits: 1 });
 
-const PersonDetail = ({ person }: { person: any }) => {
-  useTitle(person.name, {restoreOnUnmount: true});
+const PersonDetail = ({ person }: { person: Person }) => {
+  const [{ genres, languages }] = useAtom(systemDataAtom);
+  useTitle(person.name, { restoreOnUnmount: true });
   const posterUrl = person.profile_path
     ? getTmdbImage(person.profile_path, 'original')
     : '/92x138.png';
@@ -46,49 +51,95 @@ const PersonDetail = ({ person }: { person: any }) => {
       <div className="flex flex-col gap-4 sm:flex-row">
         <div className="flex-shrink-0">
           <img alt="poster" className="sm:h-96 sm:w-64" src={posterUrl} />
+          <div className="mt-4 flex flex-col justify-between gap-4">
+            <PersonStats bgColor={palette.darkVibrant || ''} data={statData} />
+            {person.birthday && (
+              <div>
+                <div>Born</div>
+                <div>
+                  {person.birthday} {!person.deathday && `(${age.years})`}
+                </div>
+                <div>{person.place_of_birth && person.place_of_birth}</div>
+              </div>
+            )}
+
+            {person.deathday && (
+              <div>
+                Died
+                <div>
+                  {person.deathday} ({age.years})
+                </div>
+              </div>
+            )}
+          </div>
         </div>
         <div className="flex flex-col gap-1">
           <div className="text-lg font-bold">{person.name}</div>
-          <div>
-            Born {person.birthday} {!person.deathday && `(${age.years})`} {person.place_of_birth && `in ${person.place_of_birth}`}
-          </div>
-          {person.deathday && <div>Died {person.deathday} at {age.years}</div>}
           <div className="max-w-prose text-justify text-sm">
             {person.biography}
-          </div>
-          <div>imdb: {person.imdb_id}</div>
-          <div className="mt-4 flex flex-col justify-between gap-4">
-            <PersonStats bgColor={palette.darkVibrant || ''} data={statData} />
           </div>
         </div>
       </div>
 
-      {/* <Credits film={film} palette={palette} /> */}
-      {(person.cast_credit as {character: string; id: string; movie: Film}[])
-      .sort((c1, c2) => c2.movie.released_at.localeCompare(c1.movie.released_at))
-      .map((c) => (
-        <div key={c.credit_id}>
-          <div>
-            <Link className='text-lg font-bold' to={`/films/${c.movie.id}`}>{c.movie.title}</Link>{" "}
-            <span className='text-sm'>{format(parse(c.movie.released_at, 'yyyy-MM-dd', new Date()), 'yyyy')}</span>
-          </div>
-          <div>{c.character}</div>
-        </div>
-      ))}
-      {(person.crew_credit as {department: string; id: string; job: string; movie: Film}[])
-      .sort((c1, c2) => c2.movie.released_at.localeCompare(c1.movie.released_at))
-      .map((c) => (
-        <div key={c.credit_id}>
-          <div>
-            <Link className='text-lg font-bold' to={`/films/${c.movie.id}`}>{c.movie.title}</Link>{" "}
-            <span className='text-sm'>{format(parse(c.movie.released_at, 'yyyy-MM-dd', new Date()), 'yyyy')}</span>
-          </div>
-          <div>{c.department} - {c.job}</div>
-        </div>
-      ))}
-      {/* {person.cast_credit.slice(0, 1).map((c) => (
-        <pre className="text-xs" key={c.id}>{JSON.stringify(c, null, 2)}</pre>
-      ))} */}
+      {person.cast_credit
+        .sort((c1, c2) =>
+          c2.movie.released_at.localeCompare(c1.movie.released_at),
+        )
+        .map((c) => (
+          <Credit
+            bgColor={palette.darkVibrant || ''}
+            credit={c}
+            genres={genres}
+            key={c.credit_id}
+            languages={languages}
+          />
+        ))}
+      {person.crew_credit
+        .sort((c1, c2) =>
+          c2.movie.released_at.localeCompare(c1.movie.released_at),
+        )
+        .map((c) => (
+          <Credit
+            bgColor={palette.darkVibrant || ''}
+            credit={c}
+            genres={genres}
+            key={c.credit_id}
+            languages={languages}
+          />
+        ))}
+    </div>
+  );
+};
+
+const Credit = ({
+  bgColor,
+  genres,
+  languages,
+  credit,
+}: {
+  bgColor: string;
+  credit: CastCredit | CrewCredit;
+  genres: Genre[];
+  languages: Language[];
+}) => {
+  return (
+    <div key={credit.credit_id}>
+      <Link className="text-lg font-bold" to={`/films/${credit.movie.id}`}>
+        {credit.movie.title}
+      </Link>{' '}
+      <span className="text-sm">
+        {format(parseISO(credit.movie.released_at), 'yyyy')}
+      </span>{' '}
+      {'character' in credit && <span>{credit.character}</span>}
+      {'department' in credit && (
+        <span>
+          {credit.department} - {credit.job}
+        </span>
+      )}
+      <FilmStats
+        bgColor={bgColor}
+        data={toStats(genres, languages, credit.movie)}
+      />
     </div>
   );
 };
