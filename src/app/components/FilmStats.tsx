@@ -5,6 +5,7 @@ import Stat from './Stat';
 const nf = Intl.NumberFormat('en-US', { maximumFractionDigits: 1 });
 
 interface Props {
+  autoWidth?: boolean;
   bgColor: string;
   data: {
     genre?: string;
@@ -38,6 +39,7 @@ const starColor = (voteCount: number) =>
     : 'text-yellow-700';
 
 const FilmStats: FC<Props> = ({
+  autoWidth = true,
   bgColor,
   data,
   data: { genre, language, voteAverage = 0, voteCount = 0 },
@@ -48,24 +50,28 @@ const FilmStats: FC<Props> = ({
       icon: undefined,
       label: genre,
       order: 2,
+      width: 'w-32',
     },
     language: {
       color: 'text-green-500',
       icon: undefined,
       label: language,
       order: 3,
+      width: 'w-32',
     },
     voteAverage: {
       color: heartColor(voteAverage),
       icon: FaHeart,
       label: nf.format(voteAverage),
       order: 0,
+      width: 'w-20',
     },
     voteCount: {
       color: starColor(voteCount),
       icon: FaStar,
       label: toShort(voteCount),
       order: 1,
+      width: 'w-20',
     },
   } as const;
 
@@ -85,6 +91,7 @@ const FilmStats: FC<Props> = ({
             color={stat.color}
             key={stat.label}
             label={stat.label || ''}
+            width={autoWidth ? undefined : stat.width}
           />
         ))}
     </span>

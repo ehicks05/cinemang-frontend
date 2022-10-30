@@ -3,6 +3,7 @@ import { FaMask, FaStar } from 'react-icons/fa';
 import Stat from './Stat';
 
 interface Props {
+  autoWidth?: boolean;
   bgColor: string;
   data: {
     knownForDepartment: string;
@@ -10,17 +11,19 @@ interface Props {
   };
 }
 
-const FilmStats: FC<Props> = ({ bgColor, data }) => {
+const FilmStats: FC<Props> = ({ bgColor, data, autoWidth = true }) => {
   const stats = [
     {
       color: 'text-yellow-300',
       icon: FaStar,
       value: data.popularity,
+      width: 'w-20',
     },
     {
       color: 'text-blue-400',
       icon: FaMask,
       value: data.knownForDepartment,
+      width: 'w-32',
     },
   ];
 
@@ -33,6 +36,7 @@ const FilmStats: FC<Props> = ({ bgColor, data }) => {
           color={stat.color}
           key={stat.value}
           label={stat.value}
+          width={autoWidth ? undefined : stat.width}
         />
       ))}
     </div>

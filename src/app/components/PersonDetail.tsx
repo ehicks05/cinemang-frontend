@@ -60,7 +60,7 @@ const PersonDetail = ({ person }: { person: Person }) => {
             <PersonStats bgColor={palette.darkVibrant || ''} data={statData} />
             {person.birthday && (
               <div>
-                <div>Born</div>
+                <div className="font-bold">Born</div>
                 <div>
                   {person.birthday} {!person.deathday && `(${age.years})`}
                 </div>
@@ -70,7 +70,7 @@ const PersonDetail = ({ person }: { person: Person }) => {
 
             {person.deathday && (
               <div>
-                Died
+                <div className="font-bold">Died</div>
                 <div>
                   {person.deathday} ({age.years})
                 </div>
@@ -81,7 +81,7 @@ const PersonDetail = ({ person }: { person: Person }) => {
         <div className="flex flex-col gap-1">
           <div className="text-lg font-bold">{person.name}</div>
           <div
-            className="max-w-prose cursor-pointer text-justify text-sm"
+            className="max-w-prose cursor-pointer text-justify"
             onClick={() => setTruncateBio(!truncateBio)}
           >
             {bio}
@@ -131,7 +131,19 @@ const Credit = ({
   languages: Language[];
 }) => {
   return (
-    <div key={credit.credit_id}>
+    <div
+      className="flex items-center gap-2 rounded border p-2"
+      key={credit.credit_id}
+      style={{ borderColor: bgColor }}
+    >
+      <FilmStats
+        autoWidth={false}
+        bgColor={bgColor}
+        data={pick(toStats(genres, languages, credit.movie), [
+          'voteAverage',
+          'voteCount',
+        ])}
+      />
       <Link className="text-lg font-bold" to={`/films/${credit.movie.id}`}>
         {credit.movie.title}
       </Link>{' '}
@@ -144,13 +156,6 @@ const Credit = ({
           {credit.department} - {credit.job}
         </span>
       )}
-      <FilmStats
-        bgColor={bgColor}
-        data={pick(toStats(genres, languages, credit.movie), [
-          'voteAverage',
-          'voteCount',
-        ])}
-      />
     </div>
   );
 };
