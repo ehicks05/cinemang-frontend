@@ -51,6 +51,7 @@ model Person {
   castCredits        CastCredit[]
   crewCredits        CrewCredit[]
 
+  @@index([name])
   @@map("person")
 }
 
@@ -66,6 +67,8 @@ model CastCredit {
   character String?
   order     Int
 
+  @@index([movieId])
+  @@index([personId])
   @@map("cast_credit")
 }
 
@@ -80,6 +83,8 @@ model CrewCredit {
   department String
   job        String
 
+  @@index([movieId])
+  @@index([personId])
   @@map("crew_credit")
 }
 
