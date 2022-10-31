@@ -14,6 +14,14 @@ import { toStats } from './utils';
 import { useAtom } from 'jotai';
 import { systemDataAtom } from '../../atoms';
 import { pick, truncate } from 'lodash';
+import {
+  autoUpdate,
+  useFloating,
+  useInteractions,
+  useHover,
+  safePolygon,
+} from '@floating-ui/react-dom-interactions';
+import Film from './Film';
 
 const BIO_LENGTH_CUTOFF = 1280;
 
@@ -159,6 +167,25 @@ const Credit = ({
   languages: Language[];
 }) => {
   const { width } = useWindowSize();
+
+  const [open, setOpen] = useState(false);
+  const { context, x, y, reference, floating, strategy } = useFloating({
+    onOpenChange: setOpen,
+    open,
+    whileElementsMounted: autoUpdate,
+  });
+  const { getReferenceProps, getFloatingProps } = useInteractions([
+    useHover(context, {
+      handleClose: safePolygon(),
+    }),
+  ]);
+
+  // const posterUrl = credit.movie.poster_path
+  //   ? getTmdbImage(credit.movie.poster_path, undefined, true)
+  //   : '/92x138.png';
+  // const { data: palette, loading, error } = usePalette(posterUrl);
+  // if (loading) return <div>...</div>;
+
   return (
     <div
       className="flex flex-col items-center justify-between gap-2 rounded border p-2 sm:flex-row"
@@ -170,12 +197,40 @@ const Credit = ({
           <span className="text-xs">
             {format(parseISO(credit.movie.released_at), 'yyyy')}
           </span>{' '}
-          <Link
-            className="text-center text-lg font-bold"
-            to={`/films/${credit.movie.id}`}
-          >
-            {credit.movie.title}
-          </Link>{' '}
+          <div className="relative">
+            <Link
+              className="text-center text-lg font-bold"
+              {...getReferenceProps()}
+              ref={reference}
+              to={`/films/${credit.movie.id}`}
+            >
+              {credit.movie.title}
+            </Link>{' '}
+            <div
+              ref={floating}
+              style={{
+                display: 'none',
+                left: x ?? 0,
+                position: strategy,
+                top: y ?? 64,
+                width: '320px',
+              }}
+              {...getFloatingProps({
+                style: {
+                  display: open ? 'flex' : 'none',
+                  position: 'absolute',
+                  top: 40,
+                  width: '350px',
+                  zIndex: '10',
+                },
+              })}
+            >
+              <Film
+                film={credit.movie}
+                // palette={palette}
+              />
+            </div>{' '}
+          </div>
         </span>
         {'character' in credit && <span>{credit.character}</span>}
         {'department' in credit && (

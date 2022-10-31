@@ -13,6 +13,7 @@
     "vitest:run": "vitest run"
   },
   "dependencies": {
+    "@floating-ui/react-dom-interactions": "^0.10.3",
     "@headlessui/react": "^1.7.3",
     "@lauriys/react-palette": "1.0.5",
     "@supabase/supabase-js": "^1.35.7",

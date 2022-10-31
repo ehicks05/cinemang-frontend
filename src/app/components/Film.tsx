@@ -29,11 +29,15 @@ const Film = ({ film, palette }: { film: IFilm; palette?: PaletteColors }) => {
   const [truncateOverview, setTruncateOverview] = useState(true);
 
   const lessMuted = chroma.mix(
-    palette?.darkVibrant || '',
+    palette?.darkVibrant || '#444',
     'rgb(38,38,38)',
     0.7,
   );
-  const muted = chroma.mix(palette?.darkVibrant || '', 'rgb(38,38,38)', 0.95);
+  const muted = chroma.mix(
+    palette?.darkVibrant || '#444',
+    'rgb(38,38,38)',
+    0.95,
+  );
   const cardStyle = {
     background: `linear-gradient(45deg, ${muted} 5%, ${muted} 45%, ${lessMuted} 95%)`,
   };
