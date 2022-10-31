@@ -1,4 +1,4 @@
-import { PaletteColors } from '@lauriys/react-palette';
+import { Palette } from '../hooks/usePalette';
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { getTmdbImage } from '../../utils';
@@ -8,7 +8,7 @@ interface Props {
   creditId: string;
   jobs?: string[];
   name: string;
-  palette: PaletteColors;
+  palette: Palette;
   personId: number;
   profilePath?: string;
 }
@@ -20,6 +20,9 @@ const toInitials = (name: string) => {
     .join('');
 };
 
+const getDefaultProfile = (name: string, color: string) =>
+  `https://via.placeholder.com/300x450/${color}/fff/?text=${toInitials(name)}`;
+
 const PersonCard = ({
   character,
   // creditId,
@@ -29,11 +32,10 @@ const PersonCard = ({
   personId,
   profilePath,
 }: Props) => {
-  const profile = profilePath
-    ? getTmdbImage(profilePath)
-    : `https://via.placeholder.com/300x450/${palette.darkVibrant?.slice(
-        1,
-      )}/fff/?text=${toInitials(name)}`;
+  const profile = getTmdbImage({
+    defaultImage: getDefaultProfile(name, palette.darkVibrant.slice(1)),
+    path: profilePath,
+  });
 
   return (
     <Link

@@ -73,7 +73,10 @@ const FormFields = () => {
               formKey="watchProviders"
               mapper={(provider) => ({
                 id: provider.id,
-                imageUrl: getTmdbImage(provider.logo_path, 'original'),
+                imageUrl: getTmdbImage({
+                  path: provider.logo_path,
+                  width: 'original',
+                }),
                 label: provider.name,
               })}
               onChange={setForm}

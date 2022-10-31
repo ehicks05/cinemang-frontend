@@ -1,12 +1,12 @@
-import { PaletteColors } from '@lauriys/react-palette';
 import React from 'react';
 import { Video } from '../../types';
 import { useFetchTrailers } from '../hooks/useFetchFilms';
 import LiteYouTubeEmbed from 'react-lite-youtube-embed';
 import 'react-lite-youtube-embed/dist/LiteYouTubeEmbed.css';
+import { Palette } from '../hooks/usePalette';
 
 interface TrailerCardProps {
-  palette: PaletteColors;
+  palette: Palette;
   trailer: Video;
 }
 
@@ -27,7 +27,7 @@ const TrailerCard = ({ trailer: { name, key }, palette }: TrailerCardProps) => {
 
 interface Props {
   movieId: number;
-  palette: PaletteColors;
+  palette: Palette;
 }
 
 const Trailers = ({ movieId, palette }: Props) => {

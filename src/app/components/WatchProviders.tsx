@@ -9,7 +9,7 @@ const WatchProvider: FC<{ provider: IWatchProvider }> = ({
 }) => (
   <img
     className="h-10 w-10 rounded-lg"
-    src={getTmdbImage(logo_path, 'original')}
+    src={getTmdbImage({ path: logo_path, width: 'original' })}
     title={name}
   />
 );

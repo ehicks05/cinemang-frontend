@@ -4,36 +4,22 @@ import { Film as IFilm } from '../types';
 import { Film, FilmSkeleton, Paginator } from './components';
 import { useSearchFilms } from './hooks/useFetchFilms';
 import { useQueryParams } from 'use-query-params';
-import Vibrant from 'node-vibrant';
-import { PaletteColors } from '@lauriys/react-palette';
 import { getTmdbImage } from '../utils';
 import { useTitle, useWindowSize } from 'react-use';
-
-const toPalette = async (url: string) => {
-  const img = new Image();
-  img.crossOrigin = 'cinemang.ehicks.net';
-  img.src = url;
-  const p = await Vibrant.from(img).getPalette();
-  return {
-    darkMuted: p.DarkMuted?.getHex(),
-    darkVibrant: p.DarkVibrant?.getHex(),
-  };
-};
+import { DEFAULT_PALETTE, Palette, toPalette } from './hooks/usePalette';
 
 const Films = ({ films }: { films: IFilm[] }) => {
   const [loading, setLoading] = useState(true);
-  const [palettes, setPalettes] = useState<
-    Record<number, PaletteColors> | undefined
-  >(undefined);
+  const [palettes, setPalettes] = useState<Record<number, Palette> | undefined>(
+    undefined,
+  );
 
   useMemo(() => {
     const doIt = async () => {
       setLoading(true);
       const palettes = await Promise.all(
         films.map(async (film) => {
-          const url = getTmdbImage(
-            film.poster_path, undefined, true
-          );
+          const url = getTmdbImage({ bustCache: true, path: film.poster_path });
           const palette = await toPalette(url);
           return { id: film.id, palette };
         }),
@@ -70,12 +56,7 @@ const Films = ({ films }: { films: IFilm[] }) => {
             <Film
               film={film}
               key={film.id}
-              palette={
-                palettes?.[film.id] || {
-                  darkMuted: '262626',
-                  darkVibrant: '363636',
-                }
-              }
+              palette={palettes?.[film.id] || DEFAULT_PALETTE}
             />
           );
         })}

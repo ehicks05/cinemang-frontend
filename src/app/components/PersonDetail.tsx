@@ -1,90 +1,40 @@
 import React, { useState } from 'react';
 import { Loading } from '../../core-components';
-import { intervalToDuration, parseISO, format } from 'date-fns';
-import { PaletteColors, usePalette } from '@lauriys/react-palette';
-import chroma from 'chroma-js';
 import { useFetchPerson } from '../hooks/useFetchPersons';
-import { Link, useParams } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
 import { getTmdbImage } from '../../utils';
 import PersonStats from './PersonStats';
-import { useTitle, useWindowSize } from 'react-use';
-import { CastCredit, CrewCredit, Genre, Language, Person } from '../../types';
-import FilmStats from './FilmStats';
-import { toStats } from './utils';
+import { useTitle } from 'react-use';
+import { Person } from '../../types';
 import { useAtom } from 'jotai';
 import { systemDataAtom } from '../../atoms';
-import { pick, truncate } from 'lodash';
-import {
-  autoUpdate,
-  useFloating,
-  useInteractions,
-  useHover,
-  safePolygon,
-} from '@floating-ui/react-dom-interactions';
-import Film from './Film';
+import { truncate } from 'lodash';
+import { usePalette } from '../hooks/usePalette';
+import BirthAndDeath from './BirthAndDeath';
+import PersonCredit from './PersonCredit';
 
 const BIO_LENGTH_CUTOFF = 1280;
 
 const nf = Intl.NumberFormat('en-US', { maximumFractionDigits: 1 });
 
-const BirthAndDeath = ({
-  person,
-  palette,
-}: {
-  palette: PaletteColors;
-  person: Person;
-}) => {
-  const age = intervalToDuration({
-    end: person.deathday ? parseISO(person.deathday) : new Date(),
-    start: parseISO(person.birthday),
-  });
-
-  return person.birthday || person.deathday ? (
-    <div
-      className="rounded border p-2"
-      style={{ borderColor: palette.darkVibrant }}
-    >
-      {person.birthday && (
-        <div>
-          <div className="font-bold">Born</div>
-          <div>
-            {person.birthday} {!person.deathday && `(${age.years})`}
-          </div>
-          <div>{person.place_of_birth && person.place_of_birth}</div>
-        </div>
-      )}
-      {person.deathday && (
-        <div>
-          <div className="font-bold">Died</div>
-          <div>
-            {person.deathday} ({age.years})
-          </div>
-        </div>
-      )}
-    </div>
-  ) : null;
-};
-
 const PersonDetail = ({ person }: { person: Person }) => {
   const [{ genres, languages }] = useAtom(systemDataAtom);
   useTitle(person.name, { restoreOnUnmount: true });
-  const posterUrl = person.profile_path
-    ? getTmdbImage(person.profile_path, 'original')
-    : '/92x138.png';
-  const { data: palette, loading, error } = usePalette(posterUrl);
+  const profileUrl = getTmdbImage({
+    path: person.profile_path,
+    width: 'original',
+  });
+
   const [truncateBio, setTruncateBio] = useState(true);
   const bio = truncateBio
-    ? truncate(person.biography, { length: BIO_LENGTH_CUTOFF })
+    ? truncate(person.biography, { length: BIO_LENGTH_CUTOFF, separator: ' ' })
     : person.biography;
 
-  if (error) return <Loading error={error} loading={loading} />;
-  if (loading) return <div className="h-full w-full bg-slate-700" />;
+  const { data, isLoading, error } = usePalette(profileUrl);
 
-  const lessMuted = chroma.mix(palette.darkVibrant || '', 'rgb(38,38,38)', 0.7);
-  const muted = chroma.mix(palette.darkVibrant || '', 'rgb(38,38,38)', 0.95);
-  const cardStyle = {
-    background: `linear-gradient(45deg, ${muted} 5%, ${muted} 45%, ${lessMuted} 95%)`,
-  };
+  if (error) return <Loading error={error} loading={isLoading} />;
+  if (isLoading) return <div className="h-full w-full bg-slate-700" />;
+  const palette = data!;
 
   const statData = {
     knownForDepartment: person.known_for_department,
@@ -94,14 +44,14 @@ const PersonDetail = ({ person }: { person: Person }) => {
   return (
     <div
       className="m-auto flex max-w-screen-xl flex-col gap-4 rounded-lg p-4"
-      style={cardStyle}
+      style={palette.bgStyles}
     >
       <div className="flex flex-col gap-4 sm:flex-row">
         <div className="flex-shrink-0">
           <img
             alt="poster"
             className="rounded-lg sm:h-96 sm:w-64"
-            src={posterUrl}
+            src={profileUrl}
           />
           <div className="mt-4 flex flex-col justify-between gap-4">
             <PersonStats bgColor={palette.darkVibrant || ''} data={statData} />
@@ -130,8 +80,8 @@ const PersonDetail = ({ person }: { person: Person }) => {
           c2.movie.released_at.localeCompare(c1.movie.released_at),
         )
         .map((c) => (
-          <Credit
-            bgColor={palette.darkVibrant || ''}
+          <PersonCredit
+            bgColor={palette.darkVibrant}
             credit={c}
             genres={genres}
             key={c.credit_id}
@@ -143,112 +93,14 @@ const PersonDetail = ({ person }: { person: Person }) => {
           c2.movie.released_at.localeCompare(c1.movie.released_at),
         )
         .map((c) => (
-          <Credit
-            bgColor={palette.darkVibrant || ''}
+          <PersonCredit
+            bgColor={palette.darkVibrant}
             credit={c}
             genres={genres}
             key={c.credit_id}
             languages={languages}
           />
         ))}
-    </div>
-  );
-};
-
-const Credit = ({
-  bgColor,
-  genres,
-  languages,
-  credit,
-}: {
-  bgColor: string;
-  credit: CastCredit | CrewCredit;
-  genres: Genre[];
-  languages: Language[];
-}) => {
-  const { width } = useWindowSize();
-
-  const [open, setOpen] = useState(false);
-  const { context, x, y, reference, floating, strategy } = useFloating({
-    onOpenChange: setOpen,
-    open,
-    whileElementsMounted: autoUpdate,
-  });
-  const { getReferenceProps, getFloatingProps } = useInteractions([
-    useHover(context, {
-      handleClose: safePolygon(),
-    }),
-  ]);
-
-  // const posterUrl = credit.movie.poster_path
-  //   ? getTmdbImage(credit.movie.poster_path, undefined, true)
-  //   : '/92x138.png';
-  // const { data: palette, loading, error } = usePalette(posterUrl);
-  // if (loading) return <div>...</div>;
-
-  return (
-    <div
-      className="flex flex-col items-center justify-between gap-2 rounded border p-2 sm:flex-row"
-      key={credit.credit_id}
-      style={{ borderColor: bgColor }}
-    >
-      <div className="flex flex-col items-baseline gap-2 sm:flex-row">
-        <span className="flex flex-col items-baseline gap-2 sm:flex-row">
-          <span className="text-xs">
-            {format(parseISO(credit.movie.released_at), 'yyyy')}
-          </span>{' '}
-          <div className="relative">
-            <Link
-              className="text-center text-lg font-bold"
-              {...getReferenceProps()}
-              ref={reference}
-              to={`/films/${credit.movie.id}`}
-            >
-              {credit.movie.title}
-            </Link>{' '}
-            <div
-              ref={floating}
-              style={{
-                display: 'none',
-                left: x ?? 0,
-                position: strategy,
-                top: y ?? 64,
-                width: '320px',
-              }}
-              {...getFloatingProps({
-                style: {
-                  display: open ? 'flex' : 'none',
-                  position: 'absolute',
-                  top: 40,
-                  width: '350px',
-                  zIndex: '10',
-                },
-              })}
-            >
-              <Film
-                film={credit.movie}
-                // palette={palette}
-              />
-            </div>{' '}
-          </div>
-        </span>
-        {'character' in credit && <span>{credit.character}</span>}
-        {'department' in credit && (
-          <span>
-            {credit.department} - {credit.job}
-          </span>
-        )}
-      </div>
-      <div className="">
-        <FilmStats
-          autoWidth={width < 640}
-          bgColor={bgColor}
-          data={pick(toStats(genres, languages, credit.movie), [
-            'voteAverage',
-            'voteCount',
-          ])}
-        />
-      </div>
     </div>
   );
 };

@@ -1,8 +1,7 @@
 import React from 'react';
 import { Loading } from '../../core-components';
 import { addMinutes, intervalToDuration, parseISO, format } from 'date-fns';
-import { usePalette } from '@lauriys/react-palette';
-import chroma from 'chroma-js';
+import { usePalette } from '../hooks/usePalette';
 import FilmStats from './FilmStats';
 import WatchProviders from './WatchProviders';
 import { Film as IFilm } from '../../types';
@@ -20,31 +19,23 @@ const FilmDetail = ({ film }: { film: IFilm }) => {
   useTitle(film.title, { restoreOnUnmount: true });
   const [{ genres, languages }] = useAtom(systemDataAtom);
 
-  const posterUrl = film.poster_path
-    ? getTmdbImage(film.poster_path, 'original')
-    : '/92x138.png';
-  const releasedAt = format(parseISO(film.released_at), 'MM-dd-yyyy');
+  const posterUrl = getTmdbImage({ path: film.poster_path, width: 'original' });
   const year = format(parseISO(film.released_at), 'yyyy');
   const runtime = intervalToDuration({
     end: addMinutes(new Date(), Number(film.runtime)),
     start: new Date(),
   });
 
-  const { data: palette, loading, error } = usePalette(posterUrl);
+  const { data, isLoading, error } = usePalette(posterUrl);
 
-  if (error) return <Loading error={error} loading={loading} />;
-  if (loading) return <div className="h-full w-full bg-slate-700" />;
-
-  const lessMuted = chroma.mix(palette.darkVibrant || '', 'rgb(38,38,38)', 0.7);
-  const muted = chroma.mix(palette.darkVibrant || '', 'rgb(38,38,38)', 0.95);
-  const cardStyle = {
-    background: `linear-gradient(45deg, ${muted} 5%, ${muted} 45%, ${lessMuted} 95%)`,
-  };
+  if (error) return <Loading error={error} loading={isLoading} />;
+  if (isLoading) return <div className="h-full w-full bg-slate-700" />;
+  const palette = data!;
 
   return (
     <div
       className="m-auto flex max-w-screen-lg flex-col gap-4 rounded-lg p-4"
-      style={cardStyle}
+      style={palette.bgStyles}
     >
       <div className="flex flex-col gap-4 sm:flex-row">
         <div className="flex-shrink-0">
@@ -53,7 +44,7 @@ const FilmDetail = ({ film }: { film: IFilm }) => {
         <div className="flex flex-col gap-1">
           <div>
             <span className="text-lg font-bold">{film.title}</span>{' '}
-            <span className="text-xs text-gray-300" title={releasedAt}>
+            <span className="text-xs text-gray-300" title={film.released_at}>
               {year} {`${runtime.hours}h ${runtime.minutes}m`}
             </span>
           </div>
@@ -64,7 +55,7 @@ const FilmDetail = ({ film }: { film: IFilm }) => {
           </div>
           <div className="mt-4 flex flex-col justify-between gap-4">
             <FilmStats
-              bgColor={palette.darkVibrant || ''}
+              bgColor={palette.darkVibrant}
               data={toStats(genres, languages, film)}
             />
           </div>

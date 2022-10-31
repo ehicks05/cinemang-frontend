@@ -1,8 +1,6 @@
 import React, { useState } from 'react';
 import { addMinutes, intervalToDuration, parseISO, format } from 'date-fns';
-import { PaletteColors } from '@lauriys/react-palette';
 import { truncate } from 'lodash';
-import chroma from 'chroma-js';
 import FilmStats from './FilmStats';
 import WatchProviders from './WatchProviders';
 import { Film as IFilm } from '../../types';
@@ -12,14 +10,12 @@ import { useAtom } from 'jotai';
 import { systemDataAtom } from '../../atoms';
 import { getTmdbImage } from '../../utils';
 import { toStats } from './utils';
+import { Palette } from '../hooks/usePalette';
 
-const Film = ({ film, palette }: { film: IFilm; palette?: PaletteColors }) => {
+const Film = ({ film, palette }: { film: IFilm; palette: Palette }) => {
   const [{ genres, languages }] = useAtom(systemDataAtom);
 
-  const posterUrl = film.poster_path
-    ? getTmdbImage(film.poster_path)
-    : '/92x138.png';
-  const releasedAt = format(parseISO(film.released_at), 'MM-dd-yyyy');
+  const posterUrl = getTmdbImage({ path: film.poster_path });
   const year = format(parseISO(film.released_at), 'yyyy');
   const runtime = intervalToDuration({
     end: addMinutes(new Date(), Number(film.runtime)),
@@ -28,22 +24,11 @@ const Film = ({ film, palette }: { film: IFilm; palette?: PaletteColors }) => {
 
   const [truncateOverview, setTruncateOverview] = useState(true);
 
-  const lessMuted = chroma.mix(
-    palette?.darkVibrant || '#444',
-    'rgb(38,38,38)',
-    0.7,
-  );
-  const muted = chroma.mix(
-    palette?.darkVibrant || '#444',
-    'rgb(38,38,38)',
-    0.95,
-  );
-  const cardStyle = {
-    background: `linear-gradient(45deg, ${muted} 5%, ${muted} 45%, ${lessMuted} 95%)`,
-  };
-
   return (
-    <div className="flex flex-col gap-4 rounded-lg p-4" style={cardStyle}>
+    <div
+      className="flex flex-col gap-4 rounded-lg p-4"
+      style={palette?.bgStyles}
+    >
       <div className="flex gap-4">
         <div className="flex-shrink-0">
           <img
@@ -58,9 +43,8 @@ const Film = ({ film, palette }: { film: IFilm; palette?: PaletteColors }) => {
             <Link className="text-lg font-bold" to={`/films/${film.id}`}>
               {film.title}
             </Link>
-            <span className="text-xs text-gray-300" title={releasedAt}>
-              {' '}
-              <span className="font-semibold">{year}</span>{' '}
+            <span className="text-xs text-gray-300" title={film.released_at}>
+              <span className="font-semibold"> {year} </span>
               <span className="whitespace-nowrap">{`${runtime.hours}h ${runtime.minutes}m`}</span>
             </span>
           </div>
@@ -83,7 +67,7 @@ const Film = ({ film, palette }: { film: IFilm; palette?: PaletteColors }) => {
           })}
         </div>
         <FilmStats
-          bgColor={palette?.darkVibrant || ''}
+          bgColor={palette.darkVibrant}
           data={toStats(genres, languages, film)}
         />
       </div>
