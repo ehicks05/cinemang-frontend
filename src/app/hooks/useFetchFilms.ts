@@ -23,6 +23,15 @@ const idQuery = async (
 ) => {
   const select = `id${
     form.watchProviders.length > 0 ? ', wp: watch_provider!inner(id)' : ''
+  }${
+    form.castCreditName.length > 0
+      ? ', cast_credit: cast_credit!inner(person!inner(name))'
+      : ''
+  }
+  ${
+    form.crewCreditName.length > 0
+      ? ', crew_credit: crew_credit!inner(person!inner(name))'
+      : ''
   }`;
   const query = supabase
     .from('movie')
@@ -44,6 +53,13 @@ const idQuery = async (
     query.in('wp.id', form.watchProviders);
   }
 
+  if (form.castCreditName.length > 0) {
+    query.ilike('cast_credit.person.name', `%${form.castCreditName}%`);
+  }
+  if (form.crewCreditName.length > 0) {
+    query.ilike('crew_credit.person.name', `%${form.crewCreditName}%`);
+  }
+
   query
     .order(form.sortColumn, { ascending: form.ascending })
     .order('id', { ascending: true })
@@ -56,12 +72,7 @@ const hydrationQuery = async (
   ids: number[],
   form: DecodedValueMap<QueryParamConfigMap>,
 ) => {
-  const select = [
-    '*',
-    'watch_provider(id)',
-    // 'cast_credit(*, person(*))',
-    // 'crew_credit(*, person(*))',
-  ].join(',');
+  const select = ['*', 'watch_provider(id)'].join(',');
 
   return supabase
     .from('movie')
@@ -128,7 +139,9 @@ export const useFetchTrailers = (id: number) => {
     const videos: Video[] = film.videos.results;
     const trailers = videos
       .filter((v) => v.official && v.type === 'Trailer')
-      .sort((v1, v2) => (isBefore(parseISO(v1.published_at), parseISO(v2.published_at)) ? 1 : -1));
+      .sort((v1, v2) =>
+        isBefore(parseISO(v1.published_at), parseISO(v2.published_at)) ? 1 : -1,
+      );
 
     return trailers;
   });

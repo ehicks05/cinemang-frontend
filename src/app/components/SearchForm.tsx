@@ -65,6 +65,36 @@ const FormFields = () => {
         </div>
       </div>
       <div className="flex gap-2">
+        <div className="flex-grow">
+          <div>Cast Includes</div>
+          <div>
+            <input
+              className="w-full bg-gray-700"
+              onChange={(e) =>
+                setForm({ ...form, castCreditName: e.target.value })
+              }
+              type="text"
+              value={form.castCreditName}
+            />
+          </div>
+        </div>
+      </div>
+      <div className="flex gap-2">
+        <div className="flex-grow">
+          <div>Crew Includes</div>
+          <div>
+            <input
+              className="w-full bg-gray-700"
+              onChange={(e) =>
+                setForm({ ...form, crewCreditName: e.target.value })
+              }
+              type="text"
+              value={form.crewCreditName}
+            />
+          </div>
+        </div>
+      </div>
+      <div className="flex gap-2">
         <div className="w-full">
           <div>Stream {getStreamLabel(form.watchProviders.length)}</div>
           <div>
