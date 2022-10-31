@@ -15,6 +15,8 @@ import { useAtom } from 'jotai';
 import { systemDataAtom } from '../../atoms';
 import { pick, truncate } from 'lodash';
 
+const BIO_LENGTH_CUTOFF = 1280;
+
 const nf = Intl.NumberFormat('en-US', { maximumFractionDigits: 1 });
 
 const BirthAndDeath = ({
@@ -64,7 +66,7 @@ const PersonDetail = ({ person }: { person: Person }) => {
   const { data: palette, loading, error } = usePalette(posterUrl);
   const [truncateBio, setTruncateBio] = useState(true);
   const bio = truncateBio
-    ? truncate(person.biography, { length: 1280 })
+    ? truncate(person.biography, { length: BIO_LENGTH_CUTOFF })
     : person.biography;
 
   if (error) return <Loading error={error} loading={loading} />;
@@ -101,7 +103,11 @@ const PersonDetail = ({ person }: { person: Person }) => {
         <div className="flex flex-col gap-1">
           <div className="text-lg font-bold">{person.name}</div>
           <div
-            className="flex cursor-pointer flex-col gap-2 text-justify"
+            className={`flex ${
+              person.biography.length > BIO_LENGTH_CUTOFF
+                ? 'cursor-pointer'
+                : ''
+            } flex-col gap-2 text-justify`}
             onClick={() => setTruncateBio(!truncateBio)}
           >
             {bio.split('\n').map((b) => (
@@ -159,8 +165,8 @@ const Credit = ({
       key={credit.credit_id}
       style={{ borderColor: bgColor }}
     >
-      <div className="flex flex-col items-center gap-2 sm:flex-row">
-        <span className="flex flex-col items-center gap-2 sm:flex-row">
+      <div className="flex flex-col items-baseline gap-2 sm:flex-row">
+        <span className="flex flex-col items-baseline gap-2 sm:flex-row">
           <span className="text-xs">
             {format(parseISO(credit.movie.released_at), 'yyyy')}
           </span>{' '}
