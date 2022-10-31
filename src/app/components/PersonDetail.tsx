@@ -1,13 +1,13 @@
 import React, { useState } from 'react';
 import { Loading } from '../../core-components';
 import { intervalToDuration, parseISO, format } from 'date-fns';
-import { usePalette } from '@lauriys/react-palette';
+import { PaletteColors, usePalette } from '@lauriys/react-palette';
 import chroma from 'chroma-js';
 import { useFetchPerson } from '../hooks/useFetchPersons';
 import { Link, useParams } from 'react-router-dom';
 import { getTmdbImage } from '../../utils';
 import PersonStats from './PersonStats';
-import { useTitle } from 'react-use';
+import { useTitle, useWindowSize } from 'react-use';
 import { CastCredit, CrewCredit, Genre, Language, Person } from '../../types';
 import FilmStats from './FilmStats';
 import { toStats } from './utils';
@@ -16,6 +16,44 @@ import { systemDataAtom } from '../../atoms';
 import { pick, truncate } from 'lodash';
 
 const nf = Intl.NumberFormat('en-US', { maximumFractionDigits: 1 });
+
+const BirthAndDeath = ({
+  person,
+  palette,
+}: {
+  palette: PaletteColors;
+  person: Person;
+}) => {
+  const age = intervalToDuration({
+    end: person.deathday ? parseISO(person.deathday) : new Date(),
+    start: parseISO(person.birthday),
+  });
+
+  return person.birthday || person.deathday ? (
+    <div
+      className="rounded border p-2"
+      style={{ borderColor: palette.darkVibrant }}
+    >
+      {person.birthday && (
+        <div>
+          <div className="font-bold">Born</div>
+          <div>
+            {person.birthday} {!person.deathday && `(${age.years})`}
+          </div>
+          <div>{person.place_of_birth && person.place_of_birth}</div>
+        </div>
+      )}
+      {person.deathday && (
+        <div>
+          <div className="font-bold">Died</div>
+          <div>
+            {person.deathday} ({age.years})
+          </div>
+        </div>
+      )}
+    </div>
+  ) : null;
+};
 
 const PersonDetail = ({ person }: { person: Person }) => {
   const [{ genres, languages }] = useAtom(systemDataAtom);
@@ -28,11 +66,6 @@ const PersonDetail = ({ person }: { person: Person }) => {
   const bio = truncateBio
     ? truncate(person.biography, { length: 1280 })
     : person.biography;
-
-  const age = intervalToDuration({
-    end: person.deathday ? parseISO(person.deathday) : new Date(),
-    start: parseISO(person.birthday),
-  });
 
   if (error) return <Loading error={error} loading={loading} />;
   if (loading) return <div className="h-full w-full bg-slate-700" />;
@@ -55,36 +88,25 @@ const PersonDetail = ({ person }: { person: Person }) => {
     >
       <div className="flex flex-col gap-4 sm:flex-row">
         <div className="flex-shrink-0">
-          <img alt="poster" className="sm:h-96 sm:w-64" src={posterUrl} />
+          <img
+            alt="poster"
+            className="rounded-lg sm:h-96 sm:w-64"
+            src={posterUrl}
+          />
           <div className="mt-4 flex flex-col justify-between gap-4">
             <PersonStats bgColor={palette.darkVibrant || ''} data={statData} />
-            {person.birthday && (
-              <div>
-                <div className="font-bold">Born</div>
-                <div>
-                  {person.birthday} {!person.deathday && `(${age.years})`}
-                </div>
-                <div>{person.place_of_birth && person.place_of_birth}</div>
-              </div>
-            )}
-
-            {person.deathday && (
-              <div>
-                <div className="font-bold">Died</div>
-                <div>
-                  {person.deathday} ({age.years})
-                </div>
-              </div>
-            )}
+            <BirthAndDeath palette={palette} person={person} />
           </div>
         </div>
         <div className="flex flex-col gap-1">
           <div className="text-lg font-bold">{person.name}</div>
           <div
-            className="max-w-prose cursor-pointer text-justify"
+            className="flex cursor-pointer flex-col gap-2 text-justify"
             onClick={() => setTruncateBio(!truncateBio)}
           >
-            {bio}
+            {bio.split('\n').map((b) => (
+              <div key={b}>{b}</div>
+            ))}
           </div>
         </div>
       </div>
@@ -130,6 +152,7 @@ const Credit = ({
   genres: Genre[];
   languages: Language[];
 }) => {
+  const { width } = useWindowSize();
   return (
     <div
       className="flex flex-col items-center justify-between gap-2 rounded border p-2 sm:flex-row"
@@ -137,11 +160,14 @@ const Credit = ({
       style={{ borderColor: bgColor }}
     >
       <div className="flex flex-col items-center gap-2 sm:flex-row">
-        <span className="flex items-center gap-2">
+        <span className="flex flex-col items-center gap-2 sm:flex-row">
           <span className="text-xs">
             {format(parseISO(credit.movie.released_at), 'yyyy')}
           </span>{' '}
-          <Link className="text-lg font-bold" to={`/films/${credit.movie.id}`}>
+          <Link
+            className="text-center text-lg font-bold"
+            to={`/films/${credit.movie.id}`}
+          >
             {credit.movie.title}
           </Link>{' '}
         </span>
@@ -152,9 +178,9 @@ const Credit = ({
           </span>
         )}
       </div>
-      <div className="flex-shrink">
+      <div className="">
         <FilmStats
-          autoWidth={false}
+          autoWidth={width < 640}
           bgColor={bgColor}
           data={pick(toStats(genres, languages, credit.movie), [
             'voteAverage',

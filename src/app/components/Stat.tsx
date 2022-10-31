@@ -12,7 +12,7 @@ interface StatProps {
 const Stat: FC<StatProps> = ({ Icon, color, bgColor, label, width }) => {
   return (
     <div
-      className={`flex ${width} items-center gap-1 rounded-lg bg-gray-700 px-2 py-1 sm:px-4 sm:py-2`}
+      className={`flex ${width} items-center gap-1 rounded-lg bg-gray-700 px-3 py-2 sm:px-4`}
       style={{ backgroundColor: bgColor }}
     >
       {Icon && (

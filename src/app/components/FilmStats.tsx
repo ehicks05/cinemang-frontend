@@ -76,9 +76,9 @@ const FilmStats: FC<Props> = ({
   } as const;
 
   return (
-    <span className="flex flex-wrap gap-2">
+    <span className={`flex ${autoWidth ? 'flex-wrap' : ''} gap-2`}>
       {Object.entries(data)
-        .filter(([key, val]) => key !== 'language' && val !== 'English')
+        .filter(([key, val]) => key !== 'language' || val !== 'English')
         .map(([key]) => {
           const stat = stats[key as keyof typeof stats];
           return stat;
