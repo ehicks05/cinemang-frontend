@@ -1,12 +1,12 @@
 import { existsSync, mkdirSync, realpathSync } from 'fs';
-import { readdir, readFile, rm, unlink, writeFile } from 'fs/promises';
+import { readdir, readFile, unlink, writeFile } from 'fs/promises';
 import logger from './logger';
 
-const TEMP_DIR = './temp';
+const TEMP_DIR = './file-cache';
 
 const getPath = (file: string) => `${TEMP_DIR}/${file}`;
 
-if (!existsSync) mkdirSync(TEMP_DIR);
+if (!existsSync(TEMP_DIR)) mkdirSync(TEMP_DIR);
 logger.info('file cache: ' + realpathSync(TEMP_DIR));
 
 const set = async (name: string, data: any) => {
