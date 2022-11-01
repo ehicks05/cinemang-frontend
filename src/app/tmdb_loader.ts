@@ -208,13 +208,13 @@ const updateDb = async () => {
     updateWatchProviders(),
   ]);
 
-  await updateResource('MOVIE', fullMode);
-  await updateResource('PERSON', fullMode);
-  await updateRelationships();
+  // await updateResource('MOVIE', fullMode);
+  // await updateResource('PERSON', fullMode);
+  // await updateRelationships();
 
-  logger.info('updating counts for languages and watch providers');
-  await updateLanguageCounts();
-  await updateWatchProviderCounts();
+  // logger.info('updating counts for languages and watch providers');
+  // await updateLanguageCounts();
+  // await updateWatchProviderCounts();
 
   logger.info('finished tmdb_loader script');
 };
