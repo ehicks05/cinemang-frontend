@@ -11,7 +11,8 @@
     "build": "tsc && npx prisma generate",
     "start": "set NODE_ENV=production&&node ./dist/src/app.js",
     "research": "set NODE_ENV=development&&ts-node-dev --transpile-only --no-notify src/research.ts",
-    "experiments": "set NODE_ENV=development&&ts-node-dev --transpile-only --no-notify src/experiments.ts"
+    "experiments": "set NODE_ENV=development&&ts-node-dev --transpile-only --no-notify src/experiments.ts",
+    "raw-response-loader": "set NODE_ENV=development&&ts-node-dev --transpile-only --no-notify src/raw-response-loader.ts"
   },
   "author": "",
   "license": "ISC",
@@ -19,6 +20,7 @@
     "@prisma/client": "^4.4.0",
     "@supabase/supabase-js": "^1.22.0",
     "@types/lodash": "^4.14.172",
+    "agentkeepalive": "^4.2.1",
     "axios": "^0.21.4",
     "bluebird": "^3.7.2",
     "date-fns": "^2.23.0",
@@ -31,6 +33,7 @@
     "node-cache": "^5.1.2",
     "node-schedule": "^2.0.0",
     "pg": "^8.7.1",
+    "redis": "^4.4.0",
     "yargs": "^17.6.0",
     "zod": "^3.7.3"
   },
