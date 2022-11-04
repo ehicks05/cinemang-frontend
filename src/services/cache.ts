@@ -16,7 +16,7 @@ const log = (name: string) => {
       n: stats.keys,
       ksize: filesize(stats.ksize, { round: 0 }),
       vsize: filesize(stats.vsize, { round: 0 }),
-      vAvg: filesize(stats.vsize / stats.keys, { round: 0 }),
+      vAvg: filesize(stats.vsize / stats.keys || 1, { round: 0 }),
     },
   });
 };

@@ -1,32 +1,25 @@
 import { Prisma } from '@prisma/client';
-import { omit, pick } from 'lodash';
-import cacheMan from '../../services/cache';
-import { getMovie } from '../../services/tmdb';
+import { pick } from 'lodash';
 import { MovieResponse } from '../../services/tmdb/types';
 
-export const isValidMovie = (
-  movie: MovieResponse,
-  director?: string,
-  cast?: string,
-) => {
+export const isValidMovie = (movie: MovieResponse) => {
   return !!(
-    movie.credits &&
+    movie.credits.crew.find((c) => c.job === 'Director')?.name?.length &&
+    movie.credits.cast
+      .slice(0, 3)
+      .map((c) => c.name)
+      .join(', ')?.length &&
     movie.genres[0] &&
     movie.overview &&
     movie.poster_path &&
     movie.release_date &&
     movie.releases &&
     movie.runtime &&
-    movie.vote_count >= 3 &&
-    director?.length &&
-    cast?.length
+    movie.vote_count >= 32
   );
 };
 
-export const idToParsedMovie = async (id: number) => {
-  const data = await getMovie(id);
-  if (!data) return undefined;
-
+export const parseMovie = (data: MovieResponse) => {
   const director = data.credits.crew.find((c) => c.job === 'Director')?.name;
   const cast = data.credits.cast
     .slice(0, 3)
@@ -34,14 +27,14 @@ export const idToParsedMovie = async (id: number) => {
     .join(', ');
 
   // ignore movies missing required data
-  if (!isValidMovie(data, director, cast)) {
+  if (!isValidMovie(data)) {
     return undefined;
   }
-  cacheMan.get('movie').set(data.id, omit(data, []));
 
-  const certification = data.releases.countries.find(
-    (r) => r.iso_3166_1 === 'US' && r.certification,
-  )?.certification;
+  const certification =
+    data.releases.countries.find(
+      (r) => r.iso_3166_1 === 'US' && r.certification,
+    )?.certification || '';
   const genreId = data.genres[0].id;
 
   const create: Prisma.MovieCreateInput = {

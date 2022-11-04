@@ -1,17 +1,12 @@
 import { Prisma } from '@prisma/client';
 import { pick } from 'lodash';
-import { getPerson } from '../../services/tmdb';
 import { PersonResponse } from '../../services/tmdb/types';
 
 const isValidPerson = (person: PersonResponse) => {
   return true;
 };
 
-export const idToParsedPerson = async (id: number) => {
-  const data = await getPerson(id);
-  if (!data) {
-    return undefined;
-  }
+export const parsePerson = (data: PersonResponse) => {
   if (!isValidPerson(data)) {
     return undefined;
   }
