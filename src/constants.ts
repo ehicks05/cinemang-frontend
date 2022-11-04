@@ -1,3 +1,4 @@
+import { format, subMonths } from 'date-fns';
 import {
   StringParam,
   withDefault,
@@ -18,10 +19,10 @@ export const DEFAULT_SEARCH_FORM = {
   maxReleasedAt: '',
   maxVotes: 100_000,
   minRating: 6,
-  minReleasedAt: '',
+  minReleasedAt: format(subMonths(new Date(), 4), 'yyyy-MM-dd'),
   minVotes: 100,
   page: 0,
-  sortColumn: 'vote_count',
+  sortColumn: 'released_at',
   title: '',
   watchProviders: [],
 };
