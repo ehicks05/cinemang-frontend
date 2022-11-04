@@ -1,4 +1,7 @@
 import axios from 'axios';
+import { configureHttp } from '../configure-http';
+
+configureHttp();
 
 const BASE_URL = 'https://api.themoviedb.org/3';
 const PARAMS = { api_key: process.env.TMDB_API_KEY };
