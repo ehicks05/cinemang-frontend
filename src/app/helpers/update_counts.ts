@@ -41,9 +41,8 @@ export const updateWatchProviderCounts = async () => {
 
   await Promise.all(
     watchProviders.map(async (p) => {
-      await prisma.watchProvider.upsert({
-        create: p,
-        update: p,
+      await prisma.watchProvider.update({
+        data: p,
         where: { id: p.id },
       });
     }),
