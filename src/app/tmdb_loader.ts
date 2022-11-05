@@ -72,12 +72,6 @@ const processIdChunk = async (
     const b = omitBy(partner, isNil);
     return !isEqual(a, b);
   });
-  if (moviesToUpdate.length > 0) {
-    console.log({
-      movieToUpdate: moviesToUpdate[0],
-      localVersion: localMovies.find((o) => o.id === moviesToUpdate[0].id),
-    });
-  }
 
   logger.info('identifying peopleIds');
   const unfilteredPersonIds = getPersonIds(remoteMovies);
@@ -112,37 +106,31 @@ const processIdChunk = async (
     const b = omitBy(partner, isNil);
     return !isEqual(a, b);
   });
-  if (personsToUpdate.length > 0) {
-    console.log({
-      personToUpdate: omitBy(personsToUpdate[0], isNil),
-      localVersion: omitBy(
-        localPersons.find((o) => o.id === personsToUpdate[0].id),
-        isNil,
-      ),
-    });
-  }
 
   try {
     const createMoviesResult = await prisma.movie.createMany({
       data: moviesToCreate,
     });
     logger.info('movie creation', {
+      remote: remoteMovies.length,
+      local: localMovies.length,
       created: createMoviesResult?.count,
-      existingButUnchanged:
-        remoteMoviesThatExist.length - moviesToUpdate.length,
+      unchanged: remoteMoviesThatExist.length - moviesToUpdate.length,
       updated: moviesToUpdate.length,
-      invalid: movieIds.length - moviesToCreate.length,
+      invalid: movieIds.length - remoteParsedMovies.length,
       failed: moviesToCreate.length - (createMoviesResult?.count || 0),
     });
     const createPersonsResult = await prisma.person.createMany({
       data: personsToCreate as any,
     });
     logger.info('person creation', {
+      remote: remotePersons.length,
+      local: localPersons.length,
       created: createPersonsResult?.count,
       existingButUnchanged:
         remotePersonsThatExist.length - personsToUpdate.length,
       updated: personsToUpdate.length,
-      invalid: personIds.length - personsToCreate.length,
+      invalid: personIds.length - remoteParsedPersons.length,
       failed: personsToCreate.length - (createPersonsResult?.count || 0),
     });
 
@@ -292,7 +280,7 @@ const updateDb = async () => {
     updateWatchProviders(),
   ]);
 
-  // await updateMovies();
+  await updateMovies();
 
   // logger.info('updating counts for languages and watch providers');
   // await updateLanguageCounts();
