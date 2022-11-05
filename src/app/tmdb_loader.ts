@@ -179,7 +179,7 @@ const updateMovies = async () => {
 
   const personIdsLoaded: number[] = [];
 
-  const chunks = chunk(ids.slice(0, 100), 1_000);
+  const chunks = chunk(ids.slice(0, 10_000), 1_000);
   await Promise.each(chunks, (ids) => processIdChunk(ids, personIdsLoaded));
 };
 
