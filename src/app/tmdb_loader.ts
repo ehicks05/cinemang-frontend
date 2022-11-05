@@ -3,9 +3,6 @@ import {
   difference,
   differenceBy,
   intersectionBy,
-  isEqual,
-  isNil,
-  omitBy,
   pick,
   uniq,
 } from 'lodash';
@@ -13,6 +10,7 @@ import Promise from 'bluebird';
 import { isFirstDayOfMonth } from 'date-fns';
 import { getValidIds } from '../services/tmdb';
 import {
+  isEqual,
   removeInvalidMovies,
   updateGenres,
   updateLanguages,
@@ -67,10 +65,8 @@ const processIdChunk = async (
     toId,
   );
   const moviesToUpdate = remoteMoviesThatExist.filter((o) => {
-    const partner = localMovies.find((m) => m.id === o.id);
-    const a = omitBy(o, isNil);
-    const b = omitBy(partner, isNil);
-    return !isEqual(a, b);
+    const p = localMovies.find((m) => m.id === o.id);
+    return p && !isEqual(o, p);
   });
 
   logger.info('identifying peopleIds');
@@ -101,10 +97,8 @@ const processIdChunk = async (
     toId,
   );
   const personsToUpdate = remotePersonsThatExist.filter((o) => {
-    const partner = localPersons.find((m) => m.id === o.id);
-    const a = omitBy(o, isNil);
-    const b = omitBy(partner, isNil);
-    return !isEqual(a, b);
+    const p = localPersons.find((m) => m.id === o.id);
+    return p && !isEqual(o, p);
   });
 
   try {
