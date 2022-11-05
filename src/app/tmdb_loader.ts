@@ -69,6 +69,31 @@ const processIdChunk = async (
     return p && !isEqual(o, p);
   });
 
+  // TODO: either rethrow, or track which movies actually made
+  // it to the db, so we don't get foreign key errors later
+  try {
+    const createResult = await prisma.movie.createMany({
+      data: moviesToCreate,
+    });
+
+    logger.info('updating movies');
+    const updateResults = await Promise.map(moviesToUpdate, async (o) => {
+      return prisma.movie.update({ where: { id: o.id }, data: o });
+    });
+
+    logger.info('movie', {
+      remote: remoteMovies.length,
+      local: localMovies.length,
+      created: createResult?.count,
+      unchanged: remoteMoviesThatExist.length - moviesToUpdate.length,
+      updated: moviesToUpdate.length,
+      invalid: movieIds.length - remoteParsedMovies.length,
+      failedToCreate: moviesToCreate.length - (createResult?.count || 0),
+    });
+  } catch (e) {
+    logger.error('error while saving', e);
+  }
+
   logger.info('identifying peopleIds');
   const unfilteredPersonIds = getPersonIds(remoteMovies);
   const personIds = difference(unfilteredPersonIds, personIdsLoaded);
@@ -102,48 +127,31 @@ const processIdChunk = async (
   });
 
   try {
-    const createMoviesResult = await prisma.movie.createMany({
-      data: moviesToCreate,
-    });
-    logger.info('movie creation', {
-      remote: remoteMovies.length,
-      local: localMovies.length,
-      created: createMoviesResult?.count,
-      unchanged: remoteMoviesThatExist.length - moviesToUpdate.length,
-      updated: moviesToUpdate.length,
-      invalid: movieIds.length - remoteParsedMovies.length,
-      failed: moviesToCreate.length - (createMoviesResult?.count || 0),
-    });
-    const createPersonsResult = await prisma.person.createMany({
+    const createResult = await prisma.person.createMany({
       data: personsToCreate as any,
     });
-    logger.info('person creation', {
+    logger.info('updating persons');
+    const updateResults = await Promise.map(personsToUpdate, async (o) => {
+      return prisma.person.update({ where: { id: o.id }, data: o });
+    });
+
+    logger.info('person', {
       remote: remotePersons.length,
       local: localPersons.length,
-      created: createPersonsResult?.count,
+      created: createResult?.count,
       existingButUnchanged:
         remotePersonsThatExist.length - personsToUpdate.length,
       updated: personsToUpdate.length,
       invalid: personIds.length - remoteParsedPersons.length,
-      failed: personsToCreate.length - (createPersonsResult?.count || 0),
+      failedToCreate: personsToCreate.length - (createResult?.count || 0),
     });
-
-    logger.info('updating movies');
-    const updateMoviesResults = await Promise.map(moviesToUpdate, async (o) => {
-      return prisma.movie.update({ where: { id: o.id }, data: o });
-    });
-    logger.info('updating persons');
-    const updatePersonsResults = await Promise.map(
-      personsToUpdate,
-      async (o) => {
-        return prisma.person.update({ where: { id: o.id }, data: o });
-      },
-    );
 
     personIdsLoaded.concat(personIds);
   } catch (e) {
     logger.error('error while saving', e);
   }
+
+  // TODO: relationship tables
 };
 
 interface WithCredits {
