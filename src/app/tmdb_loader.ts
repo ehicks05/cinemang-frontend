@@ -286,13 +286,13 @@ const updateDb = async () => {
   logger.info(`running ${fullMode ? 'full' : 'partial'} load`);
 
   // logger.info('updating genres, languages, and watch providers...');
-  // await Promise.all([
-  //   updateGenres(),
-  //   updateLanguages(),
-  //   updateWatchProviders(),
-  // ]);
+  await Promise.all([
+    updateGenres(),
+    updateLanguages(),
+    updateWatchProviders(),
+  ]);
 
-  await updateMovies();
+  // await updateMovies();
 
   // logger.info('updating counts for languages and watch providers');
   // await updateLanguageCounts();
