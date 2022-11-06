@@ -47,7 +47,7 @@ const PersonCard = ({
 
       <div className="flex-grow p-1.5">
         <div>{name}</div>
-        {character && <div>{character}</div>}
+        {character && <div>as {character}</div>}
         {jobs && (
           <div>
             {jobs.map((j) => (

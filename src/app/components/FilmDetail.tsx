@@ -39,20 +39,23 @@ const FilmDetail = ({ film }: { film: IFilm }) => {
     >
       <div className="flex flex-col gap-4 sm:flex-row">
         <div className="flex-shrink-0">
-          <img alt="poster" className="sm:h-96 sm:w-64" src={posterUrl} />
+          <img
+            alt="poster"
+            className="rounded-lg sm:h-96 sm:w-64"
+            src={posterUrl}
+          />
         </div>
         <div className="flex flex-col gap-1">
           <div>
             <span className="text-lg font-bold">{film.title}</span>{' '}
             <span className="text-xs text-gray-300" title={film.released_at}>
-              {year} {`${runtime.hours}h ${runtime.minutes}m`}
+              <span className="font-semibold"> {year} </span>
+              <span className="whitespace-nowrap">{`${runtime.hours}h ${runtime.minutes}m`}</span>
             </span>
           </div>
           <div>{film.director}</div>
           <div>{film.cast}</div>
-          <div className="max-w-prose text-justify text-sm">
-            {film.overview}
-          </div>
+          <div className="text-justify text-sm">{film.overview}</div>
           <div className="mt-4 flex flex-col justify-between gap-4">
             <FilmStats
               bgColor={palette.darkVibrant}
@@ -60,10 +63,9 @@ const FilmDetail = ({ film }: { film: IFilm }) => {
             />
           </div>
           {film.watch_provider.length > 0 && (
-            <>
-              <div className="mt-4">Watch on:</div>
+            <div className="mt-4">
               <WatchProviders selectedIds={film.watch_provider} />
-            </>
+            </div>
           )}
         </div>
       </div>
