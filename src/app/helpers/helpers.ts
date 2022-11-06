@@ -75,9 +75,8 @@ export const update = async ({
 
   const changes = {
     remote: remoteRecords.length,
-    local: localRecords.length,
-    created: 0,
     unchanged: 0,
+    created: 0,
     updated: 0,
     deleted: 0,
   };
