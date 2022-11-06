@@ -2,6 +2,8 @@ import { Prisma } from '@prisma/client';
 import { pick } from 'lodash';
 import { MovieResponse } from '../../services/tmdb/types';
 
+const MIN_VOTES = 64;
+
 export const isValidMovie = (movie: MovieResponse) => {
   return !!(
     movie.credits.crew.find((c) => c.job === 'Director')?.name?.length &&
@@ -15,7 +17,7 @@ export const isValidMovie = (movie: MovieResponse) => {
     movie.release_date &&
     movie.releases &&
     movie.runtime &&
-    movie.vote_count >= 32
+    movie.vote_count >= MIN_VOTES
   );
 };
 

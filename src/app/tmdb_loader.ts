@@ -8,7 +8,11 @@ import {
   uniq,
 } from 'lodash';
 import Promise from 'bluebird';
-import { isFirstDayOfMonth } from 'date-fns';
+import {
+  formatDuration,
+  intervalToDuration,
+  isFirstDayOfMonth,
+} from 'date-fns';
 import { getValidIds } from '../services/tmdb';
 import {
   isEqual,
@@ -28,7 +32,7 @@ import { parseMovie } from './helpers/parse_movie';
 import { MovieResponse, PersonResponse } from '../services/tmdb/types';
 import { parsePerson } from './helpers/parse_person';
 import { Prisma } from '@prisma/client';
-import cacheMan from '../services/cache';
+import Bluebird from 'bluebird';
 
 const options = { concurrency: 64 };
 
@@ -39,37 +43,26 @@ const getMovie = async (id: number) =>
 const getPerson = async (id: number) =>
   prisma.personApiResponse.findUnique({ where: { id } });
 
-const processIdChunk = async (
-  movieIds: number[],
-  personIdsLoaded: number[],
-) => {
+const processMovies = async (ids: number[]) => {
   logger.info('fetching movie data');
-  const remoteMovies = (
-    await Promise.map(movieIds, (id) => getMovie(id), options)
-  )
+  const remote = (await Promise.map(ids, getMovie, options))
     .map((o) => o?.data)
     .filter((o) => o) as unknown as MovieResponse[];
 
-  const remoteParsedMovies = remoteMovies
+  const parsed = remote
     .map(parseMovie)
     .filter((m) => m) as Prisma.MovieCreateInput[];
-  const remoteParsedMovieIdMap = keyBy(remoteParsedMovies, toId);
-  const validatedRemoteMovies = remoteMovies.filter(
-    (o) => remoteParsedMovieIdMap[o.id],
-  );
-  const localMovies = await prisma.movie.findMany({
-    where: { id: { in: movieIds } },
+  const parsedById = keyBy(parsed, toId);
+  const remoteValidated = remote.filter((o) => parsedById[o.id]);
+  const local = await prisma.movie.findMany({
+    where: { id: { in: ids } },
   });
-  const localMoviesById = keyBy(localMovies, toId);
+  const localById = keyBy(local, toId);
 
-  const moviesToCreate = differenceBy(remoteParsedMovies, localMovies, toId);
-  const remoteMoviesThatExist = intersectionBy(
-    remoteParsedMovies,
-    localMovies,
-    toId,
-  );
-  const moviesToUpdate = remoteMoviesThatExist.filter((o) => {
-    const p = localMoviesById[o.id];
+  const toCreate = differenceBy(parsed, local, toId);
+  const existing = intersectionBy(parsed, local, toId);
+  const toUpdate = existing.filter((o) => {
+    const p = localById[o.id];
     return p && !isEqual(o, p);
   });
 
@@ -77,84 +70,106 @@ const processIdChunk = async (
   // it to the db, so we don't get foreign key errors later
   try {
     const createResult = await prisma.movie.createMany({
-      data: moviesToCreate,
+      data: toCreate,
     });
 
-    const updateResults = await Promise.map(moviesToUpdate, async (o) => {
-      return prisma.movie.update({ where: { id: o.id }, data: o });
+    const updateResults = await Promise.map(toUpdate, async (o) => {
+      try {
+        await prisma.movie.update({ where: { id: o.id }, data: o });
+        return { result: 'ok', id: o.id };
+      } catch (e) {
+        return { result: 'error', id: o.id };
+      }
     });
+    const updated = updateResults.filter((o) => o.result === 'ok');
+    const updateErrors = updateResults.filter((o) => o.result === 'error');
+    const updateErrorsById = keyBy(updateErrors, toId);
 
     logger.info('movie', {
-      remote: remoteMovies.length,
-      unchanged: remoteMoviesThatExist.length - moviesToUpdate.length,
-      created: createResult?.count,
-      updated: moviesToUpdate.length,
-      invalid: movieIds.length - remoteParsedMovies.length,
-      failedToCreate: moviesToCreate.length - (createResult?.count || 0),
+      ids: ids.length,
+      fetched: remote.length,
+      validated: parsed.length,
+      created: createResult.count,
+      updated: updated.length,
+      unchanged: existing.length - toUpdate.length,
+      failedToSave: toCreate.length - (createResult.count || 0),
     });
+
+    return updateErrors.length
+      ? remoteValidated.filter((o) => !updateErrorsById[o.id])
+      : remoteValidated;
   } catch (e) {
     logger.error('error while saving', e);
   }
+};
 
-  const unfilteredPersonIds = getPersonIds(validatedRemoteMovies);
-  const personIds = difference(unfilteredPersonIds, personIdsLoaded);
+const processIdChunk = async (
+  movieIds: number[],
+  personIdsProcessed: number[],
+) => {
+  const loadedMovies = await processMovies(movieIds);
+  if (!loadedMovies) return;
+
+  const personIds = getPersonIds(loadedMovies, personIdsProcessed);
   logger.info('fetching person data');
-  const remotePersons = (
-    await Promise.map(personIds, (id) => getPerson(id), options)
-  )
+  const remote = (await Promise.map(personIds, (id) => getPerson(id), options))
     .map((o) => o?.data)
     .filter((o) => o) as unknown as PersonResponse[];
-  const remoteParsedPersons = remotePersons
+  const parsed = remote
     .map(parsePerson)
     .filter((o) => o) as Prisma.PersonCreateInput[];
+  const parsedById = keyBy(parsed, toId);
+  const remoteValidated = remote.filter((o) => parsedById[o.id]);
 
-  {
-    const remoteParsedPersonsById = keyBy(remoteParsedPersons, toId);
-    const missing = personIds.filter((o) => !remoteParsedPersonsById[o]);
-    console.log({ missing });
-  }
-
-  const localPersons = await prisma.person.findMany({
+  const local = await prisma.person.findMany({
     where: { id: { in: personIds } },
   });
-  const localPersonsById = keyBy(localPersons, toId);
+  const localById = keyBy(local, toId);
 
   logger.info('determining new vs updated');
-  const personsToCreate = differenceBy(remoteParsedPersons, localPersons, toId);
-  const remotePersonsThatExist = intersectionBy(
-    remoteParsedPersons,
-    localPersons,
-    toId,
-  );
-  const personsToUpdate = remotePersonsThatExist.filter((o) => {
-    const p = localPersonsById[o.id];
+  const toCreate = differenceBy(parsed, local, toId);
+  const remoteThatExist = intersectionBy(parsed, local, toId);
+  const toUpdate = remoteThatExist.filter((o) => {
+    const p = localById[o.id];
     return p && !isEqual(o, p);
   });
 
   try {
     const createResult = await prisma.person.createMany({
-      data: personsToCreate as any,
+      data: toCreate as any,
     });
-    const updateResults = await Promise.map(personsToUpdate, async (o) => {
-      return prisma.person.update({ where: { id: o.id }, data: o });
+    const updateResults = await Promise.map(toUpdate, async (o) => {
+      try {
+        await prisma.person.update({ where: { id: o.id }, data: o });
+        return { result: 'ok', id: o.id };
+      } catch (e) {
+        return { result: 'error', id: o.id };
+      }
     });
+    const updated = updateResults.filter((o) => o.result === 'ok');
+    const updateErrors = updateResults.filter((o) => o.result === 'error');
+    const updateErrorsById = keyBy(updateErrors, toId);
 
     logger.info('person', {
-      remote: remotePersons.length,
-      unchanged: remotePersonsThatExist.length - personsToUpdate.length,
+      ids: personIds.length,
+      fetched: remote.length,
       created: createResult?.count,
-      updated: personsToUpdate.length,
-      invalid: personIds.length - remoteParsedPersons.length,
-      failedToCreate: personsToCreate.length - (createResult?.count || 0),
+      updated: toUpdate.length,
+      unchanged: remoteThatExist.length - toUpdate.length,
+      invalid: personIds.length - parsed.length,
+      failedToCreate: toCreate.length - (createResult?.count || 0),
     });
 
-    personIdsLoaded.concat(remoteParsedPersons.map(toId));
+    const loadedPersons = updateErrors.length
+      ? remoteValidated.filter((o) => !updateErrorsById[o.id])
+      : remoteValidated;
+
+    await updateRelationships(loadedMovies);
+
+    return personIds;
   } catch (e) {
     logger.error('error while saving', e);
   }
-
-  // TODO: relationship tables
-  await updateRelationships(validatedRemoteMovies, remoteParsedPersons);
 };
 
 interface WithCredits {
@@ -163,14 +178,18 @@ interface WithCredits {
     crew: { id: number }[];
   };
 }
-const getPersonIds = (movies: WithCredits[]) => {
+const getPersonIds = (
+  movies: WithCredits[],
+  ignoreList: number[] | undefined = [],
+) => {
   const personIds = movies
     .map(({ credits: { cast, crew } }) => [
       ...cast.map((c) => c.id),
       ...crew.map((c) => c.id),
     ])
     .flat();
-  return uniq(personIds);
+  const deduped = uniq(personIds);
+  return difference(deduped, ignoreList);
 };
 
 const updateMovies = async () => {
@@ -180,12 +199,15 @@ const updateMovies = async () => {
   }
   logger.info(`found ${ids?.length} movie ids to load`);
 
-  const personIdsLoaded: number[] = [];
+  let personIdsProcessed: number[] = [];
 
-  const chunks = chunk(ids.slice(0, 10_000), 1_000);
-  await Promise.each(chunks, async (ids) => {
+  const chunks = chunk(ids.slice(0, 1_000), 1_000);
+  await Promise.each(chunks, async (ids, i) => {
     try {
-      await processIdChunk(ids, personIdsLoaded);
+      logger.info(`processing chunk ${i + 1}/${chunks.length}`);
+      logger.info(`processed ${personIdsProcessed.length} persons`);
+      const personIds = await processIdChunk(ids, personIdsProcessed);
+      personIdsProcessed = personIdsProcessed.concat(personIds || []);
     } catch (e) {
       logger.error(e);
     }
@@ -222,14 +244,25 @@ const toMovieWatchProviderCreateInput = (movie: MovieResponse) => {
   );
 };
 
-const updateRelationships = async (
-  movies: MovieResponse[],
-  remoteParsedPersons: any[],
-) => {
+const getExtantPersons = async (movies: MovieResponse[]) => {
+  const personIdsRaw = getPersonIds(movies);
+  const chunks = chunk(personIdsRaw, 10_000);
+
+  const results = await Bluebird.map(chunks, async (ids) => {
+    const args = {
+      where: { id: { in: ids } },
+      select: { id: true },
+    };
+    return await prisma.person.findMany(args);
+  });
+  return results.flat().map((o) => o.id);
+};
+
+const updateRelationships = async (movies: MovieResponse[]) => {
   logger.info('updating relationships...');
-  // const movieIds = movies.map(o => ({movieId: o.id}));
   const movieIds = movies.map(toId);
-  const personIdMap = keyBy(remoteParsedPersons, toId);
+  const personIds = await getExtantPersons(movies);
+  const personIdMap = keyBy(personIds, (o) => o);
 
   const remoteCastCredits: Prisma.CastCreditUncheckedCreateInput[] = movies
     .map(toCastCreditCreateInput)
@@ -282,6 +315,7 @@ const updateRelationships = async (
 
 const updateDb = async () => {
   logger.info('starting tmdb_loader script');
+  const start = new Date();
 
   const isStartOfMonth = isFirstDayOfMonth(new Date());
   if (isStartOfMonth) {
@@ -308,7 +342,8 @@ const updateDb = async () => {
   // await updateLanguageCounts();
   // await updateWatchProviderCounts();
 
-  logger.info('finished tmdb_loader script');
+  const duration = intervalToDuration({ start, end: new Date() });
+  logger.info(`finished tmdb_loader script in ${formatDuration(duration)}`);
 };
 
 export default updateDb;
