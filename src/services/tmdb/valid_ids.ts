@@ -16,8 +16,7 @@ const getFormattedDate = () => {
   const compareTo = new Date(new Date().setUTCHours(8, 0, 0, 0));
   const daysToSub = isBefore(now, compareTo) ? 1 : 0;
   const date = subDays(new Date(), daysToSub);
-  // return format(date, 'MM_dd_yyyy');
-  return '11_03_2022';
+  return format(date, 'MM_dd_yyyy');
 };
 
 export const getFilename = (resource: ResourceKey) => {

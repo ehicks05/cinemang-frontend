@@ -17,7 +17,7 @@ export const parsePerson = (data: PersonResponse) => {
     deathday: data.deathday ? new Date(data.deathday) : undefined,
     gender: Number(data.gender),
     imdbId: data.imdb_id,
-    knownForDepartment: data.known_for_department,
+    knownForDepartment: data.known_for_department || '',
     placeOfBirth: data.place_of_birth,
     profilePath: data.profile_path,
   };

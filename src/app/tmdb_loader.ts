@@ -13,7 +13,7 @@ import {
   intervalToDuration,
   isFirstDayOfMonth,
 } from 'date-fns';
-import { getValidIds } from '../services/tmdb';
+import { getMovie, getPerson, getValidIds } from '../services/tmdb';
 import {
   isEqual,
   removeInvalidMovies,
@@ -38,16 +38,16 @@ const options = { concurrency: 64 };
 
 const toId = (o: { id: number }) => o.id;
 
-const getMovie = async (id: number) =>
-  prisma.movieApiResponse.findUnique({ where: { id } });
-const getPerson = async (id: number) =>
-  prisma.personApiResponse.findUnique({ where: { id } });
+// const getMovie = async (id: number) =>
+//   prisma.movieApiResponse.findUnique({ where: { id } });
+// const getPerson = async (id: number) =>
+//   prisma.personApiResponse.findUnique({ where: { id } });
 
 const processMovies = async (ids: number[]) => {
   logger.info('fetching movie data');
-  const remote = (await Promise.map(ids, getMovie, options))
-    .map((o) => o?.data)
-    .filter((o) => o) as unknown as MovieResponse[];
+  const remote = (await Promise.map(ids, getMovie, options)).filter(
+    (o) => o,
+  ) as unknown as MovieResponse[];
 
   const parsed = remote
     .map(parseMovie)
@@ -108,13 +108,13 @@ const processIdChunk = async (
   personIdsProcessed: number[],
 ) => {
   const loadedMovies = await processMovies(movieIds);
-  if (!loadedMovies) return;
+  if (!loadedMovies || loadedMovies.length === 0) return;
 
   const personIds = getPersonIds(loadedMovies, personIdsProcessed);
   logger.info('fetching person data');
-  const remote = (await Promise.map(personIds, (id) => getPerson(id), options))
-    .map((o) => o?.data)
-    .filter((o) => o) as unknown as PersonResponse[];
+  const remote = (
+    await Promise.map(personIds, (id) => getPerson(id), options)
+  ).filter((o) => o) as unknown as PersonResponse[];
   const parsed = remote
     .map(parsePerson)
     .filter((o) => o) as Prisma.PersonCreateInput[];
@@ -201,7 +201,7 @@ const updateMovies = async () => {
 
   let personIdsProcessed: number[] = [];
 
-  const chunks = chunk(ids.slice(0, 1_000), 1_000);
+  const chunks = chunk(ids, 10_000);
   await Promise.each(chunks, async (ids, i) => {
     try {
       logger.info(`processing chunk ${i + 1}/${chunks.length}`);
