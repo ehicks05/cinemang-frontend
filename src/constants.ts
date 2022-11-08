@@ -1,4 +1,3 @@
-import { format, subMonths } from 'date-fns';
 import {
   StringParam,
   withDefault,
@@ -14,12 +13,12 @@ export const DEFAULT_SEARCH_FORM = {
   castCreditName: '',
   crewCreditName: '',
   genre: '',
-  language: 'en',
+  language: '',
   maxRating: 10,
   maxReleasedAt: '',
   maxVotes: 100_000,
   minRating: 6,
-  minReleasedAt: format(subMonths(new Date(), 4), 'yyyy-MM-dd'),
+  minReleasedAt: '',
   minVotes: 100,
   page: 0,
   sortColumn: 'released_at',
