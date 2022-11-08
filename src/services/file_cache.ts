@@ -18,13 +18,15 @@ const get = async (name: string) => {
   if (existsSync(path)) return (await readFile(path)).toString();
 };
 
-const clear = async () => {
+const clear = async (except: string) => {
   const dir = await readdir(TEMP_DIR);
   await Promise.all(
-    dir.map((file) => {
-      logger.info('cleaning up file cache: ' + realpathSync(getPath(file)));
-      unlink(realpathSync(getPath(file)));
-    }),
+    dir
+      .filter((file) => !file.includes(except))
+      .map((file) => {
+        logger.info('cleaning up file cache: ' + realpathSync(getPath(file)));
+        unlink(realpathSync(getPath(file)));
+      }),
   );
 };
 

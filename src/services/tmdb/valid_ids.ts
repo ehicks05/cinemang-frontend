@@ -51,6 +51,7 @@ export const getDailyFile = async (resource: ResourceKey) => {
 
   const fromTmdb = await fetchDailyFile(resource);
 
+  await fileCache.clear(filename.slice(-15)); // don't delete files like '...CURRENT_DATE.json'
   await fileCache.set(filename, fromTmdb);
 
   logger.info('done');
