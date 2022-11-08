@@ -19,7 +19,7 @@ export const DEFAULT_SEARCH_FORM = {
   maxVotes: 100_000,
   minRating: 6,
   minReleasedAt: '',
-  minVotes: 100,
+  minVotes: 500,
   page: 0,
   sortColumn: 'released_at',
   title: '',
