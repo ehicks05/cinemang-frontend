@@ -1,5 +1,6 @@
 import {
   chunk,
+  Dictionary,
   difference,
   differenceBy,
   intersectionBy,
@@ -13,7 +14,11 @@ import {
   intervalToDuration,
   isFirstDayOfMonth,
 } from 'date-fns';
-import { getMovie, getPerson, getValidIds } from '../services/tmdb';
+import {
+  getMovie,
+  getPerson,
+  getValidIds,
+} from '../services/tmdb';
 import {
   isEqual,
   removeInvalidMovies,
@@ -31,7 +36,7 @@ import {
 import { parseMovie } from './helpers/parse_movie';
 import { MovieResponse, PersonResponse } from '../services/tmdb/types';
 import { parsePerson } from './helpers/parse_person';
-import { Prisma } from '@prisma/client';
+import { MovieWatchProvider, Prisma } from '@prisma/client';
 import Bluebird from 'bluebird';
 
 const options = { concurrency: 64 };
@@ -39,9 +44,9 @@ const options = { concurrency: 64 };
 const toId = (o: { id: number }) => o.id;
 
 // const getMovie = async (id: number) =>
-//   prisma.movieApiResponse.findUnique({ where: { id } });
+//   (await prisma.movieApiResponse.findUnique({ where: { id } }))?.data;
 // const getPerson = async (id: number) =>
-//   prisma.personApiResponse.findUnique({ where: { id } });
+//   (await prisma.personApiResponse.findUnique({ where: { id } }))?.data;
 
 const processMovies = async (ids: number[]) => {
   logger.info('fetching movie data');
@@ -92,7 +97,6 @@ const processMovies = async (ids: number[]) => {
       created: createResult.count,
       updated: updated.length,
       unchanged: existing.length - toUpdate.length,
-      failedToSave: toCreate.length - (createResult.count || 0),
     });
 
     return updateErrors.length
@@ -157,7 +161,6 @@ const processIdChunk = async (
       updated: toUpdate.length,
       unchanged: remoteThatExist.length - toUpdate.length,
       invalid: personIds.length - parsed.length,
-      failedToCreate: toCreate.length - (createResult?.count || 0),
     });
 
     const loadedPersons = updateErrors.length
@@ -201,7 +204,8 @@ const updateMovies = async () => {
 
   let personIdsProcessed: number[] = [];
 
-  const chunks = chunk(ids, 10_000);
+  // const chunks = chunk(ids.slice(0, 1_000), 1_000);
+  const chunks = chunk(ids, 1_000);
   await Promise.each(chunks, async (ids, i) => {
     try {
       logger.info(`processing chunk ${i + 1}/${chunks.length}`);
@@ -258,12 +262,11 @@ const getExtantPersons = async (movies: MovieResponse[]) => {
   return results.flat().map((o) => o.id);
 };
 
-const updateRelationships = async (movies: MovieResponse[]) => {
-  logger.info('updating relationships...');
-  const movieIds = movies.map(toId);
-  const personIds = await getExtantPersons(movies);
-  const personIdMap = keyBy(personIds, (o) => o);
-
+const updateCastCredits = async (
+  movies: MovieResponse[],
+  movieIds: number[],
+  personIdMap: Dictionary<number>,
+) => {
   const remoteCastCredits: Prisma.CastCreditUncheckedCreateInput[] = movies
     .map(toCastCreditCreateInput)
     .flat()
@@ -309,8 +312,142 @@ const updateRelationships = async (movies: MovieResponse[]) => {
     unchanged: (existingCastCredits.length = updateCastCredits.length),
     created: castCreditCreateResult.count,
     updated: updateCastCredits.length,
-    deleted: 0,
   });
+};
+
+const updateCrewCredits = async (
+  movies: MovieResponse[],
+  movieIds: number[],
+  personIdMap: Dictionary<number>,
+) => {
+  const remoteCrewCredits: Prisma.CrewCreditUncheckedCreateInput[] = movies
+    .map(toCrewCreditCreateInput)
+    .flat()
+    .filter((o) => personIdMap[o.personId]);
+  const localCrewCredits = await prisma.crewCredit.findMany({
+    where: {
+      movieId: { in: movieIds },
+    },
+  });
+  const localCrewCreditsById = keyBy(localCrewCredits, (o) => o.creditId);
+
+  const newCrewCredits = differenceBy(
+    remoteCrewCredits,
+    localCrewCredits,
+    (o) => o.creditId,
+  );
+  const existingCrewCredits = differenceBy(
+    remoteCrewCredits,
+    newCrewCredits,
+    (o) => o.creditId,
+  );
+  const updateCrewCredits = existingCrewCredits.filter((o) => {
+    const p = localCrewCreditsById[o.creditId];
+    return p && !isEqual(o, p);
+  });
+
+  const crewCreditCreateResult = await prisma.crewCredit.createMany({
+    data: newCrewCredits,
+  });
+
+  const crewCreditUpdateResults = await Promise.map(
+    updateCrewCredits,
+    async (o) => {
+      return prisma.crewCredit.update({
+        where: { creditId: o.creditId },
+        data: o,
+      });
+    },
+  );
+
+  logger.info('crewCredit', {
+    remote: remoteCrewCredits.length,
+    unchanged: (existingCrewCredits.length = updateCrewCredits.length),
+    created: crewCreditCreateResult.count,
+    updated: updateCrewCredits.length,
+  });
+};
+
+const toMovieWatchProviderId = (o: MovieWatchProvider) =>
+  `${o.movieId}-${o.watchProviderId}`;
+
+const updateMovieWatchProviders = async (
+  movies: MovieResponse[],
+  movieIds: number[],
+) => {
+  const validWatchProviders = await prisma.watchProvider.findMany({
+    select: { id: true },
+  });
+  const validWatchProvidersById = keyBy(validWatchProviders, toId);
+  const remoteMovieWatchProviders: Prisma.MovieWatchProviderUncheckedCreateInput[] =
+    movies
+      .map(toMovieWatchProviderCreateInput)
+      .flat()
+      .filter((o) => o && validWatchProvidersById[o.watchProviderId]);
+  const localMovieWatchProviders = await prisma.movieWatchProvider.findMany({
+    where: {
+      movieId: { in: movieIds },
+    },
+  });
+  const localMovieWatchProvidersById = keyBy(
+    localMovieWatchProviders,
+    toMovieWatchProviderId,
+  );
+
+  const newMovieWatchProviders = differenceBy(
+    remoteMovieWatchProviders,
+    localMovieWatchProviders,
+    toMovieWatchProviderId,
+  );
+  const existingMovieWatchProviders = differenceBy(
+    remoteMovieWatchProviders,
+    newMovieWatchProviders,
+    toMovieWatchProviderId,
+  );
+  const updateMovieWatchProviders = existingMovieWatchProviders.filter((o) => {
+    const key = toMovieWatchProviderId(o);
+    const p = localMovieWatchProvidersById[key];
+    return p && !isEqual(o, p);
+  });
+
+  const movieWatchProviderCreateResult =
+    await prisma.movieWatchProvider.createMany({
+      data: newMovieWatchProviders,
+    });
+
+  const movieWatchProviderUpdateResults = await Promise.map(
+    updateMovieWatchProviders,
+    async (o) => {
+      return prisma.movieWatchProvider.update({
+        where: {
+          movieId_watchProviderId: {
+            movieId: o.movieId,
+            watchProviderId: o.watchProviderId,
+          },
+        },
+        data: o,
+      });
+    },
+  );
+
+  logger.info('movieWatchProvider', {
+    remote: remoteMovieWatchProviders.length,
+    unchanged: (existingMovieWatchProviders.length =
+      updateMovieWatchProviders.length),
+    created: movieWatchProviderCreateResult.count,
+    updated: updateMovieWatchProviders.length,
+  });
+};
+
+const updateRelationships = async (movies: MovieResponse[]) => {
+  logger.info('updating relationships...');
+  const movieIds = movies.map(toId);
+  const personIds = await getExtantPersons(movies);
+  const personIdMap = keyBy(personIds, (o) => o);
+
+  await updateCastCredits(movies, movieIds, personIdMap);
+  await updateCrewCredits(movies, movieIds, personIdMap);
+  await updateMovieWatchProviders(movies, movieIds);
 };
 
 const updateDb = async () => {

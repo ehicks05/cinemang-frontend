@@ -17,6 +17,7 @@ const getFormattedDate = () => {
   const daysToSub = isBefore(now, compareTo) ? 1 : 0;
   const date = subDays(new Date(), daysToSub);
   return format(date, 'MM_dd_yyyy');
+  // return '11_03_2022';
 };
 
 export const getFilename = (resource: ResourceKey) => {

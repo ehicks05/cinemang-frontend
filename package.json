@@ -7,7 +7,7 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "generate": "npx prisma generate",
-    "dev": "set NODE_OPTIONS=--max_old_space_size=8192&&set NODE_ENV=development&&ts-node-dev --transpile-only --no-notify src/app.ts",
+    "dev": "set NODE_OPTIONS=--max_old_space_size=512&&set NODE_ENV=development&&ts-node-dev --transpile-only --no-notify src/app.ts",
     "build": "tsc && npx prisma generate",
     "start": "set NODE_ENV=production&&node ./dist/src/app.js",
     "research": "set NODE_ENV=development&&ts-node-dev --transpile-only --no-notify src/research.ts",
