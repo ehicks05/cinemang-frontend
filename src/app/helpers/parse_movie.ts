@@ -6,6 +6,7 @@ const MIN_VOTES = 64;
 
 export const isValidMovie = (movie: MovieResponse) => {
   return !!(
+    movie.credits &&
     movie.credits.crew.find((c) => c.job === 'Director')?.name?.length &&
     movie.credits.cast
       .slice(0, 3)
@@ -22,17 +23,16 @@ export const isValidMovie = (movie: MovieResponse) => {
 };
 
 export const parseMovie = (data: MovieResponse) => {
-  const director = data.credits.crew.find((c) => c.job === 'Director')?.name;
-  const cast = data.credits.cast
-    .slice(0, 3)
-    .map((c) => c.name)
-    .join(', ');
-
   // ignore movies missing required data
   if (!isValidMovie(data)) {
     return undefined;
   }
 
+  const director = data.credits.crew.find((c) => c.job === 'Director')?.name;
+  const cast = data.credits.cast
+    .slice(0, 3)
+    .map((c) => c.name)
+    .join(', ');
   const certification =
     data.releases.countries.find(
       (r) => r.iso_3166_1 === 'US' && r.certification,
