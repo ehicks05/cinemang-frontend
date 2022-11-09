@@ -1,11 +1,12 @@
 import React, { FC } from 'react';
-import { FaMask, FaStar } from 'react-icons/fa';
+import { FaFilm, FaMask, FaStar } from 'react-icons/fa';
 import Stat from './Stat';
 
 interface Props {
   autoWidth?: boolean;
   bgColor: string;
   data: {
+    credits: number;
     knownForDepartment: string;
     popularity: string;
   };
@@ -16,13 +17,22 @@ const FilmStats: FC<Props> = ({ bgColor, data, autoWidth = true }) => {
     {
       color: 'text-yellow-300',
       icon: FaStar,
+      title: 'Popularity',
       value: data.popularity,
       width: 'w-20',
     },
     {
       color: 'text-blue-400',
       icon: FaMask,
+      title: 'Known for',
       value: data.knownForDepartment,
+      width: 'w-32',
+    },
+    {
+      color: 'text-blue-400',
+      icon: FaFilm,
+      title: 'Credits',
+      value: data.credits,
       width: 'w-32',
     },
   ];
@@ -36,6 +46,7 @@ const FilmStats: FC<Props> = ({ bgColor, data, autoWidth = true }) => {
           color={stat.color}
           key={stat.value}
           label={stat.value}
+          title={stat.title}
           width={autoWidth ? undefined : stat.width}
         />
       ))}

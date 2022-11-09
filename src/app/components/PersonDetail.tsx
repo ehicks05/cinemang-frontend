@@ -37,6 +37,7 @@ const PersonDetail = ({ person }: { person: Person }) => {
   const palette = data!;
 
   const statData = {
+    credits: [...person.cast_credit, ...person.crew_credit].length,
     knownForDepartment: person.known_for_department,
     popularity: nf.format(person.popularity),
   };
