@@ -37,6 +37,14 @@ export type TmdbMovieStatus =
   | 'Released'
   | 'Canceled';
 
+export type TmdbTvStatus =
+  | 'Returning Series'
+  | 'Planned'
+  | 'In Production'
+  | 'Ended'
+  | 'Canceled'
+  | 'Pilot';
+
 export interface Movie {
   adult: boolean;
   backdrop_path?: string;
@@ -61,6 +69,44 @@ export interface Movie {
   tagline?: string;
   title: string;
   video: boolean;
+  vote_average: number;
+  vote_count: number;
+}
+
+export interface TV {
+  adult: boolean;
+  backdrop_path?: string;
+  created_by: Pick<
+    CrewCredit,
+    'id' | 'credit_id' | 'name' | 'gender' | 'profile_path'
+  >[];
+  episode_run_time: number[];
+  first_air_date: string;
+  genres: Genre[];
+  homepage?: string;
+  id: number;
+  in_production: boolean;
+  languages: string[];
+  last_air_date: string;
+  last_episode_to_air: any;
+  name: string;
+  next_episode_to_air: any;
+  networks: any[];
+  number_of_episodes: number;
+  number_of_seasons: number;
+  origin_country: string[];
+  original_language: string;
+  original_name: string;
+  overview?: string;
+  popularity: number;
+  poster_path?: string;
+  production_companies: ProductionCompany[];
+  production_countries: ProductionCountry[];
+  seasons: any[];
+  spoken_languages: Language[];
+  status: TmdbTvStatus;
+  tagline?: string;
+  type: string;
   vote_average: number;
   vote_count: number;
 }
