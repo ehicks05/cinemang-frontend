@@ -14,11 +14,7 @@ import {
   intervalToDuration,
   isFirstDayOfMonth,
 } from 'date-fns';
-import {
-  getMovie,
-  getPerson,
-  getValidIds,
-} from '../services/tmdb';
+import { getMovie, getPerson, getValidIds } from '../services/tmdb';
 import {
   isEqual,
   removeInvalidMovies,
@@ -34,7 +30,10 @@ import {
   updateWatchProviderCounts,
 } from './helpers/update_counts';
 import { parseMovie } from './helpers/parse_movie';
-import { MovieResponse, PersonResponse } from '../services/tmdb/types/responses';
+import {
+  MovieResponse,
+  PersonResponse,
+} from '../services/tmdb/types/responses';
 import { parsePerson } from './helpers/parse_person';
 import { MovieWatchProvider, Prisma } from '@prisma/client';
 import Bluebird from 'bluebird';

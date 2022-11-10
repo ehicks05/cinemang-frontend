@@ -1,5 +1,4 @@
-import { string } from 'zod';
-import { Company, Person, WatchProvider } from './base';
+import { Person, WatchProvider } from './base';
 
 /**
  * Variations of the base types that generally omit a few fields
