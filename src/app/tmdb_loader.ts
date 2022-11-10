@@ -34,7 +34,7 @@ import {
   updateWatchProviderCounts,
 } from './helpers/update_counts';
 import { parseMovie } from './helpers/parse_movie';
-import { MovieResponse, PersonResponse } from '../services/tmdb/types';
+import { MovieResponse, PersonResponse } from '../services/tmdb/types/responses';
 import { parsePerson } from './helpers/parse_person';
 import { MovieWatchProvider, Prisma } from '@prisma/client';
 import Bluebird from 'bluebird';

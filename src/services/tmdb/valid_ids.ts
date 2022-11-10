@@ -3,9 +3,10 @@ import { format, isBefore, subDays } from 'date-fns';
 import { TextDecoder } from 'util';
 import logger from '../logger';
 import zlib from 'zlib';
-import { DailyFileRow, ResourceKey } from './types';
+import { ResourceKey } from './types';
 import { DAILY_FILE, RESOURCES } from './constants';
 import fileCache from '../file_cache';
+import { DailyFileRow } from './types/responses';
 
 // https://developers.themoviedb.org/3/getting-started/daily-file-exports
 

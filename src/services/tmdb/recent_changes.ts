@@ -3,7 +3,8 @@ import { intersection } from 'lodash';
 import logger from '../logger';
 import { RESOURCES } from './constants';
 import tmdb from './tmdb';
-import { ResourceKey, RecentChangesResponse } from './types';
+import { ResourceKey } from './types';
+import { RecentChangesResponse } from './types/responses';
 import { getValidIds } from './valid_ids';
 
 const getRecentlyChangedIds = async (resource: ResourceKey) => {

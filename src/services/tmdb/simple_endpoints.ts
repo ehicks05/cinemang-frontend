@@ -2,13 +2,13 @@ import { AxiosError } from 'axios';
 import { pick } from 'lodash';
 import logger from '../logger';
 import tmdb from './tmdb';
+import { Language } from './types/base';
 import {
-  Language,
   PersonResponse,
   MovieResponse,
   GenreResponse,
   WatchProviderResponse,
-} from './types';
+} from './types/responses';
 
 export const logAxiosError = (error: AxiosError) => {
   const config = pick(error.config, ['baseURL', 'url', 'params']);

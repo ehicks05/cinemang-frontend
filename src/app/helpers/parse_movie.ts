@@ -1,6 +1,6 @@
 import { Prisma } from '@prisma/client';
 import { pick } from 'lodash';
-import { MovieResponse } from '../../services/tmdb/types';
+import { MovieResponse } from '../../services/tmdb/types/responses';
 
 const MIN_VOTES = 64;
 
