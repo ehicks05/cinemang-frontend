@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { configureHttp } from '../configure-http';
+import { configureHttp } from '../../utils/configure-http';
 
 configureHttp();
 
