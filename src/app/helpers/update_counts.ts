@@ -17,8 +17,11 @@ export const updateLanguageCounts = async () => {
     return { ...l, count };
   });
 
-  await prisma.language.deleteMany();
-  await prisma.language.createMany({ data: languagesWithCounts });
+  await Promise.all(
+    languagesWithCounts.map((o) =>
+      prisma.language.update({ data: o, where: { id: o.id } }),
+    ),
+  );
 
   logger.info(`updated language counts`);
 };

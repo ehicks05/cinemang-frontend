@@ -465,7 +465,7 @@ const updateDb = async () => {
 
   logger.info(`running ${fullMode ? 'full' : 'partial'} load`);
 
-  // logger.info('updating genres, languages, and watch providers...');
+  logger.info('updating genres, languages, and watch providers...');
   await Promise.all([
     updateGenres(),
     updateLanguages(),
@@ -474,9 +474,12 @@ const updateDb = async () => {
 
   await updateMovies();
 
-  // logger.info('updating counts for languages and watch providers');
-  // await updateLanguageCounts();
-  // await updateWatchProviderCounts();
+  logger.info('updating counts for languages and watch providers');
+  await updateLanguageCounts();
+  await updateWatchProviderCounts();
+
+  logger.info('cleaning up dead movies');
+  logger.info('[placeholder]');
 
   const duration = intervalToDuration({ start, end: new Date() });
   logger.info(`finished tmdb_loader script in ${formatDuration(duration)}`);
