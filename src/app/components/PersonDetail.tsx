@@ -9,7 +9,7 @@ import { Person } from '../../types';
 import { useAtom } from 'jotai';
 import { systemDataAtom } from '../../atoms';
 import { orderBy, truncate } from 'lodash';
-import { usePalette } from '../hooks/usePalette';
+import { Palette, usePalette } from '../hooks/usePalette';
 import BirthAndDeath from './BirthAndDeath';
 import PersonCredit from './PersonCredit';
 import Stat from './Stat';
@@ -26,6 +26,26 @@ const SORT_OPTIONS: { color: string; icon: IconType; sort: SortKey }[] = [
   { color: 'text-red-600', icon: FaHeart, sort: 'vote_average' },
   { color: 'text-yellow-300', icon: FaStar, sort: 'vote_count' },
 ];
+
+const StatsAndLifespan = ({
+  palette,
+  person,
+}: {
+  palette: Palette;
+  person: Person;
+}) => {
+  const statData = {
+    credits: [...person.cast_credit, ...person.crew_credit].length,
+    knownForDepartment: person.known_for_department,
+    popularity: nf.format(person.popularity),
+  };
+  return (
+    <div className={`mt-4 flex w-full flex-col justify-between gap-4`}>
+      <PersonStats bgColor={palette.darkVibrant || ''} data={statData} />
+      <BirthAndDeath palette={palette} person={person} />
+    </div>
+  );
+};
 
 const PersonDetail = ({ person }: { person: Person }) => {
   const [{ genres, languages }] = useAtom(systemDataAtom);
@@ -50,12 +70,6 @@ const PersonDetail = ({ person }: { person: Person }) => {
   if (isLoading) return <div className="h-full w-full bg-slate-700" />;
   const palette = data!;
 
-  const statData = {
-    credits: [...person.cast_credit, ...person.crew_credit].length,
-    knownForDepartment: person.known_for_department,
-    popularity: nf.format(person.popularity),
-  };
-
   return (
     <div
       className="m-auto flex max-w-screen-lg flex-col gap-4 rounded-lg p-4"
@@ -68,9 +82,8 @@ const PersonDetail = ({ person }: { person: Person }) => {
             className="rounded-lg sm:h-96 sm:w-64"
             src={profileUrl}
           />
-          <div className="mt-4 flex flex-col justify-between gap-4">
-            <PersonStats bgColor={palette.darkVibrant || ''} data={statData} />
-            <BirthAndDeath palette={palette} person={person} />
+          <div className="hidden sm:flex">
+            <StatsAndLifespan palette={palette} person={person} />
           </div>
         </div>
         <div className="flex flex-col gap-1">
@@ -87,6 +100,9 @@ const PersonDetail = ({ person }: { person: Person }) => {
               <div key={b}>{b}</div>
             ))}
           </div>
+        </div>
+        <div className="sm:hidden">
+          <StatsAndLifespan palette={palette} person={person} />
         </div>
       </div>
 
