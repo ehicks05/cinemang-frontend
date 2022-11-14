@@ -86,9 +86,9 @@ const FilmStats: FC<Props> = ({
         .sort((s1, s2) => s1.order - s2.order)
         .map((stat) => (
           <Stat
-            Icon={stat.icon}
             bgColor={bgColor}
             color={stat.color}
+            icon={stat.icon}
             key={stat.label}
             label={stat.label || ''}
             width={autoWidth ? undefined : stat.width}
