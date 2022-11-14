@@ -8,7 +8,6 @@ import {
   pick,
   uniq,
 } from 'lodash';
-import Promise from 'bluebird';
 import {
   formatDuration,
   intervalToDuration,
@@ -49,7 +48,7 @@ const toId = (o: { id: number }) => o.id;
 
 const processMovies = async (ids: number[]) => {
   logger.info('fetching movie data');
-  const remote = (await Promise.map(ids, getMovie, options)).filter(
+  const remote = (await Bluebird.map(ids, getMovie, options)).filter(
     (o) => o,
   ) as unknown as MovieResponse[];
 
@@ -77,14 +76,17 @@ const processMovies = async (ids: number[]) => {
       data: toCreate,
     });
 
-    const updateResults = await Promise.map(toUpdate, async (o) => {
+    const updateOne = async (o: Prisma.MovieCreateInput) => {
       try {
         await prisma.movie.update({ where: { id: o.id }, data: o });
         return { result: 'ok', id: o.id };
       } catch (e) {
+        logger.error(e);
         return { result: 'error', id: o.id };
       }
-    });
+    };
+
+    const updateResults = await Bluebird.map(toUpdate, updateOne, options);
     const updated = updateResults.filter((o) => o.result === 'ok');
     const updateErrors = updateResults.filter((o) => o.result === 'error');
     const updateErrorsById = keyBy(updateErrors, toId);
@@ -116,13 +118,11 @@ const processIdChunk = async (
   const personIds = getPersonIds(loadedMovies, personIdsProcessed);
   logger.info('fetching person data');
   const remote = (
-    await Promise.map(personIds, (id) => getPerson(id), options)
+    await Bluebird.map(personIds, (id) => getPerson(id), options)
   ).filter((o) => o) as unknown as PersonResponse[];
   const parsed = remote
     .map(parsePerson)
     .filter((o) => o) as Prisma.PersonCreateInput[];
-  const parsedById = keyBy(parsed, toId);
-  const remoteValidated = remote.filter((o) => parsedById[o.id]);
 
   const local = await prisma.person.findMany({
     where: { id: { in: personIds } },
@@ -141,17 +141,18 @@ const processIdChunk = async (
     const createResult = await prisma.person.createMany({
       data: toCreate as any,
     });
-    const updateResults = await Promise.map(toUpdate, async (o) => {
+
+    const updateOne = async (o: Prisma.PersonCreateInput) => {
       try {
         await prisma.person.update({ where: { id: o.id }, data: o });
         return { result: 'ok', id: o.id };
       } catch (e) {
+        logger.error(e);
         return { result: 'error', id: o.id };
       }
-    });
-    const updated = updateResults.filter((o) => o.result === 'ok');
-    const updateErrors = updateResults.filter((o) => o.result === 'error');
-    const updateErrorsById = keyBy(updateErrors, toId);
+    };
+
+    await Bluebird.map(toUpdate, updateOne, options);
 
     logger.info('person', {
       ids: personIds.length,
@@ -161,10 +162,6 @@ const processIdChunk = async (
       unchanged: remoteThatExist.length - toUpdate.length,
       invalid: personIds.length - parsed.length,
     });
-
-    const loadedPersons = updateErrors.length
-      ? remoteValidated.filter((o) => !updateErrorsById[o.id])
-      : remoteValidated;
 
     await updateRelationships(loadedMovies);
 
@@ -205,7 +202,7 @@ const updateMovies = async () => {
 
   // const chunks = chunk(ids.slice(0, 1_000), 1_000);
   const chunks = chunk(ids, 1_000);
-  await Promise.each(chunks, async (ids, i) => {
+  await Bluebird.each(chunks, async (ids, i) => {
     try {
       logger.info(`processing chunk ${i + 1}/${chunks.length}`);
       logger.info(`processed ${personIdsProcessed.length} persons`);
@@ -292,26 +289,31 @@ const updateCastCredits = async (
     return p && !isEqual(o, p);
   });
 
-  const castCreditCreateResult = await prisma.castCredit.createMany({
-    data: newCastCredits,
-  });
+  try {
+    const castCreditCreateResult = await prisma.castCredit.createMany({
+      data: newCastCredits,
+    });
 
-  const castCreditUpdateResults = await Promise.map(
-    updateCastCredits,
-    async (o) => {
-      return prisma.castCredit.update({
-        where: { creditId: o.creditId },
-        data: o,
-      });
-    },
-  );
+    const updateOne = async (o: Prisma.CastCreditUncheckedCreateInput) => {
+      try {
+        const where = { creditId: o.creditId };
+        prisma.castCredit.update({ where, data: o });
+      } catch (e) {
+        logger.error(e);
+      }
+    };
 
-  logger.info('castCredit', {
-    remote: remoteCastCredits.length,
-    unchanged: (existingCastCredits.length = updateCastCredits.length),
-    created: castCreditCreateResult.count,
-    updated: updateCastCredits.length,
-  });
+    await Bluebird.map(updateCastCredits, updateOne, options);
+
+    logger.info('castCredit', {
+      remote: remoteCastCredits.length,
+      unchanged: existingCastCredits.length - updateCastCredits.length,
+      created: castCreditCreateResult.count,
+      updated: updateCastCredits.length,
+    });
+  } catch (e) {
+    logger.error(e);
+  }
 };
 
 const updateCrewCredits = async (
@@ -349,19 +351,20 @@ const updateCrewCredits = async (
     data: newCrewCredits,
   });
 
-  const crewCreditUpdateResults = await Promise.map(
-    updateCrewCredits,
-    async (o) => {
-      return prisma.crewCredit.update({
-        where: { creditId: o.creditId },
-        data: o,
-      });
-    },
-  );
+  const updateOne = async (o: Prisma.CrewCreditUncheckedCreateInput) => {
+    try {
+      const where = { creditId: o.creditId };
+      prisma.crewCredit.update({ where, data: o });
+    } catch (e) {
+      logger.error(e);
+    }
+  };
+
+  await Bluebird.map(updateCrewCredits, updateOne, options);
 
   logger.info('crewCredit', {
     remote: remoteCrewCredits.length,
-    unchanged: (existingCrewCredits.length = updateCrewCredits.length),
+    unchanged: existingCrewCredits.length - updateCrewCredits.length,
     created: crewCreditCreateResult.count,
     updated: updateCrewCredits.length,
   });
@@ -414,25 +417,28 @@ const updateMovieWatchProviders = async (
       data: newMovieWatchProviders,
     });
 
-  const movieWatchProviderUpdateResults = await Promise.map(
-    updateMovieWatchProviders,
-    async (o) => {
-      return prisma.movieWatchProvider.update({
-        where: {
-          movieId_watchProviderId: {
-            movieId: o.movieId,
-            watchProviderId: o.watchProviderId,
-          },
+  const updateOne = async (
+    o: Prisma.MovieWatchProviderUncheckedCreateInput,
+  ) => {
+    try {
+      const where = {
+        movieId_watchProviderId: {
+          movieId: o.movieId,
+          watchProviderId: o.watchProviderId,
         },
-        data: o,
-      });
-    },
-  );
+      };
+      prisma.movieWatchProvider.update({ where, data: o });
+    } catch (e) {
+      logger.error(e);
+    }
+  };
+
+  await Bluebird.map(updateMovieWatchProviders, updateOne, options);
 
   logger.info('movieWatchProvider', {
     remote: remoteMovieWatchProviders.length,
-    unchanged: (existingMovieWatchProviders.length =
-      updateMovieWatchProviders.length),
+    unchanged:
+      existingMovieWatchProviders.length - updateMovieWatchProviders.length,
     created: movieWatchProviderCreateResult.count,
     updated: updateMovieWatchProviders.length,
   });
