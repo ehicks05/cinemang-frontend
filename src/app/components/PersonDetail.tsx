@@ -8,14 +8,24 @@ import { useTitle } from 'react-use';
 import { Person } from '../../types';
 import { useAtom } from 'jotai';
 import { systemDataAtom } from '../../atoms';
-import { truncate } from 'lodash';
+import { orderBy, truncate } from 'lodash';
 import { usePalette } from '../hooks/usePalette';
 import BirthAndDeath from './BirthAndDeath';
 import PersonCredit from './PersonCredit';
+import Stat from './Stat';
+import { FaCalendar, FaHeart, FaStar } from 'react-icons/fa';
+import { IconType } from 'react-icons';
 
 const BIO_LENGTH_CUTOFF = 1280;
 
 const nf = Intl.NumberFormat('en-US', { maximumFractionDigits: 1 });
+
+type SortKey = 'released_at' | 'vote_average' | 'vote_count';
+const SORT_OPTIONS: { color: string; icon: IconType; sort: SortKey }[] = [
+  { color: 'text-sky-500', icon: FaCalendar, sort: 'released_at' },
+  { color: 'text-red-600', icon: FaHeart, sort: 'vote_average' },
+  { color: 'text-yellow-300', icon: FaStar, sort: 'vote_count' },
+];
 
 const PersonDetail = ({ person }: { person: Person }) => {
   const [{ genres, languages }] = useAtom(systemDataAtom);
@@ -24,6 +34,10 @@ const PersonDetail = ({ person }: { person: Person }) => {
     path: person.profile_path,
     width: 'original',
   });
+
+  const [sort, setSort] = useState<SortKey>('released_at');
+
+  const castCredits = orderBy(person.cast_credit, (o) => o.movie[sort], 'desc');
 
   const [truncateBio, setTruncateBio] = useState(true);
   const bio = truncateBio
@@ -76,19 +90,28 @@ const PersonDetail = ({ person }: { person: Person }) => {
         </div>
       </div>
 
-      {person.cast_credit
-        .sort((c1, c2) =>
-          c2.movie.released_at.localeCompare(c1.movie.released_at),
-        )
-        .map((c) => (
-          <PersonCredit
-            bgColor={palette.darkVibrant}
-            credit={c}
-            genres={genres}
-            key={c.credit_id}
-            languages={languages}
-          />
-        ))}
+      <div className="flex justify-end gap-2">
+        {SORT_OPTIONS.map((o) => {
+          return (
+            <button key={o.sort} onClick={() => setSort(o.sort)}>
+              <Stat
+                bgColor={palette.darkVibrant}
+                color={sort === o.sort ? o.color : ''}
+                icon={o.icon}
+              />
+            </button>
+          );
+        })}
+      </div>
+      {castCredits.map((c) => (
+        <PersonCredit
+          bgColor={palette.darkVibrant}
+          credit={c}
+          genres={genres}
+          key={c.credit_id}
+          languages={languages}
+        />
+      ))}
       {person.crew_credit
         .sort((c1, c2) =>
           c2.movie.released_at.localeCompare(c1.movie.released_at),
