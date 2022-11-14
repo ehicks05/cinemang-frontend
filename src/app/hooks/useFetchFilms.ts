@@ -21,16 +21,33 @@ const idQuery = async (
   form: DecodedValueMap<QueryParamConfigMap>,
   page: number,
 ) => {
+  let castPersonIds;
+  if (form.castCreditName.length > 2) {
+    const query = supabase
+      .from('person')
+      .select('id')
+      .ilike('name', `%${form.castCreditName}%`);
+    castPersonIds = (await query).data?.map((o) => o.id);
+  }
+  let crewPersonIds;
+  if (form.crewCreditName.length > 2) {
+    const query = supabase
+      .from('person')
+      .select('id')
+      .ilike('name', `%${form.crewCreditName}%`);
+    crewPersonIds = (await query).data?.map((o) => o.id);
+  }
+
   const select = `id${
     form.watchProviders.length > 0 ? ', wp: watch_provider!inner(id)' : ''
   }${
     form.castCreditName.length > 0
-      ? ', cast_credit: cast_credit!inner(person!inner(name))'
+      ? ', cast_credit: cast_credit!inner(personId)'
       : ''
   }
   ${
     form.crewCreditName.length > 0
-      ? ', crew_credit: crew_credit!inner(person!inner(name))'
+      ? ', crew_credit: crew_credit!inner(personId)'
       : ''
   }`;
   const query = supabase.from('movie').select(select, { count: 'exact' });
@@ -70,11 +87,11 @@ const idQuery = async (
     query.in('wp.id', form.watchProviders);
   }
 
-  if (form.castCreditName.length > 0) {
-    query.ilike('cast_credit.person.name', `%${form.castCreditName}%`);
+  if ((castPersonIds || []).length > 0) {
+    query.in('cast_credit.personId', castPersonIds || []);
   }
-  if (form.crewCreditName.length > 0) {
-    query.ilike('crew_credit.person.name', `%${form.crewCreditName}%`);
+  if ((crewPersonIds || []).length > 0) {
+    query.in('crew_credit.personId', crewPersonIds || []);
   }
 
   query
