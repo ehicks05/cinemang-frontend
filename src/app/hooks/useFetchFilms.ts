@@ -33,20 +33,37 @@ const idQuery = async (
       ? ', crew_credit: crew_credit!inner(person!inner(name))'
       : ''
   }`;
-  const query = supabase
-    .from('movie')
-    .select(select, { count: 'exact' })
-    .ilike('title', `%${form.title || ''}%`)
-    .gte('vote_count', form.minVotes || 0)
-    .lte('vote_count', form.maxVotes || 100_000_000)
-    .gte('vote_average', form.minRating || 0)
-    .lte('vote_average', form.maxRating || 10)
-    .gte('released_at', form.minReleasedAt || '1870-01-01')
-    .lte('released_at', form.maxReleasedAt || new Date().toLocaleDateString())
-    .like('language_id', form.language || '*');
+  const query = supabase.from('movie').select(select, { count: 'exact' });
+
+  if (form.title) {
+    query.ilike('title', `%${form.title}%`);
+  }
+
+  if (form.minVotes !== 0) {
+    query.gte('vote_count', form.minVotes);
+  }
+  if (form.maxVotes !== 100_000_0000) {
+    query.lte('vote_count', form.maxVotes);
+  }
+  if (form.minRating !== 0) {
+    query.gte('vote_average', form.minRating);
+  }
+  if (form.maxRating !== 10) {
+    query.lte('vote_average', form.maxRating);
+  }
+
+  if (form.minReleasedAt) {
+    query.gte('released_at', form.minReleasedAt);
+  }
+  if (form.maxReleasedAt) {
+    query.lte('released_at', form.maxReleasedAt);
+  }
 
   if (form.genre) {
-    query.eq('genre_id', form.genre || '*');
+    query.eq('genre_id', form.genre);
+  }
+  if (form.language) {
+    query.like('language_id', form.language);
   }
 
   if (form.watchProviders.length > 0) {
