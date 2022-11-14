@@ -15,7 +15,7 @@ const Credits = ({ film, palette }: Props) => {
 
   return (
     <>
-      <h1 className="font-bold">cast</h1>
+      <h1 className="text-xl font-bold">cast</h1>
       <div className="grid grid-cols-2 justify-center gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5">
         {film.cast_credit
           .sort((c1, c2) => c1.order - c2.order)
@@ -31,7 +31,7 @@ const Credits = ({ film, palette }: Props) => {
             />
           ))}
       </div>
-      <h1 className="font-bold">crew</h1>
+      <h1 className="text-xl font-bold">crew</h1>
       <div className="grid grid-cols-2 justify-center gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5">
         {Object.values(grouped)
           .sort((c1, c2) => c2[0].person.popularity - c1[0].person.popularity)

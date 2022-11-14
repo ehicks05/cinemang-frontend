@@ -20,7 +20,7 @@ const BirthAndDeath = ({ person, palette }: Props) => {
     >
       {person.birthday && (
         <div>
-          <div className="font-bold">Born</div>
+          <div className="font-semibold">Born</div>
           <div>
             {person.birthday} {!person.deathday && `(${age.years})`}
           </div>
@@ -29,7 +29,7 @@ const BirthAndDeath = ({ person, palette }: Props) => {
       )}
       {person.deathday && (
         <div>
-          <div className="font-bold">Died</div>
+          <div className="font-semibold">Died</div>
           <div>
             {person.deathday} ({age.years})
           </div>

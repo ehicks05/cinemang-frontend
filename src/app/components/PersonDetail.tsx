@@ -87,7 +87,7 @@ const PersonDetail = ({ person }: { person: Person }) => {
           </div>
         </div>
         <div className="flex flex-col gap-1">
-          <div className="text-lg font-bold">{person.name}</div>
+          <div className="text-2xl font-semibold">{person.name}</div>
           <div
             className={`flex ${
               person.biography.length > BIO_LENGTH_CUTOFF
@@ -119,28 +119,38 @@ const PersonDetail = ({ person }: { person: Person }) => {
           );
         })}
       </div>
-      {castCredits.map((c) => (
-        <PersonCredit
-          bgColor={palette.darkVibrant}
-          credit={c}
-          genres={genres}
-          key={c.credit_id}
-          languages={languages}
-        />
-      ))}
-      {person.crew_credit
-        .sort((c1, c2) =>
-          c2.movie.released_at.localeCompare(c1.movie.released_at),
-        )
-        .map((c) => (
-          <PersonCredit
-            bgColor={palette.darkVibrant}
-            credit={c}
-            genres={genres}
-            key={c.credit_id}
-            languages={languages}
-          />
-        ))}
+      {person.cast_credit.length !== 0 && (
+        <>
+          <h1 className="text-xl font-bold">Cast</h1>
+          {castCredits.map((c) => (
+            <PersonCredit
+              bgColor={palette.darkVibrant}
+              credit={c}
+              genres={genres}
+              key={c.credit_id}
+              languages={languages}
+            />
+          ))}
+        </>
+      )}
+      {person.crew_credit.length !== 0 && (
+        <>
+          <h1 className="text-xl font-bold">Crew</h1>
+          {person.crew_credit
+            .sort((c1, c2) =>
+              c2.movie.released_at.localeCompare(c1.movie.released_at),
+            )
+            .map((c) => (
+              <PersonCredit
+                bgColor={palette.darkVibrant}
+                credit={c}
+                genres={genres}
+                key={c.credit_id}
+                languages={languages}
+              />
+            ))}
+        </>
+      )}
     </div>
   );
 };

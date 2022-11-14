@@ -47,7 +47,7 @@ const FilmDetail = ({ film }: { film: IFilm }) => {
         </div>
         <div className="flex flex-col gap-1">
           <div>
-            <span className="text-lg font-bold">{film.title}</span>{' '}
+            <span className="text-2xl font-semibold">{film.title}</span>{' '}
             <span className="text-xs text-gray-300" title={film.released_at}>
               <span className="font-semibold"> {year} </span>
               <span className="whitespace-nowrap">{`${runtime.hours}h ${runtime.minutes}m`}</span>
@@ -70,12 +70,12 @@ const FilmDetail = ({ film }: { film: IFilm }) => {
         </div>
       </div>
 
-      <div>
-        <h1 className="font-bold">trailers</h1>
+      <div className="flex flex-col gap-4">
+        <h1 className="text-xl font-bold">trailers</h1>
         <Trailers movieId={film.id} palette={palette} />
       </div>
-      <div>
-        <h1 className="font-bold">more like this</h1>
+      <div className="flex flex-col gap-4">
+        <h1 className="text-xl font-bold">more like this</h1>
         TODO
       </div>
       <Credits film={film} palette={palette} />
