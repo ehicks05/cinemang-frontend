@@ -26,7 +26,9 @@ const idQuery = async (
     const query = supabase
       .from('person')
       .select('id')
-      .ilike('name', `%${form.castCreditName}%`);
+      .ilike('name', `%${form.castCreditName}%`)
+      .order('popularity', { ascending: false })
+      .range(0, 100);
     castPersonIds = (await query).data?.map((o) => o.id);
   }
   let crewPersonIds;
@@ -34,7 +36,9 @@ const idQuery = async (
     const query = supabase
       .from('person')
       .select('id')
-      .ilike('name', `%${form.crewCreditName}%`);
+      .ilike('name', `%${form.crewCreditName}%`)
+      .order('popularity', { ascending: false })
+      .range(0, 100);
     crewPersonIds = (await query).data?.map((o) => o.id);
   }
 
