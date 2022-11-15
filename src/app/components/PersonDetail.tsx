@@ -106,7 +106,10 @@ const PersonDetail = ({ person }: { person: Person }) => {
         </div>
       </div>
 
-      <div className="flex justify-end gap-2">
+      <div
+        className="flex w-fit gap-2 self-end rounded border p-2"
+        style={{ borderColor: palette.darkVibrant }}
+      >
         {SORT_OPTIONS.map((o) => {
           return (
             <button key={o.sort} onClick={() => setSort(o.sort)}>
