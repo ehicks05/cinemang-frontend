@@ -1,13 +1,16 @@
 import { format, subDays } from 'date-fns';
 import { intersection } from 'lodash';
 import logger from '../logger';
-import { RESOURCES } from './constants';
+import { RecentChangeCompatibleResource, RESOURCES } from './constants';
 import tmdb from './tmdb';
-import { ResourceKey } from './types';
 import { RecentChangesResponse } from './types/responses';
 import { getValidIds } from './valid_ids';
 
-const getRecentlyChangedIds = async (resource: ResourceKey) => {
+const getRecentlyChangedIds = async (
+  resource: RecentChangeCompatibleResource,
+) => {
+  if (!['MOVIE', 'PERSON'].includes(resource)) return;
+
   const path = RESOURCES[resource].RECENTLY_CHANGED_PATH;
   const url = `/${path}/changes`;
   const start_date = format(subDays(new Date(), 1), 'yyyy-MM-dd');
@@ -21,7 +24,9 @@ const getRecentlyChangedIds = async (resource: ResourceKey) => {
   return [];
 };
 
-export const getRecentlyChangedValidIds = async (resource: ResourceKey) => {
+export const getRecentlyChangedValidIds = async (
+  resource: RecentChangeCompatibleResource,
+) => {
   try {
     const [recentlyChangedIds, validIds] = await Promise.all([
       getRecentlyChangedIds(resource),
