@@ -28,12 +28,42 @@ model Movie {
   crewCredits    CrewCredit[]
   watchProviders MovieWatchProvider[]
 
-  @@index([title])
   @@index([languageId])
   @@index([releasedAt])
+  @@index([title])
   @@index([voteAverage])
   @@index([voteCount])
   @@map("movie")
+}
+
+model TvSeries {
+  id            Int      @id
+  cast          String
+  contentRating String?  @map("content_rating")
+  createdBy     String   @map("created_by")
+  firstAirDate  DateTime @map("first_air_date") @db.Date
+  genreId       Int      @map("genre_id")
+  languageId    String   @map("language_id")
+  lastAirDate   DateTime @map("last_air_date") @db.Date
+  name          String
+  overview      String
+  popularity    Float
+  posterPath    String   @map("poster_path")
+  status        String
+  voteAverage   Float    @map("vote_average")
+  voteCount     Int      @map("vote_count")
+
+  // castCredits    CastCredit[]
+  // crewCredits    CrewCredit[]
+  // watchProviders MovieWatchProvider[]
+
+  @@index([firstAirDate])
+  @@index([languageId])
+  @@index([lastAirDate])
+  @@index([name])
+  @@index([voteAverage])
+  @@index([voteCount])
+  @@map("tv_series")
 }
 
 model Person {
@@ -122,6 +152,31 @@ model MovieWatchProvider {
 
   @@id([movieId, watchProviderId])
   @@map("movie_watch_provider")
+}
+
+model Company {
+  id            Int     @id
+  description   String
+  headquarters  String
+  homepage      String
+  logoPath      String? @map("logo_path")
+  name          String
+  originCountry String  @map("origin_country")
+  parentCompany String? @map("parent_company")
+
+  @@map("company")
+}
+
+model TvNetwork {
+  id            Int     @id
+  headquarters  String
+  homepage      String
+  logoPath      String? @map("logo_path")
+  name          String
+  originCountry String  @map("origin_country")
+  parentCompany String? @map("parent_company")
+
+  @@map("tv_network")
 }
 
 model MovieApiResponse {
