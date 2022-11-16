@@ -34,6 +34,8 @@ export type Credit = CastCredit | CrewCredit;
 
 export interface AppendedImage {
   aspect_ratio: number;
+  file_path: string;
+  file_type?: '.svg' | '.png';
   height: number;
   iso_639_1?: string;
   vote_average: number;
