@@ -36,6 +36,12 @@ model Movie {
   @@map("movie")
 }
 
+model IgnoredMovie {
+  id Int @id
+
+  @@map("ignored_movie")
+}
+
 model TvSeries {
   id            Int      @id
   cast          String
