@@ -1,19 +1,20 @@
-import React, { useState } from 'react';
-import { useParams } from 'react-router-dom';
-import { useTitle } from 'react-use';
 import { useAtom } from 'jotai';
 import { orderBy, truncate } from 'lodash';
-import { FaCalendar, FaHeart, FaStar } from 'react-icons/fa';
+import React, { useState } from 'react';
 import { IconType } from 'react-icons';
-import { Loading } from '../../core-components';
-import { useFetchPerson } from '../hooks/useFetchPersons';
-import { getTmdbImage } from '../../utils';
-import PersonStats from './PersonStats';
-import { Person } from '../../types';
+import { FaCalendar, FaHeart, FaStar } from 'react-icons/fa';
+import { useParams } from 'react-router-dom';
+import { useTitle } from 'react-use';
+
 import { systemDataAtom } from '../../atoms';
+import { Loading } from '../../core-components';
+import { Person } from '../../types';
+import { getTmdbImage } from '../../utils';
+import { useFetchPerson } from '../hooks/useFetchPersons';
 import { Palette, usePalette } from '../hooks/usePalette';
 import BirthAndDeath from './BirthAndDeath';
 import PersonCredit from './PersonCredit';
+import PersonStats from './PersonStats';
 import Stat from './Stat';
 
 const BIO_LENGTH_CUTOFF = 1280;
