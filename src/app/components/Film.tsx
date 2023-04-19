@@ -56,7 +56,11 @@ const Film = ({ film, palette }: { film: IFilm; palette: Palette }) => {
           )}
         </div>
       </div>
-      <div className="flex h-full flex-col justify-between gap-4">
+      <div className="flex h-full flex-col justify-start gap-4">
+        <FilmStats
+          bgColor={palette.darkVibrant}
+          data={toStats(genres, languages, film)}
+        />
         <div
           className="text-justify text-sm"
           onClick={() => setTruncateOverview(!truncateOverview)}
@@ -66,10 +70,6 @@ const Film = ({ film, palette }: { film: IFilm; palette: Palette }) => {
             separator: ' ',
           })}
         </div>
-        <FilmStats
-          bgColor={palette.darkVibrant}
-          data={toStats(genres, languages, film)}
-        />
       </div>
     </div>
   );

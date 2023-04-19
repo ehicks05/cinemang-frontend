@@ -1,20 +1,20 @@
 import React, { useState } from 'react';
+import { useParams } from 'react-router-dom';
+import { useTitle } from 'react-use';
+import { useAtom } from 'jotai';
+import { orderBy, truncate } from 'lodash';
+import { FaCalendar, FaHeart, FaStar } from 'react-icons/fa';
+import { IconType } from 'react-icons';
 import { Loading } from '../../core-components';
 import { useFetchPerson } from '../hooks/useFetchPersons';
-import { useParams } from 'react-router-dom';
 import { getTmdbImage } from '../../utils';
 import PersonStats from './PersonStats';
-import { useTitle } from 'react-use';
 import { Person } from '../../types';
-import { useAtom } from 'jotai';
 import { systemDataAtom } from '../../atoms';
-import { orderBy, truncate } from 'lodash';
 import { Palette, usePalette } from '../hooks/usePalette';
 import BirthAndDeath from './BirthAndDeath';
 import PersonCredit from './PersonCredit';
 import Stat from './Stat';
-import { FaCalendar, FaHeart, FaStar } from 'react-icons/fa';
-import { IconType } from 'react-icons';
 
 const BIO_LENGTH_CUTOFF = 1280;
 
@@ -40,12 +40,37 @@ const StatsAndLifespan = ({
     popularity: nf.format(person.popularity),
   };
   return (
-    <div className={`mt-4 flex w-full flex-col justify-between gap-4`}>
+    <div className="mt-4 flex w-full flex-col justify-between gap-4">
       <PersonStats bgColor={palette.darkVibrant || ''} data={statData} />
       <BirthAndDeath palette={palette} person={person} />
     </div>
   );
 };
+
+const SortOptions = ({
+  darkVibrant,
+  setSort,
+  sort,
+}: {
+  darkVibrant: string;
+  setSort: React.Dispatch<React.SetStateAction<SortKey>>;
+  sort: SortKey;
+}) => (
+  <div
+    className="flex w-fit gap-2 self-end rounded p-2"
+    style={{ borderColor: darkVibrant }}
+  >
+    {SORT_OPTIONS.map(o => (
+      <button key={o.sort} onClick={() => setSort(o.sort)}>
+        <Stat
+          bgColor={darkVibrant}
+          color={sort === o.sort ? o.color : ''}
+          icon={o.icon}
+        />
+      </button>
+    ))}
+  </div>
+);
 
 const PersonDetail = ({ person }: { person: Person }) => {
   const [{ genres, languages }] = useAtom(systemDataAtom);
@@ -57,7 +82,7 @@ const PersonDetail = ({ person }: { person: Person }) => {
 
   const [sort, setSort] = useState<SortKey>('released_at');
 
-  const castCredits = orderBy(person.cast_credit, (o) => o.movie[sort], 'desc');
+  const castCredits = orderBy(person.cast_credit, o => o.movie[sort], 'desc');
 
   const [truncateBio, setTruncateBio] = useState(true);
   const bio = truncateBio
@@ -90,13 +115,11 @@ const PersonDetail = ({ person }: { person: Person }) => {
           <div className="text-2xl font-semibold">{person.name}</div>
           <div
             className={`flex ${
-              person.biography.length > BIO_LENGTH_CUTOFF
-                ? 'cursor-pointer'
-                : ''
+              person.biography.length > BIO_LENGTH_CUTOFF ? 'cursor-pointer' : ''
             } flex-col gap-2 text-justify`}
             onClick={() => setTruncateBio(!truncateBio)}
           >
-            {bio.split('\n').map((b) => (
+            {bio.split('\n').map(b => (
               <div key={b}>{b}</div>
             ))}
           </div>
@@ -106,26 +129,18 @@ const PersonDetail = ({ person }: { person: Person }) => {
         </div>
       </div>
 
-      <div
-        className="flex w-fit gap-2 self-end rounded border p-2"
-        style={{ borderColor: palette.darkVibrant }}
-      >
-        {SORT_OPTIONS.map((o) => {
-          return (
-            <button key={o.sort} onClick={() => setSort(o.sort)}>
-              <Stat
-                bgColor={palette.darkVibrant}
-                color={sort === o.sort ? o.color : ''}
-                icon={o.icon}
-              />
-            </button>
-          );
-        })}
-      </div>
       {person.cast_credit.length !== 0 && (
         <>
-          <h1 className="text-xl font-bold">Cast</h1>
-          {castCredits.map((c) => (
+          <h1 className="flex items-end justify-between text-xl font-bold">
+            Cast
+            <SortOptions
+              darkVibrant={palette.darkVibrant}
+              setSort={setSort}
+              sort={sort}
+            />
+          </h1>
+
+          {castCredits.map(c => (
             <PersonCredit
               bgColor={palette.darkVibrant}
               credit={c}
@@ -138,12 +153,19 @@ const PersonDetail = ({ person }: { person: Person }) => {
       )}
       {person.crew_credit.length !== 0 && (
         <>
-          <h1 className="text-xl font-bold">Crew</h1>
+          <h1 className="flex items-center justify-between text-xl font-bold">
+            crew
+            <SortOptions
+              darkVibrant={palette.darkVibrant}
+              setSort={setSort}
+              sort={sort}
+            />
+          </h1>
           {person.crew_credit
             .sort((c1, c2) =>
               c2.movie.released_at.localeCompare(c1.movie.released_at),
             )
-            .map((c) => (
+            .map(c => (
               <PersonCredit
                 bgColor={palette.darkVibrant}
                 credit={c}
@@ -165,7 +187,7 @@ const PersonDetailWrapper = () => {
 
   if (error || isLoading) return <Loading error={error} loading={isLoading} />;
   if (!person) {
-    return <Loading error={'person not found'} loading={isLoading} />;
+    return <Loading error="person not found" loading={isLoading} />;
   }
 
   return <PersonDetail person={person} />;

@@ -14,10 +14,7 @@ const BirthAndDeath = ({ person, palette }: Props) => {
   });
 
   return person.birthday || person.deathday ? (
-    <div
-      className="rounded border p-2"
-      style={{ borderColor: palette.darkVibrant }}
-    >
+    <div className="border-l-4 pl-2" style={{ borderColor: palette.darkVibrant }}>
       {person.birthday && (
         <div>
           <div className="font-semibold">Born</div>
