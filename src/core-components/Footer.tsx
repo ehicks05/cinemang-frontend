@@ -17,29 +17,20 @@ const LINKS = [
   },
 ];
 
-const Footer = () => {
-  return (
-    <footer className="flex justify-end gap-4 p-4">
-      {LINKS.map(({ url, icon: Icon }) => {
-        return (
-          <Link href={url} key={url}>
-            <Icon className="text-3xl text-green-500 hover:text-green-400" />
-          </Link>
-        );
-      })}
-    </footer>
-  );
-};
+const Footer = () => (
+  <footer className="flex justify-end gap-4 p-4">
+    {LINKS.map(({ url, icon: Icon }) => (
+      <Link href={url} key={url}>
+        <Icon className="text-3xl text-green-500 hover:text-green-400" />
+      </Link>
+    ))}
+  </footer>
+);
 
-const Link: FC<{ children: ReactNode; href: string }> = ({
-  href,
-  children,
-}) => {
-  return (
-    <a href={href} rel="noreferrer" target="_blank">
-      {children}
-    </a>
-  );
-};
+const Link: FC<{ children: ReactNode; href: string }> = ({ href, children }) => (
+  <a href={href} rel="noreferrer" target="_blank">
+    {children}
+  </a>
+);
 
 export default React.memo(Footer);

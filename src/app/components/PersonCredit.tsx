@@ -2,10 +2,10 @@ import React from 'react';
 import { parseISO, format } from 'date-fns';
 import { Link } from 'react-router-dom';
 import { useWindowSize } from 'react-use';
+import { pick } from 'lodash';
 import { CastCredit, CrewCredit, Genre, Language } from '../../types';
 import FilmStats from './FilmStats';
 import { toStats } from './utils';
-import { pick } from 'lodash';
 
 interface Props {
   bgColor: string;

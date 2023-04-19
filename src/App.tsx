@@ -1,10 +1,10 @@
 import React, { useEffect } from 'react';
 import { Route, Routes } from 'react-router-dom';
 
+import { useAtom } from 'jotai';
 import { Header, Footer, Loading } from './core-components';
 import { Home } from './app/index';
 import { FilmDetail, PersonDetail } from './app/components';
-import { useAtom } from 'jotai';
 import { useFetchSystemData } from './app/hooks/useFetchSystemData';
 import { systemDataAtom } from './atoms';
 
@@ -19,7 +19,7 @@ function App() {
 
   if (error || isLoading) return <Loading error={error} loading={isLoading} />;
   if (!data) {
-    return <Loading error={'systemData is undefined'} loading={isLoading} />;
+    return <Loading error="systemData is undefined" loading={isLoading} />;
   }
   const { genres, languages, watchProviders } = data;
 
@@ -31,9 +31,9 @@ function App() {
       <Header />
       <div className="flex h-full flex-grow flex-col p-4 pt-0">
         <Routes>
-          <Route element={<Home />} path={'/'} />
-          <Route element={<FilmDetail />} path={'/films/:id'} />
-          <Route element={<PersonDetail />} path={'/people/:id'} />
+          <Route element={<Home />} path="/" />
+          <Route element={<FilmDetail />} path="/films/:id" />
+          <Route element={<PersonDetail />} path="/people/:id" />
         </Routes>
       </div>
       <Footer />

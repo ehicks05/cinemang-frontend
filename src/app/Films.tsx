@@ -1,11 +1,11 @@
 import React, { useMemo, useState } from 'react';
+import { useQueryParams } from 'use-query-params';
+import { useTitle, useWindowSize } from 'react-use';
 import { Loading } from '../core-components';
 import { Film as IFilm } from '../types';
 import { Film, FilmSkeleton, Paginator } from './components';
 import { useSearchFilms } from './hooks/useFetchFilms';
-import { useQueryParams } from 'use-query-params';
 import { getTmdbImage } from '../utils';
-import { useTitle, useWindowSize } from 'react-use';
 import { DEFAULT_PALETTE, Palette, toPalette } from './hooks/usePalette';
 
 const Films = ({ films }: { films: IFilm[] }) => {
@@ -18,17 +18,14 @@ const Films = ({ films }: { films: IFilm[] }) => {
     const doIt = async () => {
       setLoading(true);
       const palettes = await Promise.all(
-        films.map(async (film) => {
+        films.map(async film => {
           const url = getTmdbImage({ bustCache: true, path: film.poster_path });
           const palette = await toPalette(url);
           return { id: film.id, palette };
         }),
       );
       setPalettes(
-        palettes.reduce(
-          (agg, curr) => ({ ...agg, [curr.id]: curr.palette }),
-          {},
-        ),
+        palettes.reduce((agg, curr) => ({ ...agg, [curr.id]: curr.palette }), {}),
       );
       setLoading(false);
     };
@@ -41,25 +38,20 @@ const Films = ({ films }: { films: IFilm[] }) => {
 
   return (
     <div
-      className={`grid gap-4`}
+      className="grid gap-4"
       style={{
         gridTemplateColumns: `repeat( auto-fill, minmax(${minColumnWidth}px, 1fr) )`,
       }}
     >
-      {loading &&
-        films.map((film) => {
-          return <FilmSkeleton key={film.id} />;
-        })}
+      {loading && films.map(film => <FilmSkeleton key={film.id} />)}
       {!loading &&
-        films.map((film) => {
-          return (
-            <Film
-              film={film}
-              key={film.id}
-              palette={palettes?.[film.id] || DEFAULT_PALETTE}
-            />
-          );
-        })}
+        films.map(film => (
+          <Film
+            film={film}
+            key={film.id}
+            palette={palettes?.[film.id] || DEFAULT_PALETTE}
+          />
+        ))}
     </div>
   );
 };

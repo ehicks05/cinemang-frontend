@@ -1,11 +1,7 @@
 import { Fragment, useState } from 'react';
 import { Combobox } from '@headlessui/react';
 import { HiCheck, HiChevronDown, HiChevronUp } from 'react-icons/hi';
-import {
-  SetQuery,
-  QueryParamConfigMap,
-  DecodedValueMap,
-} from 'use-query-params';
+import { SetQuery, QueryParamConfigMap, DecodedValueMap } from 'use-query-params';
 
 type Id = string | number;
 
@@ -41,9 +37,9 @@ const ComboBox = <T,>({
   const filteredOptions =
     query === ''
       ? parsedOptions
-      : parsedOptions.filter(({ label }) => {
-          return label.toLowerCase().includes(query.toLowerCase());
-        });
+      : parsedOptions.filter(({ label }) =>
+          label.toLowerCase().includes(query.toLowerCase()),
+        );
 
   const handleChange = (values: Id[]) => {
     onChange({ ...form, [formKey]: values });
@@ -54,22 +50,18 @@ const ComboBox = <T,>({
       <Combobox
         defaultValue={selectedOptionIds}
         multiple
-        onChange={(values) => handleChange(values)}
+        onChange={values => handleChange(values)}
       >
         <Combobox.Input
-          className={'w-full bg-gray-700'}
-          onChange={(event) => setQuery(event.target.value)}
+          className="w-full bg-gray-700"
+          onChange={event => setQuery(event.target.value)}
         />
-        <Combobox.Button
-          className={'absolute right-2 top-1.5 flex w-4 flex-col'}
-        >
+        <Combobox.Button className="absolute right-2 top-1.5 flex w-4 flex-col">
           <HiChevronUp />
           <HiChevronDown />
         </Combobox.Button>
-        <Combobox.Options
-          className={'absolute flex w-full flex-col bg-gray-700'}
-        >
-          {filteredOptions.map((option) => (
+        <Combobox.Options className="absolute flex w-full flex-col bg-gray-700">
+          {filteredOptions.map(option => (
             <Combobox.Option as={Fragment} key={option.id} value={option.id}>
               {({ active, selected }) => (
                 <li
@@ -80,9 +72,7 @@ const ComboBox = <T,>({
                   <div className="flex items-center gap-2">
                     <img
                       alt="logo"
-                      className={`h-6 w-6 rounded ${
-                        !selected ? 'opacity-50' : ''
-                      }`}
+                      className={`h-6 w-6 rounded ${!selected ? 'opacity-50' : ''}`}
                       src={option.imageUrl}
                     />
                     <span className={selected ? 'font-bold' : ''}>

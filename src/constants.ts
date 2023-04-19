@@ -53,7 +53,4 @@ export const SCALED_IMAGE = {
   w: IMAGE_WIDTH / 2,
 };
 
-export const GENRE_NAMES = { 'Science Fiction': 'Sci-Fi' } as Record<
-  string,
-  string
->;
+export const GENRE_NAMES = { 'Science Fiction': 'Sci-Fi' } as Record<string, string>;

@@ -33,11 +33,7 @@ export const toPalette = async (url: string) => {
     'rgb(38,38,38)',
     0.7,
   );
-  const muted = chroma.mix(
-    p.DarkVibrant?.getHex() || '#333',
-    'rgb(38,38,38)',
-    0.95,
-  );
+  const muted = chroma.mix(p.DarkVibrant?.getHex() || '#333', 'rgb(38,38,38)', 0.95);
   const bgStyles = {
     background: `linear-gradient(45deg, ${muted} 5%, ${muted} 45%, ${lessMuted} 95%)`,
   };

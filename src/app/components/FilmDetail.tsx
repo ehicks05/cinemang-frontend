@@ -1,18 +1,18 @@
 import React from 'react';
-import { Loading } from '../../core-components';
 import { addMinutes, intervalToDuration, parseISO, format } from 'date-fns';
+import { useParams } from 'react-router-dom';
+import { useAtom } from 'jotai';
+import { useTitle } from 'react-use';
+import { Loading } from '../../core-components';
 import { usePalette } from '../hooks/usePalette';
 import FilmStats from './FilmStats';
 import WatchProviders from './WatchProviders';
 import { Film as IFilm } from '../../types';
 import { useFetchFilm } from '../hooks/useFetchFilms';
-import { useParams } from 'react-router-dom';
 import Trailers from './Trailers';
 import Credits from './Credits';
-import { useAtom } from 'jotai';
 import { systemDataAtom } from '../../atoms';
 import { getTmdbImage } from '../../utils';
-import { useTitle } from 'react-use';
 import { toStats } from './utils';
 
 const FilmDetail = ({ film }: { film: IFilm }) => {
@@ -39,11 +39,7 @@ const FilmDetail = ({ film }: { film: IFilm }) => {
     >
       <div className="flex flex-col gap-4 sm:flex-row">
         <div className="flex-shrink-0">
-          <img
-            alt="poster"
-            className="rounded-lg sm:h-96 sm:w-64"
-            src={posterUrl}
-          />
+          <img alt="poster" className="rounded-lg sm:h-96 sm:w-64" src={posterUrl} />
         </div>
         <div className="flex flex-col gap-1">
           <div>
@@ -90,7 +86,7 @@ const FilmDetailWrapper = () => {
 
   if (error || isLoading) return <Loading error={error} loading={isLoading} />;
   if (!film) {
-    return <Loading error={'films are not defined'} loading={isLoading} />;
+    return <Loading error="films are not defined" loading={isLoading} />;
   }
 
   return <FilmDetail film={film} />;

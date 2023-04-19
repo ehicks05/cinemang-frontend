@@ -42,8 +42,7 @@ export interface SystemData {
   watchProviders: WatchProvider[];
 }
 
-export const useFetchSystemData = () => {
-  return useQuery<SystemData, Error>(['systemData'], fetchData, {
+export const useFetchSystemData = () =>
+  useQuery<SystemData, Error>(['systemData'], fetchData, {
     keepPreviousData: true,
   });
-};

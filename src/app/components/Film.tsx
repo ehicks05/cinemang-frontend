@@ -1,12 +1,12 @@
 import React, { useState } from 'react';
 import { addMinutes, intervalToDuration, parseISO, format } from 'date-fns';
 import { truncate } from 'lodash';
+import { Link } from 'react-router-dom';
+import { useAtom } from 'jotai';
 import FilmStats from './FilmStats';
 import WatchProviders from './WatchProviders';
 import { Film as IFilm } from '../../types';
-import { Link } from 'react-router-dom';
 import { SCALED_IMAGE } from '../../constants';
-import { useAtom } from 'jotai';
 import { systemDataAtom } from '../../atoms';
 import { getTmdbImage } from '../../utils';
 import { toStats } from './utils';
@@ -25,10 +25,7 @@ const Film = ({ film, palette }: { film: IFilm; palette: Palette }) => {
   const [truncateOverview, setTruncateOverview] = useState(true);
 
   return (
-    <div
-      className="flex flex-col gap-4 rounded-lg p-4"
-      style={palette?.bgStyles}
-    >
+    <div className="flex flex-col gap-4 rounded-lg p-4" style={palette?.bgStyles}>
       <div className="flex gap-4">
         <div className="flex-shrink-0">
           <img
@@ -50,7 +47,7 @@ const Film = ({ film, palette }: { film: IFilm; palette: Palette }) => {
           </div>
           <div>{film.director}</div>
           <div>{film.cast}</div>
-          <div className="flex-grow"></div>
+          <div className="flex-grow" />
           {film.watch_provider && (
             <WatchProviders selectedIds={film.watch_provider} />
           )}

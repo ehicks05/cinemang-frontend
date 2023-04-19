@@ -17,10 +17,7 @@ interface Data {
   films: any[] | null;
 }
 
-const idQuery = async (
-  form: DecodedValueMap<QueryParamConfigMap>,
-  page: number,
-) => {
+const idQuery = async (form: DecodedValueMap<QueryParamConfigMap>, page: number) => {
   let castPersonIds;
   if (form.castCreditName.length > 2) {
     const query = supabase
@@ -29,7 +26,7 @@ const idQuery = async (
       .ilike('name', `%${form.castCreditName}%`)
       .order('popularity', { ascending: false })
       .range(0, 100);
-    castPersonIds = (await query).data?.map((o) => o.id);
+    castPersonIds = (await query).data?.map(o => o.id);
   }
   let crewPersonIds;
   if (form.crewCreditName.length > 2) {
@@ -39,7 +36,7 @@ const idQuery = async (
       .ilike('name', `%${form.crewCreditName}%`)
       .order('popularity', { ascending: false })
       .range(0, 100);
-    crewPersonIds = (await query).data?.map((o) => o.id);
+    crewPersonIds = (await query).data?.map(o => o.id);
   }
 
   const select = `id${
@@ -137,7 +134,7 @@ export const useSearchFilms = ({ page }: { page: number }) => {
   return useQuery<Data>(['films', form, page], async () => {
     // query 1: identify the ids for our search results
     const { data, count } = await idQuery(form, page);
-    const ids = data?.map((row) => row.id) || [];
+    const ids = data?.map(row => row.id) || [];
 
     // query 2: fetch data for the ids
     const { data: films } = await hydrationQuery(ids, form);
@@ -157,30 +154,27 @@ const fetchFilmQuery = async (id: number) => {
   return supabase.from('movie').select(select).eq('id', id).single();
 };
 
-export const useFetchFilm = (id: number) => {
-  return useQuery(['films', id], async () => {
+export const useFetchFilm = (id: number) =>
+  useQuery(['films', id], async () => {
     const { data: film } = await fetchFilmQuery(id);
 
     return film;
   });
-};
 
-const fetchTrailers = async (id: number) => {
-  return tmdb.get(`/movie/${id}`, {
+const fetchTrailers = async (id: number) =>
+  tmdb.get(`/movie/${id}`, {
     params: { append_to_response: 'videos' },
   });
-};
 
-export const useFetchTrailers = (id: number) => {
-  return useQuery<Video[]>(['films', id, 'trailers'], async () => {
+export const useFetchTrailers = (id: number) =>
+  useQuery<Video[]>(['films', id, 'trailers'], async () => {
     const { data: film } = await fetchTrailers(id);
     const videos: Video[] = film.videos.results;
     const trailers = videos
-      .filter((v) => v.official && v.type === 'Trailer')
+      .filter(v => v.official && v.type === 'Trailer')
       .sort((v1, v2) =>
         isBefore(parseISO(v1.published_at), parseISO(v2.published_at)) ? 1 : -1,
       );
 
     return trailers;
   });
-};

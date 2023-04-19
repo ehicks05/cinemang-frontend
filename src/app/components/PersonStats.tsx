@@ -39,7 +39,7 @@ const FilmStats: FC<Props> = ({ bgColor, data, autoWidth = true }) => {
 
   return (
     <div className="flex flex-wrap gap-2">
-      {stats.map((stat) => (
+      {stats.map(stat => (
         <Stat
           bgColor={bgColor}
           color={stat.color}

@@ -1,4 +1,3 @@
-import { Button, ComboBox } from '../../core-components';
 import { useState } from 'react';
 
 import { UnmountClosed } from 'react-collapse';
@@ -9,9 +8,10 @@ import {
   QueryParamConfigMap,
   useQueryParams,
 } from 'use-query-params';
+import { useAtom } from 'jotai';
 import { DEFAULT_SEARCH_FORM } from '../../constants';
 import { systemDataAtom } from '../../atoms';
-import { useAtom } from 'jotai';
+import { Button, ComboBox } from '../../core-components';
 import { getTmdbImage } from '../../utils';
 
 const SearchForm = () => {
@@ -57,7 +57,7 @@ const FormFields = () => {
           <div>
             <input
               className="w-full bg-gray-700"
-              onChange={(e) => setForm({ ...form, title: e.target.value })}
+              onChange={e => setForm({ ...form, title: e.target.value })}
               type="text"
               value={form.title}
             />
@@ -70,9 +70,7 @@ const FormFields = () => {
           <div>
             <input
               className="w-full bg-gray-700"
-              onChange={(e) =>
-                setForm({ ...form, castCreditName: e.target.value })
-              }
+              onChange={e => setForm({ ...form, castCreditName: e.target.value })}
               type="text"
               value={form.castCreditName}
             />
@@ -85,9 +83,7 @@ const FormFields = () => {
           <div>
             <input
               className="w-full bg-gray-700"
-              onChange={(e) =>
-                setForm({ ...form, crewCreditName: e.target.value })
-              }
+              onChange={e => setForm({ ...form, crewCreditName: e.target.value })}
               type="text"
               value={form.crewCreditName}
             />
@@ -101,7 +97,7 @@ const FormFields = () => {
             <ComboBox
               form={form}
               formKey="watchProviders"
-              mapper={(provider) => ({
+              mapper={provider => ({
                 id: provider.id,
                 imageUrl: getTmdbImage({
                   path: provider.logo_path,
@@ -112,7 +108,7 @@ const FormFields = () => {
               onChange={setForm}
               options={watchProviders
                 .sort((o1, o2) => o1.display_priority - o2.display_priority)
-                .filter((wp) => wp.count > 0)}
+                .filter(wp => wp.count > 0)}
               selectedOptionIds={form.watchProviders}
             />
           </div>
@@ -126,9 +122,7 @@ const FormFields = () => {
               className="w-full bg-gray-700"
               max={form.maxVotes || undefined}
               min={1}
-              onChange={(e) =>
-                setForm({ ...form, minVotes: Number(e.target.value) })
-              }
+              onChange={e => setForm({ ...form, minVotes: Number(e.target.value) })}
               type="number"
               value={form.minVotes}
             />
@@ -148,7 +142,7 @@ const FormFields = () => {
           <div className="flex gap-2">
             <input
               className="w-full bg-gray-700"
-              onChange={(e) =>
+              onChange={e =>
                 setForm({
                   ...form,
                   minRating: Number(e.target.value),
@@ -159,7 +153,7 @@ const FormFields = () => {
             />
             <input
               className="w-full bg-gray-700"
-              onChange={(e) =>
+              onChange={e =>
                 setForm({
                   ...form,
                   maxRating: Number(e.target.value),
@@ -176,7 +170,7 @@ const FormFields = () => {
         <div className="flex flex-col gap-2 sm:flex-row">
           <input
             className="w-full bg-gray-700"
-            onChange={(e) =>
+            onChange={e =>
               setForm({
                 ...form,
                 minReleasedAt: e.target.value,
@@ -187,7 +181,7 @@ const FormFields = () => {
           />
           <input
             className="w-full bg-gray-700"
-            onChange={(e) =>
+            onChange={e =>
               setForm({
                 ...form,
                 maxReleasedAt: e.target.value,
@@ -205,14 +199,14 @@ const FormFields = () => {
           <div>
             <select
               className="w-full bg-gray-700"
-              onChange={(e) => setForm({ ...form, language: e.target.value })}
+              onChange={e => setForm({ ...form, language: e.target.value })}
               value={form.language}
             >
               <option value="">Any</option>
               {languages
                 .sort((o1, o2) => o2.count - o1.count)
                 .slice(0, 10)
-                .map((language) => (
+                .map(language => (
                   <option key={language.id} value={language.id}>
                     {language.name}
                   </option>
@@ -226,11 +220,11 @@ const FormFields = () => {
           <div>
             <select
               className="w-full bg-gray-700"
-              onChange={(e) => setForm({ ...form, genre: e.target.value })}
+              onChange={e => setForm({ ...form, genre: e.target.value })}
               value={form.genre}
             >
               <option value="">Any</option>
-              {genres.map((genre) => (
+              {genres.map(genre => (
                 <option key={genre.id} value={genre.id}>
                   {genre.name}
                 </option>
@@ -245,14 +239,14 @@ const FormFields = () => {
         <div className="flex">
           <select
             className="w-full bg-gray-700"
-            onChange={(e) => setForm({ ...form, sortColumn: e.target.value })}
+            onChange={e => setForm({ ...form, sortColumn: e.target.value })}
             value={form.sortColumn}
           >
             {[
               { label: 'User Rating', value: 'vote_average' },
               { label: 'User Votes', value: 'vote_count' },
               { label: 'Released', value: 'released_at' },
-            ].map((option) => (
+            ].map(option => (
               <option key={option.value} value={option.value}>
                 {option.label}
               </option>

@@ -11,7 +11,7 @@ interface Props {
 }
 
 const Credits = ({ film, palette }: Props) => {
-  const grouped = groupBy(film.crew_credit, (c) => c.personId);
+  const grouped = groupBy(film.crew_credit, c => c.personId);
 
   return (
     <>
@@ -19,10 +19,9 @@ const Credits = ({ film, palette }: Props) => {
       <div className="grid grid-cols-2 justify-center gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5">
         {film.cast_credit
           .sort((c1, c2) => c1.order - c2.order)
-          .map((c) => (
+          .map(c => (
             <PersonCard
               character={c.character}
-              creditId={c.credit_id}
               key={c.credit_id}
               name={c.person.name}
               palette={palette}
@@ -35,10 +34,9 @@ const Credits = ({ film, palette }: Props) => {
       <div className="grid grid-cols-2 justify-center gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5">
         {Object.values(grouped)
           .sort((c1, c2) => c2[0].person.popularity - c1[0].person.popularity)
-          .map((c) => (
+          .map(c => (
             <PersonCard
-              creditId={c[0].credit_id}
-              jobs={c.map((c) => c.job)}
+              jobs={c.map(c => c.job)}
               key={c[0].credit_id}
               name={c[0].person.name}
               palette={palette}

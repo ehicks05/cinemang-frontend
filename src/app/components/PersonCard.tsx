@@ -1,11 +1,10 @@
-import { Palette } from '../hooks/usePalette';
 import React from 'react';
 import { Link } from 'react-router-dom';
+import { Palette } from '../hooks/usePalette';
 import { getTmdbImage } from '../../utils';
 
 interface Props {
   character?: string;
-  creditId: string;
   jobs?: string[];
   name: string;
   palette: Palette;
@@ -15,9 +14,7 @@ interface Props {
 
 const toInitials = (name: string) => {
   const parts = name.split(' ');
-  return [parts.at(0), parts.at(-1)]
-    .map((part) => (part || '').slice(0, 1))
-    .join('');
+  return [parts.at(0), parts.at(-1)].map(part => (part || '').slice(0, 1)).join('');
 };
 
 const getDefaultProfile = (name: string, color: string) =>
@@ -25,7 +22,6 @@ const getDefaultProfile = (name: string, color: string) =>
 
 const PersonCard = ({
   character,
-  // creditId,
   jobs,
   name,
   palette,
@@ -50,7 +46,7 @@ const PersonCard = ({
         {character && <div>as {character}</div>}
         {jobs && (
           <div>
-            {jobs.map((j) => (
+            {jobs.map(j => (
               <div key={j}>{j}</div>
             ))}
           </div>

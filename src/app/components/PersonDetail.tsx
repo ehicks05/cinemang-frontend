@@ -5,7 +5,6 @@ import { IconType } from 'react-icons';
 import { FaCalendar, FaHeart, FaStar } from 'react-icons/fa';
 import { useParams } from 'react-router-dom';
 import { useTitle } from 'react-use';
-
 import { systemDataAtom } from '../../atoms';
 import { Loading } from '../../core-components';
 import { Person } from '../../types';

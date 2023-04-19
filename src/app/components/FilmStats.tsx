@@ -16,9 +16,7 @@ interface Props {
 }
 
 export const toShort = (voteCount: number) =>
-  Number(voteCount) > 1000
-    ? `${Math.round(voteCount / 1000)}k`
-    : String(voteCount);
+  Number(voteCount) > 1000 ? `${Math.round(voteCount / 1000)}k` : String(voteCount);
 
 const heartColor = (voteAverage: number) =>
   voteAverage >= 8
@@ -84,7 +82,7 @@ const FilmStats: FC<Props> = ({
           return stat;
         })
         .sort((s1, s2) => s1.order - s2.order)
-        .map((stat) => (
+        .map(stat => (
           <Stat
             bgColor={bgColor}
             color={stat.color}

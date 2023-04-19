@@ -1,5 +1,4 @@
 import React, { FC, ReactNode } from 'react';
-import { PAGE_SIZE } from '../../constants';
 import P from 'paginator';
 import { range } from 'lodash';
 import {
@@ -8,6 +7,7 @@ import {
   HiChevronLeft,
   HiChevronRight,
 } from 'react-icons/hi';
+import { PAGE_SIZE } from '../../constants';
 
 const nf = Intl.NumberFormat('en-US');
 
@@ -23,7 +23,7 @@ const Paginator: FC<PaginatorProps> = ({
   isLoading,
   pageIndex = 0,
   pageSize = PAGE_SIZE,
-  setPage = () => {},
+  setPage = () => undefined,
 }) => {
   const page = pageIndex + 1;
   // Arguments are `per_page` and `length`. `per_page` changes the number of
@@ -43,7 +43,7 @@ const Paginator: FC<PaginatorProps> = ({
     total_pages,
   } = paginator.build(count, page);
 
-  const links = range(first_page, last_page + 1).map((i) => ({
+  const links = range(first_page, last_page + 1).map(i => ({
     active: i === page,
     disabled: false,
     label: i,
@@ -77,10 +77,10 @@ const Paginator: FC<PaginatorProps> = ({
           >
             <HiChevronLeft className="my-auto" size={20} />
           </Link>
-          {links.map((link, i) => (
+          {links.map(link => (
             <Link
               isActive={link.active}
-              key={i}
+              key={link.label}
               setPage={() => setPage(link.label - 1)}
             >
               {link.label}
