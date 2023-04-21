@@ -45,7 +45,8 @@ export const isEqual = (
   const a = omitBy(value, isNil);
   const b = omitBy(other, isNil);
   // TODO: omitting 'count' is hacky
-  return _.isEqual(omit(a, ['count']), omit(b, ['count']));
+  const omittedFields = ['popularity', 'count'];
+  return _.isEqual(omit(a, omittedFields), omit(b, omittedFields));
 };
 
 interface Params {
