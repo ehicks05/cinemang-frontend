@@ -5,16 +5,16 @@ import { IconType } from 'react-icons';
 import { FaCalendar, FaHeart, FaStar } from 'react-icons/fa';
 import { useParams } from 'react-router-dom';
 import { useTitle } from 'react-use';
-import { systemDataAtom } from '../../atoms';
-import { Loading } from '../../core-components';
-import { Person } from '../../types';
-import { getTmdbImage } from '../../utils';
-import { useFetchPerson } from '../hooks/useFetchPersons';
-import { Palette, usePalette } from '../hooks/usePalette';
+import { systemDataAtom } from '../../../atoms';
+import { Loading } from '../../../core-components';
+import { Person } from '../../../types';
+import { getTmdbImage } from '../../../utils';
+import { useFetchPerson } from '../../hooks/useFetchPersons';
+import { Palette, usePalette } from '../../hooks/usePalette';
 import BirthAndDeath from './BirthAndDeath';
 import PersonCredit from './PersonCredit';
 import PersonStats from './PersonStats';
-import Stat from './Stat';
+import Stat from '../Stat';
 
 const BIO_LENGTH_CUTOFF = 1280;
 

@@ -1,6 +1,6 @@
 import React, { FC } from 'react';
 import { FaFilm, FaMask, FaStar } from 'react-icons/fa';
-import Stat from './Stat';
+import Stat from '../Stat';
 
 interface Props {
   autoWidth?: boolean;

@@ -1,6 +1,6 @@
 import { intervalToDuration, parseISO } from 'date-fns';
-import { Person } from '../../types';
-import { Palette } from '../hooks/usePalette';
+import { Person } from '../../../types';
+import { Palette } from '../../hooks/usePalette';
 
 interface Props {
   palette: Palette;
