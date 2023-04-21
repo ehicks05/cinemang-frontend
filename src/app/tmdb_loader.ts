@@ -497,14 +497,19 @@ const updateDb = async () => {
       updateWatchProviders(),
     ]);
     
+    if (fullMode) {
+      logger.info('truncating ignored_movie and ignored_person tables');
+      await Promise.all([prisma.ignoredMovie.deleteMany(), prisma.ignoredPerson.deleteMany()])
+    }
     await updateMovies();
     
     logger.info('updating counts for languages and watch providers');
     await updateLanguageCounts();
     await updateWatchProviderCounts();
     
-    logger.info('cleaning up dead movies [TODO]');
-    logger.info('un-ignore ignored movies+people [TODO]');
+    if (fullMode) {
+      logger.info('cleaning up dead movies [TODO]');
+    }
     
     const duration = intervalToDuration({ start, end: new Date() });
     logger.info(`finished tmdb_loader script in ${formatDuration(duration)}`);
