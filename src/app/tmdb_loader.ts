@@ -473,39 +473,45 @@ const updateRelationships = async (movies: MovieResponse[]) => {
 };
 
 const updateDb = async () => {
-  logger.info('starting tmdb_loader script');
-  const start = new Date();
+  try {
 
-  const isStartOfMonth = isFirstDayOfMonth(new Date());
-  if (isStartOfMonth) {
-    logger.info('start of month detected.');
+    logger.info('starting tmdb_loader script');
+    const start = new Date();
+    
+    const isStartOfMonth = isFirstDayOfMonth(new Date());
+    if (isStartOfMonth) {
+      logger.info('start of month detected.');
+    }
+    if (argv.full) {
+      logger.info('--full arg detected.');
+    }
+    
+    const fullMode = isStartOfMonth || argv.full;
+    
+    logger.info(`running ${fullMode ? 'full' : 'partial'} load`);
+    
+    logger.info('updating genres, languages, and watch providers...');
+    await Promise.all([
+      updateGenres(),
+      updateLanguages(),
+      updateWatchProviders(),
+    ]);
+    
+    await updateMovies();
+    
+    logger.info('updating counts for languages and watch providers');
+    await updateLanguageCounts();
+    await updateWatchProviderCounts();
+    
+    logger.info('cleaning up dead movies [TODO]');
+    logger.info('un-ignore ignored movies+people [TODO]');
+    
+    const duration = intervalToDuration({ start, end: new Date() });
+    logger.info(`finished tmdb_loader script in ${formatDuration(duration)}`);
   }
-  if (argv.full) {
-    logger.info('--full arg detected.');
+  catch (err) {
+    logger.error(err);
   }
-
-  const fullMode = isStartOfMonth || argv.full;
-
-  logger.info(`running ${fullMode ? 'full' : 'partial'} load`);
-
-  logger.info('updating genres, languages, and watch providers...');
-  await Promise.all([
-    updateGenres(),
-    updateLanguages(),
-    updateWatchProviders(),
-  ]);
-
-  await updateMovies();
-
-  logger.info('updating counts for languages and watch providers');
-  await updateLanguageCounts();
-  await updateWatchProviderCounts();
-
-  logger.info('cleaning up dead movies [TODO]');
-  logger.info('un-ignore ignored movies+people [TODO]');
-
-  const duration = intervalToDuration({ start, end: new Date() });
-  logger.info(`finished tmdb_loader script in ${formatDuration(duration)}`);
 };
 
 export default updateDb;
