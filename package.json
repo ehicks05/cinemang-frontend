@@ -10,7 +10,6 @@
     "dev": "set NODE_OPTIONS=--max_old_space_size=512&&set NODE_ENV=development&&ts-node-dev --transpile-only --no-notify src/app.ts",
     "build": "tsc && npx prisma generate",
     "start": "set NODE_ENV=production&&node ./dist/src/app.js",
-    "raw-response-loader": "set NODE_ENV=development&&ts-node-dev --transpile-only --no-notify src/raw-response-loader.ts"
   },
   "author": "",
   "license": "ISC",
