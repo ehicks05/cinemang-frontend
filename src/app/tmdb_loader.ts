@@ -503,8 +503,8 @@ const updateDb = async () => {
   await updateLanguageCounts();
   await updateWatchProviderCounts();
 
-  logger.info('cleaning up dead movies');
-  logger.info('[placeholder]');
+  logger.info('cleaning up dead movies [TODO]');
+  logger.info('un-ignore ignored movies+people [TODO]');
 
   const duration = intervalToDuration({ start, end: new Date() });
   logger.info(`finished tmdb_loader script in ${formatDuration(duration)}`);
