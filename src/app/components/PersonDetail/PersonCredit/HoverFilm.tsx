@@ -1,7 +1,7 @@
 import { Loading } from '../../../../core-components';
 import { getTmdbImage } from '../../../../utils';
-import { useFetchFilm } from '../../../hooks/useFetchFilms';
-import { usePalette } from '../../../hooks/usePalette';
+import { useFetchFilm } from '@/app/hooks/useFetchFilms';
+import { usePalette } from '@/app/hooks/usePalette';
 import Film from '../../Film';
 
 const HoverFilm = ({ id }: { id: number }) => {

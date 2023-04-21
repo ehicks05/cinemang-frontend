@@ -3,7 +3,7 @@ import { groupBy } from 'lodash';
 
 import { Film as IFilm } from '../../../types';
 import PersonCard from './PersonCard';
-import { Palette } from '../../hooks/usePalette';
+import { Palette } from '@/app/hooks/usePalette';
 
 interface Props {
   film: IFilm;

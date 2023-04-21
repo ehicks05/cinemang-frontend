@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { Palette } from '../../hooks/usePalette';
+import { Palette } from '@/app/hooks/usePalette';
 import { getTmdbImage } from '../../../utils';
 
 interface Props {

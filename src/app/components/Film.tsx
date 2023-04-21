@@ -10,7 +10,7 @@ import { SCALED_IMAGE } from '../../constants';
 import { systemDataAtom } from '../../atoms';
 import { getTmdbImage } from '../../utils';
 import { toStats } from './utils';
-import { Palette } from '../hooks/usePalette';
+import { Palette } from '@/app/hooks/usePalette';
 
 const Film = ({ film, palette }: { film: IFilm; palette: Palette }) => {
   const [{ genres, languages }] = useAtom(systemDataAtom);

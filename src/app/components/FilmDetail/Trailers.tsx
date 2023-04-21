@@ -1,9 +1,9 @@
 import React from 'react';
 import LiteYouTubeEmbed from 'react-lite-youtube-embed';
 import { Video } from '../../../types';
-import { useFetchTrailers } from '../../hooks/useFetchFilms';
+import { useFetchTrailers } from '@/app/hooks/useFetchFilms';
 import 'react-lite-youtube-embed/dist/LiteYouTubeEmbed.css';
-import { Palette } from '../../hooks/usePalette';
+import { Palette } from '@/app/hooks/usePalette';
 
 interface TrailerCardProps {
   palette: Palette;
