@@ -48,7 +48,7 @@ export const getDailyFile = async (resource: ResourceKey) => {
     logger.info('retrieving from file cache');
     return fromCache;
   }
-  logger.info('retrieving from tmdb');
+  logger.info(`retrieving ${filename} from tmdb`);
 
   const fromTmdb = await fetchDailyFile(resource);
 

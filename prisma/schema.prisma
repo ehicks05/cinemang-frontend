@@ -13,7 +13,7 @@ model Movie {
   certification String?
   director      String
   genreId       Int      @map("genre_id")
-  imdbId        String?  @map("imdb_id")
+  imdbId        String   @map("imdb_id")
   languageId    String   @map("language_id")
   overview      String
   popularity    Float
@@ -80,7 +80,7 @@ model TvSeries {
 
 model Person {
   id                 Int          @id
-  imdbId             String?      @map("imdb_id")
+  imdbId             String       @map("imdb_id")
   biography          String
   birthday           DateTime?    @db.Date
   deathday           DateTime?    @db.Date
@@ -89,7 +89,7 @@ model Person {
   name               String
   placeOfBirth       String?      @map("place_of_birth")
   popularity         Float
-  profilePath        String?      @map("profile_path")
+  profilePath        String       @map("profile_path")
   castCredits        CastCredit[]
   crewCredits        CrewCredit[]
 
@@ -105,8 +105,8 @@ model CastCredit {
   person   Person @relation(fields: [personId], references: [id], onDelete: Cascade)
   personId Int
 
-  castId    Int     @map("cast_id")
-  character String?
+  castId    Int    @map("cast_id")
+  character String
   order     Int
 
   @@index([movieId])

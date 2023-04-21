@@ -283,9 +283,8 @@ const updateCastCredits = async (
   personIdMap: Dictionary<number>,
 ) => {
   const remoteCastCredits: Prisma.CastCreditUncheckedCreateInput[] = movies
-    .map(toCastCreditCreateInput)
-    .flat()
-    .filter((o) => personIdMap[o.personId]);
+    .flatMap(toCastCreditCreateInput)
+    .filter((o) => personIdMap[o.personId] && o.character);
   const localCastCredits = await prisma.castCredit.findMany({
     where: {
       movieId: { in: movieIds },
@@ -341,8 +340,7 @@ const updateCrewCredits = async (
   personIdMap: Dictionary<number>,
 ) => {
   const remoteCrewCredits: Prisma.CrewCreditUncheckedCreateInput[] = movies
-    .map(toCrewCreditCreateInput)
-    .flat()
+    .flatMap(toCrewCreditCreateInput)
     .filter((o) => personIdMap[o.personId]);
   const localCrewCredits = await prisma.crewCredit.findMany({
     where: {

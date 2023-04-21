@@ -13,6 +13,7 @@ export const isValidMovie = (movie: MovieResponse) => {
       .map((c) => c.name)
       .join(', ')?.length &&
     movie.genres[0] &&
+    movie.imdb_id &&
     movie.overview &&
     movie.poster_path &&
     movie.release_date &&
