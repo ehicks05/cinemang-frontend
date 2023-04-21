@@ -5,13 +5,16 @@ import {
   differenceBy,
   intersectionBy,
   keyBy,
+  partition,
   pick,
   uniq,
 } from 'lodash';
 import {
   formatDuration,
   intervalToDuration,
+  isAfter,
   isFirstDayOfMonth,
+  subDays,
 } from 'date-fns';
 import { getMovie, getPerson, getValidIds } from '../services/tmdb';
 import {
@@ -37,7 +40,7 @@ import { parsePerson } from './helpers/parse_person';
 import { MovieWatchProvider, Prisma } from '@prisma/client';
 import Bluebird from 'bluebird';
 
-const options = { concurrency: 64 };
+const options = { concurrency: 32 };
 
 const toId = (o: { id: number }) => o.id;
 
@@ -56,7 +59,7 @@ const processMovies = async (ids: number[]) => {
     .map(parseMovie)
     .filter((m) => m) as Prisma.MovieCreateInput[];
   const parsedById = keyBy(parsed, toId);
-  const remoteValidated = remote.filter((o) => parsedById[o.id]);
+  const [remoteValid, remoteInvalid] = partition(remote, o => parsedById[o.id]);
   const local = await prisma.movie.findMany({
     where: { id: { in: ids } },
   });
@@ -68,6 +71,13 @@ const processMovies = async (ids: number[]) => {
     const p = localById[o.id];
     return p && !isEqual(o, p);
   });
+
+  const [invalidButNew, invalidAndOld] = partition(remoteInvalid,
+    o => o.release_date && isAfter(new Date(o.release_date), subDays(new Date(), 30))
+  );
+  await prisma.ignoredMovie.createMany(
+    { data: invalidAndOld.map(o => ({ id: o.id })) }
+  );
 
   // TODO: either rethrow, or track which movies actually made
   // it to the db, so we don't get foreign key errors later
@@ -95,14 +105,16 @@ const processMovies = async (ids: number[]) => {
       ids: ids.length,
       fetched: remote.length,
       validated: parsed.length,
+      invalid: remoteInvalid.length,
+      invalidButNew: invalidButNew.length,
+      invalidAndOld: invalidAndOld.length,
       created: createResult.count,
       updated: updated.length,
       unchanged: existing.length - toUpdate.length,
     });
 
-    return updateErrors.length
-      ? remoteValidated.filter((o) => !updateErrorsById[o.id])
-      : remoteValidated;
+    const mutatedIds = [...toCreate.map(o => o.id), ...toUpdate.map(o => o.id)];
+    return remoteValid.filter(o => mutatedIds.includes(o.id)).filter((o) => !updateErrorsById[o.id]);
   } catch (e) {
     logger.error('error while saving', e);
   }
@@ -123,6 +135,7 @@ const processIdChunk = async (
   const parsed = remote
     .map(parsePerson)
     .filter((o) => o) as Prisma.PersonCreateInput[];
+  const parsedById = keyBy(parsed, toId);
 
   const local = await prisma.person.findMany({
     where: { id: { in: personIds } },
@@ -136,6 +149,10 @@ const processIdChunk = async (
     const p = localById[o.id];
     return p && !isEqual(o, p);
   });
+
+  const [remoteValid, remoteInvalid] = partition(remote, o => parsedById[o.id]);
+
+  await prisma.ignoredPerson.createMany({ data: remoteInvalid.map(o => ({ id: o.id }))});
 
   try {
     const createResult = await prisma.person.createMany({
@@ -196,12 +213,14 @@ const updateMovies = async () => {
   if (!ids) {
     throw new Error('Unable to fetch ids');
   }
-  logger.info(`found ${ids?.length} movie ids to load`);
+  const ignoredMovies = (await prisma.ignoredMovie.findMany()).map(o => o.id);
+  const ignoredPersons = (await prisma.ignoredPerson.findMany()).map(o => o.id);
+  const validIds = difference(ids, ignoredMovies);
+  logger.info(`found ${validIds?.length} movie ids to load`);
 
-  let personIdsProcessed: number[] = [];
+  let personIdsProcessed = ignoredPersons;
 
-  // const chunks = chunk(ids.slice(0, 1_000), 1_000);
-  const chunks = chunk(ids, 1_000);
+  const chunks = chunk(validIds, 500);
   await Bluebird.each(chunks, async (ids, i) => {
     try {
       logger.info(`processing chunk ${i + 1}/${chunks.length}`);
