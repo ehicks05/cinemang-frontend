@@ -1,38 +1,32 @@
-export interface Film {
-  cast: string;
+import { Database } from './generated/supabase';
+
+// Prefix with 'T' if we need to hydrate joined tables
+export type TCastCredit = Database['cinemang']['Tables']['cast_credit']['Row'];
+export type TCrewCredit = Database['cinemang']['Tables']['crew_credit']['Row'];
+export type Genre = Database['cinemang']['Tables']['genre']['Row'];
+export type Language = Database['cinemang']['Tables']['language']['Row'];
+export type TPerson = Database['cinemang']['Tables']['person']['Row'];
+export type TMovie = Database['cinemang']['Tables']['movie']['Row'];
+export type WatchProvider = Database['cinemang']['Tables']['watch_provider']['Row'];
+
+export interface CastCredit extends TCastCredit {
+  movie: Film;
+  person: TPerson;
+}
+export interface CrewCredit extends TCrewCredit {
+  movie: Film;
+  person: TPerson;
+}
+
+export interface Film extends TMovie {
   cast_credit: CastCredit[];
   crew_credit: CrewCredit[];
-  director: string;
-  genre_id: number;
-  id: number;
-  language_id: number;
-  overview: string;
-  poster_path: string;
-  released_at: string;
-  runtime: number;
-  title: string;
-  vote_average: number;
-  vote_count: number;
   watch_provider: WatchProvider[];
 }
 
-export interface Genre {
-  id: number;
-  name: string;
-}
-
-export interface Language {
-  count: number;
-  id: number;
-  name: string;
-}
-
-export interface WatchProvider {
-  count: number;
-  display_priority: number;
-  id: number;
-  logo_path: string;
-  name: string;
+export interface Person extends TPerson {
+  cast_credit: CastCredit[];
+  crew_credit: CrewCredit[];
 }
 
 export interface ISearchForm {
@@ -63,40 +57,4 @@ export interface Video {
   site: string;
   size: number;
   type: string;
-}
-
-export interface CastCredit {
-  character: string;
-  credit_id: string;
-  id: string;
-  movie: Film;
-  movieId: number;
-  order: number;
-  person: Person;
-  personId: number;
-}
-
-export interface CrewCredit {
-  credit_id: string;
-  department: string;
-  id: string;
-  job: string;
-  movie: Film;
-  movieId: number;
-  person: Person;
-  personId: number;
-}
-
-export interface Person {
-  biography: string;
-  birthday: string;
-  cast_credit: CastCredit[];
-  crew_credit: CrewCredit[];
-  deathday: string;
-  imdb_id: string;
-  known_for_department: string;
-  name: string;
-  place_of_birth: string;
-  popularity: number;
-  profile_path: string;
 }

@@ -1,18 +1,16 @@
 import { useQuery } from '@tanstack/react-query';
 
 import { supabase } from '../supabase';
+import { Person } from '@/types';
 
-const fetchPersonQuery = async (id: number) => {
+const fetchPersonQuery = async (id: number): Promise<Person> => {
   const select = ['*', 'cast_credit(*, movie(*))', 'crew_credit(*, movie(*))'].join(
     ',',
   );
 
-  return supabase.from('person').select(select).eq('id', id).single();
+  const result = await supabase.from('person').select(select).eq('id', id).single();
+  return result.data as unknown as Person;
 };
 
 export const useFetchPerson = (id: number) =>
-  useQuery(['person', id], async () => {
-    const { data: person } = await fetchPersonQuery(id);
-
-    return person;
-  });
+  useQuery(['person', id], async () => fetchPersonQuery(id));

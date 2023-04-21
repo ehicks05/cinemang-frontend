@@ -1,11 +1,9 @@
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '../supabase';
-import { Genre, Language, WatchProvider } from '../types';
 
 const fetchGenres = async () => {
   const result = await supabase.from('genre').select('*');
-  const genres: Genre[] = result.data || [];
-  return genres;
+  return result.data || [];
 };
 
 const fetchLanguages = async () => {
@@ -13,8 +11,7 @@ const fetchLanguages = async () => {
     .from('language')
     .select('*')
     .order('count', { ascending: false });
-  const languages: Language[] = result.data || [];
-  return languages;
+  return result.data || [];
 };
 
 const fetchWatchProviders = async () => {
@@ -22,8 +19,7 @@ const fetchWatchProviders = async () => {
     .from('watch_provider')
     .select('*')
     .order('display_priority');
-  const watchProviders: WatchProvider[] = result.data || [];
-  return watchProviders;
+  return result.data || [];
 };
 
 const fetchData = async () => {
@@ -36,13 +32,7 @@ const fetchData = async () => {
   return { genres, languages, watchProviders };
 };
 
-export interface SystemData {
-  genres: Genre[];
-  languages: Language[];
-  watchProviders: WatchProvider[];
-}
-
 export const useFetchSystemData = () =>
-  useQuery<SystemData, Error>(['systemData'], fetchData, {
+  useQuery(['systemData'], fetchData, {
     keepPreviousData: true,
   });

@@ -1,7 +1,7 @@
 import { GENRE_NAMES } from '../../constants';
 import { Film, Genre, Language } from '../../types';
 
-const findLanguage = (languages: Language[], languageId: number) =>
+const findLanguage = (languages: Language[], languageId: string) =>
   languages.find(lang => lang.id === languageId);
 
 const findGenre = (genres: Genre[], genreId: number) =>

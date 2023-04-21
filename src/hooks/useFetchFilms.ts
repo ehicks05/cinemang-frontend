@@ -10,12 +10,7 @@ import {
 import { PAGE_SIZE } from '../constants';
 import { supabase } from '../supabase';
 import { tmdb } from '../tmdb';
-import { Video } from '../types';
-
-interface Data {
-  count: number;
-  films: any[] | null;
-}
+import { Film, Video } from '../types';
 
 const idQuery = async (form: DecodedValueMap<QueryParamConfigMap>, page: number) => {
   let castPersonIds;
@@ -109,12 +104,13 @@ const hydrationQuery = async (
 ) => {
   const select = ['*', 'watch_provider(id)'].join(',');
 
-  return supabase
+  const result = await supabase
     .from('movie')
     .select(select)
     .in('id', ids)
     .order(form.sortColumn, { ascending: form.ascending })
     .order('id', { ascending: true });
+  return result.data as unknown as Film[];
 };
 
 export const useSearchFilms = ({ page }: { page: number }) => {
@@ -131,13 +127,16 @@ export const useSearchFilms = ({ page }: { page: number }) => {
     [formParams],
   );
 
-  return useQuery<Data>(['films', form, page], async () => {
+  return useQuery(['films', form, page], async () => {
     // query 1: identify the ids for our search results
-    const { data, count } = await idQuery(form, page);
+    const { data, count } = (await idQuery(form, page)) as unknown as {
+      data: { id: number }[];
+      count: number;
+    };
     const ids = data?.map(row => row.id) || [];
 
     // query 2: fetch data for the ids
-    const { data: films } = await hydrationQuery(ids, form);
+    const films = await hydrationQuery(ids, form);
 
     return { count: count || 0, films };
   });
@@ -151,15 +150,12 @@ const fetchFilmQuery = async (id: number) => {
     'crew_credit(*, person(*))',
   ].join(',');
 
-  return supabase.from('movie').select(select).eq('id', id).single();
+  const result = await supabase.from('movie').select(select).eq('id', id).single();
+  return result.data as unknown as Film;
 };
 
 export const useFetchFilm = (id: number) =>
-  useQuery(['films', id], async () => {
-    const { data: film } = await fetchFilmQuery(id);
-
-    return film;
-  });
+  useQuery(['films', id], async () => fetchFilmQuery(id));
 
 const fetchTrailers = async (id: number) =>
   tmdb.get(`/movie/${id}`, {

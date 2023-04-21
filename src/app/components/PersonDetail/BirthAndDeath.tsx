@@ -10,7 +10,7 @@ interface Props {
 const BirthAndDeath = ({ person, palette }: Props) => {
   const age = intervalToDuration({
     end: person.deathday ? parseISO(person.deathday) : new Date(),
-    start: parseISO(person.birthday),
+    start: person.birthday ? parseISO(person.birthday) : new Date(),
   });
 
   return person.birthday || person.deathday ? (
