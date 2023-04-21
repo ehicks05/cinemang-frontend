@@ -7,7 +7,7 @@ import * as HoverCard from '@radix-ui/react-hover-card';
 import { CastCredit, CrewCredit, Genre, Language } from '../../../../types';
 import FilmStats from '../../FilmStats';
 import { toStats } from '../../utils';
-// import HoverFilm from './HoverFilm';
+import HoverFilm from './HoverFilm';
 
 interface Props {
   bgColor: string;
@@ -63,7 +63,7 @@ const PersonCredit = ({ bgColor, genres, languages, credit }: Props) => {
       </div>
       <HoverCard.Portal>
         <HoverCard.Content className="HoverCardContent">
-          {/* <HoverFilm id={credit.movieId} /> */}
+          <HoverFilm id={credit.movieId} />
           <HoverCard.Arrow className="text-gray-700" />
         </HoverCard.Content>
       </HoverCard.Portal>
