@@ -3,7 +3,7 @@ import { pick } from 'lodash';
 import { PersonResponse } from '../../services/tmdb/types/responses';
 
 const isValidPerson = (person: PersonResponse) => {
-  return true;
+  return person.profile_path;
 };
 
 export const parsePerson = (data: PersonResponse) => {
