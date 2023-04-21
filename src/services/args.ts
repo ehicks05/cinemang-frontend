@@ -1,5 +1,8 @@
-const yargs = require('yargs/yargs');
-const { hideBin } = require('yargs/helpers');
-const argv = yargs(hideBin(process.argv)).argv;
+import yargs from 'yargs';
+import { hideBin } from 'yargs/helpers';
+
+const { argv } = yargs(hideBin(process.argv)).options({
+  full: { type: 'boolean', default: false },
+});
 
 export { argv };

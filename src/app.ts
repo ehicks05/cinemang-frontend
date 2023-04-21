@@ -1,4 +1,8 @@
-require('dotenv').config();
+/* eslint-disable import/first */
+import dotenv from 'dotenv';
+
+dotenv.config();
+
 import updateDb from './app/tmdb_loader';
 import { scheduleUpdateTask } from './tasks';
 import logger from './services/logger';

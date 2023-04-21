@@ -1,4 +1,4 @@
-var log4js = require('log4js');
+import log4js from 'log4js';
 
 log4js.configure({
   appenders: {
@@ -21,7 +21,7 @@ log4js.configure({
   },
 });
 
-var logger = log4js.getLogger();
+const logger = log4js.getLogger();
 logger.level = 'info';
 
 export default logger;

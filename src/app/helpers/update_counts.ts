@@ -11,14 +11,14 @@ export const updateLanguageCounts = async () => {
     }),
   ]);
 
-  const languagesWithCounts = languages.map((l) => {
-    const lc = languageCounts.find((lc) => lc.languageId === l.id);
+  const languagesWithCounts = languages.map(l => {
+    const lc = languageCounts.find(lc => lc.languageId === l.id);
     const count = lc ? lc._count : l.count;
     return { ...l, count };
   });
 
   await Promise.all(
-    languagesWithCounts.map((o) =>
+    languagesWithCounts.map(o =>
       prisma.language.update({ data: o, where: { id: o.id } }),
     ),
   );
@@ -37,13 +37,13 @@ export const updateWatchProviderCounts = async () => {
     },
   });
 
-  const watchProviders = watchProvidersWithCounts.map((wp) => ({
+  const watchProviders = watchProvidersWithCounts.map(wp => ({
     ...omit(wp, ['_count']),
     count: wp._count.movies,
   }));
 
   await Promise.all(
-    watchProviders.map(async (p) => {
+    watchProviders.map(async p => {
       await prisma.watchProvider.update({
         data: p,
         where: { id: p.id },

@@ -1,14 +1,11 @@
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-nocheck
 import _, { chunk, isNil, keyBy, omit, omitBy } from 'lodash';
 import Bluebird from 'bluebird';
+import { Prisma, PrismaClient } from '@prisma/client';
 import logger from '../../services/logger';
 import prisma from '../../services/prisma';
-import {
-  getGenres,
-  getLanguages,
-  getWatchProviders,
-} from '../../services/tmdb';
-import { Prisma, PrismaClient } from '@prisma/client';
+import { getGenres, getLanguages, getWatchProviders } from '../../services/tmdb';
 
 export const updateGenres = () =>
   update({
@@ -20,7 +17,7 @@ export const updateLanguages = () =>
   update({
     model: 'language',
     fetcher: getLanguages,
-    remoteMapper: (o) => ({
+    remoteMapper: o => ({
       id: o.iso_639_1,
       name: o.english_name,
     }),
@@ -30,18 +27,15 @@ export const updateWatchProviders = () =>
   update({
     model: 'watchProvider',
     fetcher: getWatchProviders,
-    remoteMapper: (o) => ({
-      displayPriority: o.display_priorities['US'],
+    remoteMapper: o => ({
+      displayPriority: o.display_priorities.US,
       id: o.provider_id,
       logoPath: o.logo_path,
       name: o.provider_name,
     }),
   });
 
-export const isEqual = (
-  value: Record<string, any>,
-  other: Record<string, any>,
-) => {
+export const isEqual = (value: Record<string, any>, other: Record<string, any>) => {
   const a = omitBy(value, isNil);
   const b = omitBy(other, isNil);
 
@@ -51,10 +45,10 @@ export const isEqual = (
   const bCount = b.vote_count || a.voteCount;
   const diff = Math.abs(aCount - bCount);
   const min = Math.min(aCount, bCount);
-  const omitVoteCount = diff / min > 0.1;
+  const omitVoteCount = diff / min > 0.1 ? ['vote_count'] : [];
 
   // TODO: omitting 'count' is hacky
-  const omittedFields = ['popularity', 'count', ...[omitVoteCount ? 'vote_count' : undefined]];
+  const omittedFields = ['popularity', 'count', ...omitVoteCount];
   return _.isEqual(omit(a, omittedFields), omit(b, omittedFields));
 };
 
@@ -79,9 +73,9 @@ export const update = async ({
   const remoteRecords = remoteMapper
     ? remoteRecordsRaw.map(remoteMapper)
     : remoteRecordsRaw;
-  const remoteIdMap = keyBy(remoteRecords.map(toId), (o) => o);
+  const remoteIdMap = keyBy(remoteRecords.map(toId), o => o);
   const localRecords = await client.findMany();
-  const localRecordMap = keyBy(localRecords, (o) => o[idField]);
+  const localRecordMap = keyBy(localRecords, o => o[idField]);
 
   const changes = {
     remote: remoteRecords.length,
@@ -91,14 +85,14 @@ export const update = async ({
     deleted: 0,
   };
 
-  const toBeUpdated = remoteRecords.filter((o) => {
+  const toBeUpdated = remoteRecords.filter(o => {
     const pair = localRecordMap[o[idField]];
     return pair && !isEqual(o, pair);
   });
   changes.unchanged = localRecords.length - toBeUpdated.length;
 
   if (toBeUpdated.length > 0) {
-    await Bluebird.map(toBeUpdated, async (o) => {
+    await Bluebird.map(toBeUpdated, async o => {
       const args = {
         where: { id: o[idField] },
         data: o,
@@ -108,13 +102,13 @@ export const update = async ({
     changes.updated = toBeUpdated.length;
   }
 
-  const toBeAdded = remoteRecords.filter((o) => !localRecordMap[o[idField]]);
+  const toBeAdded = remoteRecords.filter(o => !localRecordMap[o[idField]]);
   if (toBeAdded.length > 0) {
     const result = await client.createMany({ data: toBeAdded });
     changes.created = result.count;
   }
 
-  const toBeDeleted = localRecords.filter((o) => !remoteIdMap[o[idField]]);
+  const toBeDeleted = localRecords.filter(o => !remoteIdMap[o[idField]]);
   if (deleteOrphans && toBeDeleted.length > 0) {
     const where = { id: { in: toBeDeleted.map(toId) } };
     const result = await client.deleteMany({ where });
@@ -127,12 +121,12 @@ export const update = async ({
 // TODO: chunk and process the validIds instead of fetching all ids
 export const removeInvalidMovies = async (validIds: number[]) => {
   logger.info(`Removing records in the db that aren't in the valid ids file.`);
-  const existingIds = (
-    await prisma.movie.findMany({ select: { id: true } })
-  ).map((m) => m.id);
-  const invalidIds = existingIds.filter((e) => !validIds?.includes(e));
+  const existingIds = (await prisma.movie.findMany({ select: { id: true } })).map(
+    m => m.id,
+  );
+  const invalidIds = existingIds.filter(e => !validIds?.includes(e));
   const chunks = chunk(invalidIds, 10_000);
-  await Bluebird.each(chunks, (ids) =>
+  await Bluebird.each(chunks, ids =>
     prisma.movie.deleteMany({
       where: { id: { in: ids } },
     }),
