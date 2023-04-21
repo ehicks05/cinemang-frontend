@@ -3,17 +3,17 @@ import { addMinutes, intervalToDuration, parseISO, format } from 'date-fns';
 import { useParams } from 'react-router-dom';
 import { useAtom } from 'jotai';
 import { useTitle } from 'react-use';
-import { Loading } from '../../core-components';
-import { usePalette } from '../hooks/usePalette';
-import FilmStats from './FilmStats';
-import WatchProviders from './WatchProviders';
-import { Film as IFilm } from '../../types';
-import { useFetchFilm } from '../hooks/useFetchFilms';
+import { Loading } from '../../../core-components';
+import { usePalette } from '../../hooks/usePalette';
+import FilmStats from '../FilmStats';
+import WatchProviders from '../WatchProviders';
+import { Film as IFilm } from '../../../types';
+import { useFetchFilm } from '../../hooks/useFetchFilms';
 import Trailers from './Trailers';
 import Credits from './Credits';
-import { systemDataAtom } from '../../atoms';
-import { getTmdbImage } from '../../utils';
-import { toStats } from './utils';
+import { systemDataAtom } from '../../../atoms';
+import { getTmdbImage } from '../../../utils';
+import { toStats } from '../utils';
 
 const FilmDetail = ({ film }: { film: IFilm }) => {
   useTitle(film.title, { restoreOnUnmount: true });

@@ -1,9 +1,9 @@
 import React from 'react';
 import { groupBy } from 'lodash';
 
-import { Film as IFilm } from '../../types';
+import { Film as IFilm } from '../../../types';
 import PersonCard from './PersonCard';
-import { Palette } from '../hooks/usePalette';
+import { Palette } from '../../hooks/usePalette';
 
 interface Props {
   film: IFilm;
