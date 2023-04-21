@@ -1,7 +1,0 @@
-@host = api.themoviedb.org
-@api_key = {{$dotenv TMDB_API_KEY}}
-
-###
-
-https://{{host}}/3/movie/603
-  ?api_key={{api_key}}&timestamp{{$timestamp}}
