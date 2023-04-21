@@ -5,7 +5,7 @@ import { useAtom } from 'jotai';
 import { Header, Footer, Loading } from './core-components';
 import { Home } from './app/index';
 import { FilmDetail, PersonDetail } from './app/components';
-import { useFetchSystemData } from './app/hooks/useFetchSystemData';
+import { useFetchSystemData } from './hooks/useFetchSystemData';
 import { systemDataAtom } from './atoms';
 
 function App() {

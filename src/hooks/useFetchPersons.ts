@@ -1,6 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
 
-import { supabase } from '../../supabase';
+import { supabase } from '../supabase';
 
 const fetchPersonQuery = async (id: number) => {
   const select = ['*', 'cast_credit(*, movie(*))', 'crew_credit(*, movie(*))'].join(

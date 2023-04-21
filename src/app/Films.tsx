@@ -4,9 +4,9 @@ import { useTitle, useWindowSize } from 'react-use';
 import { Loading } from '../core-components';
 import { Film as IFilm } from '../types';
 import { Film, FilmSkeleton, Paginator } from './components';
-import { useSearchFilms } from './hooks/useFetchFilms';
+import { useSearchFilms } from '../hooks/useFetchFilms';
 import { getTmdbImage } from '../utils';
-import { DEFAULT_PALETTE, Palette, toPalette } from './hooks/usePalette';
+import { DEFAULT_PALETTE, Palette, toPalette } from '../hooks/usePalette';
 
 const Films = ({ films }: { films: IFilm[] }) => {
   const [loading, setLoading] = useState(true);

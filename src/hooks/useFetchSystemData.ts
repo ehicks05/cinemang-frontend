@@ -1,6 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
-import { supabase } from '../../supabase';
-import { Genre, Language, WatchProvider } from '../../types';
+import { supabase } from '../supabase';
+import { Genre, Language, WatchProvider } from '../types';
 
 const fetchGenres = async () => {
   const result = await supabase.from('genre').select('*');

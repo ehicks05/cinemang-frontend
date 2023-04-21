@@ -7,10 +7,10 @@ import {
   QueryParamConfigMap,
   useQueryParams,
 } from 'use-query-params';
-import { PAGE_SIZE } from '../../constants';
-import { supabase } from '../../supabase';
-import { tmdb } from '../../tmdb';
-import { Video } from '../../types';
+import { PAGE_SIZE } from '../constants';
+import { supabase } from '../supabase';
+import { tmdb } from '../tmdb';
+import { Video } from '../types';
 
 interface Data {
   count: number;
