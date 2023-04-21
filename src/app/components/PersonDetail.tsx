@@ -119,9 +119,12 @@ const PersonDetail = ({ person }: { person: Person }) => {
             } flex-col gap-2 text-justify`}
             onClick={() => setTruncateBio(!truncateBio)}
           >
-            {bio.split('\n').map(b => (
-              <div key={b}>{b}</div>
-            ))}
+            {bio
+              .split('\n')
+              .filter(Boolean)
+              .map(b => (
+                <div key={b}>{b}</div>
+              ))}
           </div>
         </div>
         <div className="sm:hidden">
