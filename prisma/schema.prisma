@@ -42,6 +42,12 @@ model IgnoredMovie {
   @@map("ignored_movie")
 }
 
+model IgnoredPerson {
+  id Int @id
+
+  @@map("ignored_person")
+}
+
 model TvSeries {
   id            Int      @id
   cast          String
@@ -183,29 +189,4 @@ model TvNetwork {
   parentCompany String? @map("parent_company")
 
   @@map("tv_network")
-}
-
-model MovieApiResponse {
-  id        Int      @id
-  data      Json
-  updatedAt DateTime @updatedAt @db.Date
-
-  @@map("movie_api_response")
-}
-
-model PersonApiResponse {
-  id        Int      @id
-  data      Json
-  updatedAt DateTime @updatedAt @db.Date
-
-  @@map("person_api_response")
-}
-
-model MovieMinimalApiResponse {
-  id         Int      @id
-  popularity Float
-  voteCount  Int      @map("vote_count")
-  updatedAt  DateTime @updatedAt
-
-  @@map("movie_minimal_api_response")
 }
