@@ -44,8 +44,17 @@ export const isEqual = (
 ) => {
   const a = omitBy(value, isNil);
   const b = omitBy(other, isNil);
+
+  // consider vote_count unequal only once
+  // the difference is over 10%
+  const aCount = a.vote_count || a.voteCount;
+  const bCount = b.vote_count || a.voteCount;
+  const diff = Math.abs(aCount - bCount);
+  const min = Math.min(aCount, bCount);
+  const omitVoteCount = diff / min > 0.1;
+
   // TODO: omitting 'count' is hacky
-  const omittedFields = ['popularity', 'count'];
+  const omittedFields = ['popularity', 'count', ...[omitVoteCount ? 'vote_count' : undefined]];
   return _.isEqual(omit(a, omittedFields), omit(b, omittedFields));
 };
 
