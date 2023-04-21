@@ -1,6 +1,6 @@
 import chroma from 'chroma-js';
 import Vibrant from 'node-vibrant';
-import { useQuery } from 'react-query';
+import { useQuery } from '@tanstack/react-query';
 
 export const DEFAULT_PALETTE = {
   bgStyles: { background: '#333' },
