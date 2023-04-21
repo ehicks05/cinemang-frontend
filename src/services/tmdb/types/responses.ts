@@ -16,10 +16,7 @@ export type DailyFileMovie = Pick<
   'adult' | 'id' | 'original_title' | 'popularity' | 'video'
 >;
 
-export type DailyFilePerson = Pick<
-  Person,
-  'adult' | 'id' | 'name' | 'popularity'
->;
+export type DailyFilePerson = Pick<Person, 'adult' | 'id' | 'name' | 'popularity'>;
 
 export type DailyFileRow = DailyFileMovie | DailyFilePerson;
 

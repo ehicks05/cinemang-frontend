@@ -1,8 +1,8 @@
 import axios from 'axios';
 import { format, isBefore, subDays } from 'date-fns';
 import { TextDecoder } from 'util';
-import logger from '../logger';
 import zlib from 'zlib';
+import logger from '../logger';
 import { ResourceKey } from './types';
 import { DAILY_FILE, RESOURCES } from './constants';
 import fileCache from '../file_cache';
@@ -64,15 +64,15 @@ export const getValidIdRows = async (resource: ResourceKey) => {
 
   const rows: DailyFileRow[] = dailyFile
     .split('\n')
-    .filter((l) => l)
-    .map((line) => JSON.parse(line))
+    .filter(l => l)
+    .map(line => JSON.parse(line))
     .sort((o1, o2) => o2.popularity - o1.popularity);
   return rows;
 };
 
 export const getValidIds = async (resource: ResourceKey) => {
   try {
-    return (await getValidIdRows(resource)).map((row) => row.id);
+    return (await getValidIdRows(resource)).map(row => row.id);
   } catch (e) {
     logger.error(e);
   }

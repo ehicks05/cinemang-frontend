@@ -2,9 +2,8 @@ import { Prisma } from '@prisma/client';
 import { pick } from 'lodash';
 import { PersonResponse } from '../../services/tmdb/types/responses';
 
-const isValidPerson = (person: PersonResponse) => {
-  return person.imdb_id && person.profile_path;
-};
+const isValidPerson = (person: PersonResponse) =>
+  person.imdb_id && person.profile_path;
 
 export const parsePerson = (data: PersonResponse) => {
   if (!isValidPerson(data)) {
@@ -19,7 +18,7 @@ export const parsePerson = (data: PersonResponse) => {
     imdbId: data.imdb_id,
     knownForDepartment: data.known_for_department || '',
     placeOfBirth: data.place_of_birth,
-    profilePath: data.profile_path,
+    profilePath: data.profile_path as string,
   };
   return create;
 };

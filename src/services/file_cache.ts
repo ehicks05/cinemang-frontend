@@ -7,7 +7,7 @@ const TEMP_DIR = './file-cache';
 const getPath = (file: string) => `${TEMP_DIR}/${file}`;
 
 if (!existsSync(TEMP_DIR)) mkdirSync(TEMP_DIR);
-logger.info('file cache: ' + realpathSync(TEMP_DIR));
+logger.info(`file cache: ${realpathSync(TEMP_DIR)}`);
 
 const set = async (name: string, data: any) => {
   await writeFile(`${TEMP_DIR}/${name}`, data, { flag: 'w' });
@@ -22,10 +22,11 @@ const clear = async (except: string) => {
   const dir = await readdir(TEMP_DIR);
   await Promise.all(
     dir
-      .filter((file) => !file.includes(except))
-      .map((file) => {
-        logger.info('cleaning up file cache: ' + realpathSync(getPath(file)));
+      .filter(file => !file.includes(except))
+      .map(file => {
+        logger.info(`cleaning up file cache: ${realpathSync(getPath(file))}`);
         unlink(realpathSync(getPath(file)));
+        return undefined;
       }),
   );
 };
