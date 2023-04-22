@@ -20,14 +20,13 @@ const PersonCredit = ({ bgColor, genres, languages, credit }: Props) => {
   const { width } = useWindowSize();
   const year = format(parseISO(credit.movie.released_at), 'yyyy');
 
-  const creditUi =
-    'character' in credit ? (
-      <span>{credit.character}</span>
-    ) : (
-      <span>
-        {credit.department} - {credit.job}
-      </span>
-    );
+  const creditText = (
+    <span>
+      {'character' in credit
+        ? credit.character
+        : `${credit.department} - ${credit.job}`}
+    </span>
+  );
 
   return (
     <HoverCard.Root openDelay={100}>
@@ -47,7 +46,7 @@ const PersonCredit = ({ bgColor, genres, languages, credit }: Props) => {
                 </Link>
               </HoverCard.Trigger>
             </span>{' '}
-            {creditUi}
+            {creditText}
           </div>
         </div>
         <div>
