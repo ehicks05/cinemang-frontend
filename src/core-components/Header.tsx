@@ -8,8 +8,9 @@ const Header = () => (
       style={{ fontFamily: 'Urbanist' }}
       to="/"
     >
-      Cinemang
+      Cine
       <FaCat className="inline text-green-500" />
+      Mang
     </Link>
   </div>
 );
