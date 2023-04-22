@@ -18,7 +18,7 @@ const SearchForm = () => {
   const [isOpen, setIsOpen] = useState(false);
   const Icon = isOpen ? FaChevronUp : FaChevronDown;
   return (
-    <div className="flex w-full flex-col gap-4 rounded-lg bg-gray-800 p-4">
+    <div className="flex w-full flex-col gap-4 bg-gray-800 p-4 sm:rounded-lg">
       <div
         className="flex cursor-pointer justify-between gap-32"
         onClick={() => setIsOpen(!isOpen)}

@@ -97,7 +97,7 @@ const PersonDetail = ({ person }: { person: Person }) => {
 
   return (
     <div
-      className="m-auto flex max-w-screen-lg flex-col gap-4 rounded-lg p-4"
+      className="m-auto flex max-w-screen-lg flex-col gap-4 p-4 sm:rounded-lg"
       style={palette.bgStyles}
     >
       <div className="flex flex-col gap-4 sm:flex-row">

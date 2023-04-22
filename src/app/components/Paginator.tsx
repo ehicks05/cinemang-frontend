@@ -54,7 +54,7 @@ const Paginator: FC<PaginatorProps> = ({
   )} of ${nf.format(count)} films`;
 
   return (
-    <div className=" rounded-lg bg-gray-800 p-4">
+    <div className="bg-gray-800 p-4 sm:rounded-lg">
       <div
         className={`flex flex-col items-center justify-between gap-4 sm:flex-row ${
           isLoading ? 'invisible' : ''

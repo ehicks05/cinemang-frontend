@@ -25,7 +25,7 @@ const Film = ({ film, palette }: { film: IFilm; palette: Palette }) => {
   const [truncateOverview, setTruncateOverview] = useState(true);
 
   return (
-    <div className="flex flex-col gap-4 rounded-lg p-4" style={palette?.bgStyles}>
+    <div className="flex flex-col gap-4 p-4 sm:rounded-lg" style={palette?.bgStyles}>
       <div className="flex gap-4">
         <div className="flex-shrink-0">
           <img
