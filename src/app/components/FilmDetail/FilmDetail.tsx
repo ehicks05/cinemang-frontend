@@ -39,7 +39,13 @@ const FilmDetail = ({ film }: { film: IFilm }) => {
     >
       <div className="flex flex-col gap-4 sm:flex-row">
         <div className="flex-shrink-0">
-          <img alt="poster" className="rounded-lg sm:h-96 sm:w-64" src={posterUrl} />
+          <img alt="poster" className="rounded-lg sm:w-80 md:w-96" src={posterUrl} />
+          <div className="mt-4 flex flex-col justify-between gap-4">
+            <FilmStats
+              bgColor={palette.darkVibrant}
+              data={toStats(genres, languages, film)}
+            />
+          </div>
         </div>
         <div className="flex flex-col gap-1">
           <div>
@@ -52,12 +58,7 @@ const FilmDetail = ({ film }: { film: IFilm }) => {
           <div>{film.director}</div>
           <div>{film.cast}</div>
           <div className="text-justify text-sm">{film.overview}</div>
-          <div className="mt-4 flex flex-col justify-between gap-4">
-            <FilmStats
-              bgColor={palette.darkVibrant}
-              data={toStats(genres, languages, film)}
-            />
-          </div>
+
           {film.watch_provider.length > 0 && (
             <div className="mt-4">
               <WatchProviders selectedIds={film.watch_provider} />
@@ -69,10 +70,6 @@ const FilmDetail = ({ film }: { film: IFilm }) => {
       <div className="flex flex-col gap-4">
         <h1 className="text-xl font-bold">Trailers</h1>
         <Trailers movieId={film.id} palette={palette} />
-      </div>
-      <div className="flex flex-col gap-4">
-        <h1 className="text-xl font-bold">more like this</h1>
-        TODO
       </div>
       <Credits film={film} palette={palette} />
     </div>

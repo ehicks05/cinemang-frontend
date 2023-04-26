@@ -10,7 +10,7 @@ import { Loading } from '../../../core-components';
 import { Person } from '../../../types';
 import { getTmdbImage } from '../../../utils';
 import { useFetchPerson } from '@/hooks/useFetchPersons';
-import { Palette, usePalette } from '@/hooks/usePalette';
+import { usePalette } from '@/hooks/usePalette';
 import BirthAndDeath from './BirthAndDeath';
 import PersonCredit from './PersonCredit';
 import PersonStats from './PersonStats';
@@ -20,32 +20,18 @@ const BIO_LENGTH_CUTOFF = 1280;
 
 const nf = Intl.NumberFormat('en-US', { maximumFractionDigits: 1 });
 
+const toStats = (person: Person) => ({
+  credits: [...person.cast_credit, ...person.crew_credit].length,
+  knownForDepartment: person.known_for_department,
+  popularity: nf.format(person.popularity),
+});
+
 type SortKey = 'released_at' | 'vote_average' | 'vote_count';
 const SORT_OPTIONS: { color: string; icon: IconType; sort: SortKey }[] = [
   { color: 'text-sky-500', icon: FaCalendar, sort: 'released_at' },
   { color: 'text-red-600', icon: FaHeart, sort: 'vote_average' },
   { color: 'text-yellow-300', icon: FaStar, sort: 'vote_count' },
 ];
-
-const StatsAndLifespan = ({
-  palette,
-  person,
-}: {
-  palette: Palette;
-  person: Person;
-}) => {
-  const statData = {
-    credits: [...person.cast_credit, ...person.crew_credit].length,
-    knownForDepartment: person.known_for_department,
-    popularity: nf.format(person.popularity),
-  };
-  return (
-    <div className="mt-4 flex w-full flex-col justify-between gap-4">
-      <PersonStats bgColor={palette.darkVibrant || ''} data={statData} />
-      <BirthAndDeath palette={palette} person={person} />
-    </div>
-  );
-};
 
 const SortOptions = ({
   darkVibrant,
@@ -101,40 +87,39 @@ const PersonDetail = ({ person }: { person: Person }) => {
       style={palette.bgStyles}
     >
       <div className="flex flex-col gap-4 sm:flex-row">
-        <div className="flex-shrink-0">
+        <div className="flex flex-shrink-0 flex-col gap-4">
           <img
             alt="poster"
-            className="rounded-lg sm:h-96 sm:w-64"
+            className="rounded-lg sm:w-80 md:w-96"
             src={profileUrl}
           />
-          <div className="hidden sm:flex">
-            <StatsAndLifespan palette={palette} person={person} />
-          </div>
+          <PersonStats bgColor={palette.darkVibrant || ''} data={toStats(person)} />
         </div>
-        <div className="flex flex-col gap-1">
-          <div className="text-2xl font-semibold">{person.name}</div>
-          <div
-            className={`flex ${
-              person.biography.length > BIO_LENGTH_CUTOFF ? 'cursor-pointer' : ''
-            } flex-col gap-2 text-justify`}
-            onClick={() => setTruncateBio(!truncateBio)}
-          >
-            {bio
-              .split('\n')
-              .filter(Boolean)
-              .map(b => (
-                <div key={b}>{b}</div>
-              ))}
+
+        <div className="flex flex-col gap-4">
+          <div className="flex flex-col gap-1">
+            <div className="text-2xl font-semibold">{person.name}</div>
+            <div
+              className={`flex ${
+                person.biography.length > BIO_LENGTH_CUTOFF ? 'cursor-pointer' : ''
+              } flex-col gap-2 text-justify`}
+              onClick={() => setTruncateBio(!truncateBio)}
+            >
+              {bio
+                .split('\n')
+                .filter(Boolean)
+                .map(b => (
+                  <div key={b}>{b}</div>
+                ))}
+            </div>
           </div>
-        </div>
-        <div className="sm:hidden">
-          <StatsAndLifespan palette={palette} person={person} />
+          <BirthAndDeath palette={palette} person={person} />
         </div>
       </div>
 
       {person.cast_credit.length !== 0 && (
         <>
-          <h1 className="flex items-end justify-between text-xl font-bold">
+          <h1 className="items-end flex justify-between text-xl font-bold">
             Cast
             <SortOptions
               darkVibrant={palette.darkVibrant}
