@@ -47,29 +47,26 @@ const FilmDetail = ({ film }: { film: IFilm }) => {
             />
           </div>
         </div>
-        <div className="flex flex-col gap-1">
-          <div>
-            <span className="text-2xl font-semibold">{film.title}</span>{' '}
-            <span className="text-xs text-gray-300" title={film.released_at}>
-              <span className="font-semibold"> {year} </span>
-              <span className="whitespace-nowrap">{`${runtime.hours}h ${runtime.minutes}m`}</span>
-            </span>
+        <div className="flex flex-col gap-4">
+          <div className="flex flex-col gap-1">
+            <div>
+              <span className="text-2xl font-semibold">{film.title}</span>{' '}
+              <span className="text-xs text-gray-300" title={film.released_at}>
+                <span className="font-semibold"> {year} </span>
+                <span className="whitespace-nowrap">{`${runtime.hours}h ${runtime.minutes}m`}</span>
+              </span>
+            </div>
+            <div>{film.director}</div>
+            <div>{film.cast}</div>
+            <div className="text-justify text-sm">{film.overview}</div>
           </div>
-          <div>{film.director}</div>
-          <div>{film.cast}</div>
-          <div className="text-justify text-sm">{film.overview}</div>
 
           {film.watch_provider.length > 0 && (
-            <div className="mt-4">
-              <WatchProviders selectedIds={film.watch_provider} />
-            </div>
+            <WatchProviders selectedIds={film.watch_provider} />
           )}
-        </div>
-      </div>
 
-      <div className="flex flex-col gap-4">
-        <h1 className="text-xl font-bold">Trailers</h1>
-        <Trailers movieId={film.id} palette={palette} />
+          <Trailers movieId={film.id} palette={palette} />
+        </div>
       </div>
       <Credits film={film} palette={palette} />
     </div>

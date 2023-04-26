@@ -12,10 +12,10 @@ interface TrailerCardProps {
 
 const TrailerCard = ({ trailer: { name, key }, palette }: TrailerCardProps) => (
   <div
-    className="flex w-full flex-col gap-2 rounded-lg p-1"
+    className="flex w-full flex-col gap-2 rounded-lg p-0.5"
     style={{ backgroundColor: palette.darkVibrant }}
   >
-    <LiteYouTubeEmbed id={key} title={name} />
+    <LiteYouTubeEmbed id={key} title={name} wrapperClass="yt-lite rounded-lg" />
 
     <div className="flex-grow p-2">
       <div>{name}</div>
@@ -23,19 +23,31 @@ const TrailerCard = ({ trailer: { name, key }, palette }: TrailerCardProps) => (
   </div>
 );
 
+const nameIncludesOfficial = (t: Video) => t.name.includes('Official');
+
 interface Props {
   movieId: number;
   palette: Palette;
 }
 
 const Trailers = ({ movieId, palette }: Props) => {
-  const { data: trailers } = useFetchTrailers(movieId);
-  if (!trailers || trailers.length === 0) return <div>no trailers</div>;
+  const { data } = useFetchTrailers(movieId);
+  if (!data || data.length === 0) return null;
+
+  const trailers =
+    data
+      ?.sort((t1, t2) => t1.name.length - t2.name.length)
+      .sort((t1, t2) => t1.name.localeCompare(t2.name)) || [];
+  const officialTrailers = trailers.filter(nameIncludesOfficial) || trailers;
+
   return (
-    <div className="grid grid-cols-1 justify-center gap-4 md:grid-cols-2 xl:sm:grid-cols-3">
-      {trailers.map(trailer => (
-        <TrailerCard key={trailer.id} palette={palette} trailer={trailer} />
-      ))}
+    <div className="flex flex-col gap-2">
+      <h1 className="text-xl font-bold">Trailer</h1>
+      <div className="grid grid-cols-1 justify-center gap-4 lg:grid-cols-2 xl:sm:grid-cols-3">
+        {[officialTrailers[0]].map(trailer => (
+          <TrailerCard key={trailer.id} palette={palette} trailer={trailer} />
+        ))}
+      </div>
     </div>
   );
 };
