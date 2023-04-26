@@ -67,7 +67,7 @@ const FilmDetail = ({ film }: { film: IFilm }) => {
       </div>
 
       <div className="flex flex-col gap-4">
-        <h1 className="text-xl font-bold">trailers</h1>
+        <h1 className="text-xl font-bold">Trailers</h1>
         <Trailers movieId={film.id} palette={palette} />
       </div>
       <div className="flex flex-col gap-4">
