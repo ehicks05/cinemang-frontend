@@ -61,7 +61,7 @@ const PersonCredit = ({ bgColor, genres, languages, credit }: Props) => {
         </div>
       </div>
       <HoverCard.Portal>
-        <HoverCard.Content className="HoverCardContent">
+        <HoverCard.Content>
           <HoverFilm id={credit.movieId} />
           <HoverCard.Arrow className="text-gray-700" />
         </HoverCard.Content>
