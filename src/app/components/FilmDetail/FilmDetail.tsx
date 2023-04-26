@@ -19,7 +19,7 @@ const FilmDetail = ({ film }: { film: IFilm }) => {
   useTitle(film.title, { restoreOnUnmount: true });
   const [{ genres, languages }] = useAtom(systemDataAtom);
 
-  const posterUrl = getTmdbImage({ path: film.poster_path, width: 'original' });
+  const posterUrl = getTmdbImage({ path: film.poster_path, width: 'w500' });
   const year = format(parseISO(film.released_at), 'yyyy');
   const runtime = intervalToDuration({
     end: addMinutes(new Date(), Number(film.runtime)),

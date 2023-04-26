@@ -63,7 +63,7 @@ const PersonDetail = ({ person }: { person: Person }) => {
   useTitle(person.name, { restoreOnUnmount: true });
   const profileUrl = getTmdbImage({
     path: person.profile_path,
-    width: 'original',
+    width: 'w500',
   });
 
   const [sort, setSort] = useState<SortKey>('released_at');
