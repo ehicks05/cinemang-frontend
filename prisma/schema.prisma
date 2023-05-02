@@ -193,8 +193,8 @@ model TvNetwork {
 
 model SystemInfo {
   id             Int      @id
-  loadStartedAt  DateTime @updatedAt
-  loadFinishedAt DateTime @updatedAt
+  loadStartedAt  DateTime @updatedAt @db.Timestamptz
+  loadFinishedAt DateTime @updatedAt @db.Timestamptz
 
   @@map("system_info")
 }
