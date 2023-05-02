@@ -1,6 +1,8 @@
 import React, { FC, ReactNode } from 'react';
-import { FaGithubSquare, FaHome } from 'react-icons/fa';
+import { HiOutlineHome } from 'react-icons/hi2';
 import { SiThemoviedatabase } from 'react-icons/si';
+import { VscGithub } from 'react-icons/vsc';
+import SystemInfo from './SystemInfo';
 
 const LINKS = [
   {
@@ -8,11 +10,11 @@ const LINKS = [
     url: 'https://www.themoviedb.org',
   },
   {
-    icon: FaGithubSquare,
+    icon: VscGithub,
     url: 'https://www.github.com/ehicks05/cinemang-frontend',
   },
   {
-    icon: FaHome,
+    icon: HiOutlineHome,
     url: 'https://ehicks.net',
   },
 ];
@@ -24,6 +26,7 @@ const Footer = () => (
         <Icon className="text-3xl text-green-500 hover:text-green-400" />
       </Link>
     ))}
+    <SystemInfo />
   </footer>
 );
 

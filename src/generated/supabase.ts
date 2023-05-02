@@ -251,6 +251,23 @@ export interface Database {
           profile_path?: string
         }
       }
+      system_info: {
+        Row: {
+          id: number
+          loadFinishedAt: string
+          loadStartedAt: string
+        }
+        Insert: {
+          id: number
+          loadFinishedAt: string
+          loadStartedAt: string
+        }
+        Update: {
+          id?: number
+          loadFinishedAt?: string
+          loadStartedAt?: string
+        }
+      }
       tv_network: {
         Row: {
           headquarters: string
