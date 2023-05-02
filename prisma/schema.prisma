@@ -190,3 +190,11 @@ model TvNetwork {
 
   @@map("tv_network")
 }
+
+model SystemInfo {
+  id             Int      @id
+  loadStartedAt  DateTime @updatedAt
+  loadFinishedAt DateTime @updatedAt
+
+  @@map("system_info")
+}

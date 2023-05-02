@@ -463,9 +463,12 @@ const updateDb = async () => {
   try {
     logger.info('starting tmdb_loader script');
     const start = new Date();
+    await prisma.systemInfo.update({
+      data: { loadStartedAt: start, loadFinishedAt: start },
+      where: { id: 1 },
+    });
 
-    const args = await argv;
-    if (args.full) {
+    if (argv.full) {
       logger.info('--full arg detected.');
     }
 
@@ -474,7 +477,7 @@ const updateDb = async () => {
       logger.info('start of month detected.');
     }
 
-    const fullMode = isStartOfMonth || args.full;
+    const fullMode = isStartOfMonth || argv.full;
 
     logger.info(`running ${fullMode ? 'full' : 'partial'} load`);
 
@@ -498,7 +501,12 @@ const updateDb = async () => {
       logger.info('cleaning up dead movies [TODO]');
     }
 
-    const duration = intervalToDuration({ start, end: new Date() });
+    const end = new Date();
+    await prisma.systemInfo.update({
+      data: { loadStartedAt: start, loadFinishedAt: end },
+      where: { id: 1 },
+    });
+    const duration = intervalToDuration({ start, end });
     logger.info(`finished tmdb_loader script in ${formatDuration(duration)}`);
   } catch (err) {
     logger.error(err);

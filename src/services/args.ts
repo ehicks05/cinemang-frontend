@@ -1,8 +1,10 @@
 import yargs from 'yargs';
-import { hideBin } from 'yargs/helpers';
 
-const { argv } = yargs(hideBin(process.argv)).options({
-  full: { type: 'boolean', default: false },
-});
+const argv = yargs(process.argv.slice(2))
+  .options({
+    full: { type: 'boolean', default: false },
+    syncOnStart: { type: 'boolean', default: false },
+  })
+  .parseSync();
 
 export { argv };
