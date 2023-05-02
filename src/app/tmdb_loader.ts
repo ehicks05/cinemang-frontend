@@ -477,7 +477,7 @@ const updateDb = async () => {
       logger.info('start of month detected.');
     }
 
-    const fullMode = isStartOfMonth || argv.full;
+    const fullMode = argv.full === 'on' || (isStartOfMonth && argv.full !== 'off');
 
     logger.info(`running ${fullMode ? 'full' : 'partial'} load`);
 
