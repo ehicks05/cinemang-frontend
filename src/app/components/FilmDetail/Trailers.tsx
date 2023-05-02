@@ -38,15 +38,20 @@ const Trailers = ({ movieId, palette }: Props) => {
     data
       ?.sort((t1, t2) => t1.name.length - t2.name.length)
       .sort((t1, t2) => t1.name.localeCompare(t2.name)) || [];
-  const officialTrailers = trailers.filter(nameIncludesOfficial) || trailers;
+  const officialTrailer =
+    trailers.filter(nameIncludesOfficial)?.[0] || trailers?.[0] || [];
 
   return (
     <div className="flex flex-col gap-2">
       <h1 className="text-xl font-bold">Trailer</h1>
       <div className="grid grid-cols-1 justify-center gap-4 lg:grid-cols-2 xl:sm:grid-cols-3">
-        {[officialTrailers[0]].map(trailer => (
-          <TrailerCard key={trailer.id} palette={palette} trailer={trailer} />
-        ))}
+        {officialTrailer && (
+          <TrailerCard
+            key={officialTrailer.id}
+            palette={palette}
+            trailer={officialTrailer}
+          />
+        )}
       </div>
     </div>
   );
