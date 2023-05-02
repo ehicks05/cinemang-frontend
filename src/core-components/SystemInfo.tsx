@@ -6,7 +6,8 @@ import * as Popover from '@radix-ui/react-popover';
 import { HiX } from 'react-icons/hi';
 import { supabase } from '../supabase';
 
-const DF = 'MMM dd hh:mm:ss a';
+const SHORT = 'hh:mm:ss a';
+const DEFAULT = `MMM dd ${SHORT}`;
 
 const SystemInfo = () => {
   const { data: systemInfo } = useQuery(
@@ -17,6 +18,8 @@ const SystemInfo = () => {
 
   const syncStartedAt = new Date(systemInfo.loadStartedAt);
   const syncEndedAt = new Date(systemInfo.loadFinishedAt);
+  const df = syncStartedAt.getDate() === syncEndedAt.getDate() ? SHORT : DEFAULT;
+
   return (
     <Popover.Root>
       <Popover.Trigger asChild>
@@ -35,11 +38,11 @@ const SystemInfo = () => {
               </thead>
               <tr>
                 <td className="text-left">start</td>
-                <td className="text-right">{format(syncStartedAt, DF)}</td>
+                <td className="text-right">{format(syncStartedAt, df)}</td>
               </tr>
               <tr>
                 <td className="text-left">end</td>
-                <td className="text-right">{format(syncEndedAt, DF)}</td>
+                <td className="text-right">{format(syncEndedAt, df)}</td>
               </tr>
               <tfoot>
                 <tr>
