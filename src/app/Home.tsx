@@ -4,7 +4,7 @@ import { SearchForm } from './components';
 import FilmsWrapper from './Films';
 
 const Home = () => (
-  <div className="flex flex-col gap-4">
+  <div className="flex flex-col sm:gap-4">
     <SearchForm />
     <FilmsWrapper />
   </div>

@@ -38,7 +38,7 @@ const Films = ({ films }: { films: IFilm[] }) => {
 
   return (
     <div
-      className="grid gap-4"
+      className="grid sm:gap-4"
       style={{
         gridTemplateColumns: `repeat( auto-fill, minmax(${minColumnWidth}px, 1fr) )`,
       }}
