@@ -468,7 +468,7 @@ const updateDb = async () => {
       where: { id: 1 },
     });
 
-    if (argv.full) {
+    if (argv.full !== 'auto') {
       logger.info('--full arg detected.');
     }
 
