@@ -1,12 +1,7 @@
 import React, { FC, ReactNode } from 'react';
 import P from 'paginator';
 import { range } from 'lodash';
-import {
-  HiChevronDoubleLeft,
-  HiChevronDoubleRight,
-  HiChevronLeft,
-  HiChevronRight,
-} from 'react-icons/hi';
+import { IoIosPlay, IoIosSkipForward } from 'react-icons/io';
 import { PAGE_SIZE } from '../../constants';
 
 const nf = Intl.NumberFormat('en-US');
@@ -68,14 +63,14 @@ const Paginator: FC<PaginatorProps> = ({
             isFirst
             setPage={() => setPage(0)}
           >
-            <HiChevronDoubleLeft className="my-auto" size={20} />
+            <IoIosSkipForward className="my-auto rotate-180" size={20} />
           </Link>
           <Link
             isCompact
             isDisabled={!has_previous_page}
             setPage={() => setPage(previous_page - 1)}
           >
-            <HiChevronLeft className="my-auto" size={20} />
+            <IoIosPlay className="my-auto rotate-180" size={20} />
           </Link>
           {links.map(link => (
             <Link
@@ -91,7 +86,7 @@ const Paginator: FC<PaginatorProps> = ({
             isDisabled={!has_next_page}
             setPage={() => setPage(next_page - 1)}
           >
-            <HiChevronRight className="my-auto" size={20} />
+            <IoIosPlay className="my-auto" size={20} />
           </Link>
           <Link
             isCompact
@@ -99,7 +94,7 @@ const Paginator: FC<PaginatorProps> = ({
             isLast
             setPage={() => setPage(total_pages - 1)}
           >
-            <HiChevronDoubleRight className="my-auto" size={20} />
+            <IoIosSkipForward className="my-auto" size={20} />
           </Link>
         </div>
       </div>
@@ -130,7 +125,7 @@ const Link: FC<LinkProps> = ({
   const defaultStyle =
     'flex border border-solid border-gray-500 px-2 sm:px-3 sm:py-1';
   const disabled = isDisabled ? 'opacity-60' : 'cursor-pointer';
-  const active = isActive ? 'z-10 border-green-600 bg-green-700' : undefined;
+  const active = isActive ? 'z-10 border-green-700 bg-green-900' : undefined;
   const notSpecial = !isDisabled && !isActive ? 'hover:bg-gray-700' : undefined;
   const first = isFirst ? 'rounded-l-md' : undefined;
   const last = isLast ? 'rounded-r-md' : undefined;
