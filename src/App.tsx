@@ -1,4 +1,4 @@
-import React, { ReactNode, useEffect } from 'react';
+import React, { useEffect } from 'react';
 import { Route, Routes } from 'react-router-dom';
 
 import { useAtom } from 'jotai';
@@ -27,19 +27,14 @@ function App() {
     <div className="flex min-h-screen flex-col bg-gradient-to-tr from-indigo-900 to-green-900 text-gray-50">
       <Header />
       <div className="flex h-full flex-grow flex-col pb-4 sm:px-4">
-        {systemDataLoaded && (
-          <Routes>
-            <Route element={<Home />} path="/" />
-            <Route element={<FilmDetail />} path="/films/:id" />
-            <Route element={<PersonDetail />} path="/people/:id" />
-          </Routes>
+        {!isLoading && (error || !systemDataLoaded) && (
+          <Loading error={error || 'something went wrong'} loading={false} />
         )}
-        {!systemDataLoaded && (isLoading || !!error) && (
-          <Loading error={error} loading={isLoading} />
-        )}
-        {!systemDataLoaded && !(isLoading || error) && (
-          <Loading error="something went wrong" loading={false} />
-        )}
+        <Routes>
+          <Route element={<Home />} path="/" />
+          <Route element={<FilmDetail />} path="/films/:id" />
+          <Route element={<PersonDetail />} path="/people/:id" />
+        </Routes>
       </div>
       <Footer />
     </div>
