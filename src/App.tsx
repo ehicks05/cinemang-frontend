@@ -23,41 +23,27 @@ function App() {
     data.languages.length > 0 &&
     data.watchProviders.length > 0;
 
-  if (systemDataLoaded) {
-    return (
-      <Layout>
-        <Routes>
-          <Route element={<Home />} path="/" />
-          <Route element={<FilmDetail />} path="/films/:id" />
-          <Route element={<PersonDetail />} path="/people/:id" />
-        </Routes>
-      </Layout>
-    );
-  }
-  if (isLoading || error) {
-    return (
-      <Layout>
-        <Loading error={error} loading />
-      </Layout>
-    );
-  }
-  if (!systemDataLoaded) {
-    return (
-      <Layout>
-        <Loading error="something went wrong" loading={false} />
-      </Layout>
-    );
-  }
-
-  return null;
+  return (
+    <div className="flex min-h-screen flex-col bg-gradient-to-tr from-indigo-900 to-green-900 text-gray-50">
+      <Header />
+      <div className="flex h-full flex-grow flex-col pb-4 sm:px-4">
+        {systemDataLoaded && (
+          <Routes>
+            <Route element={<Home />} path="/" />
+            <Route element={<FilmDetail />} path="/films/:id" />
+            <Route element={<PersonDetail />} path="/people/:id" />
+          </Routes>
+        )}
+        {!systemDataLoaded && (isLoading || !!error) && (
+          <Loading error={error} loading={isLoading} />
+        )}
+        {!systemDataLoaded && !(isLoading || error) && (
+          <Loading error="something went wrong" loading={false} />
+        )}
+      </div>
+      <Footer />
+    </div>
+  );
 }
-
-const Layout = ({ children }: { children: ReactNode }) => (
-  <div className="flex min-h-screen flex-col bg-gradient-to-tr from-indigo-900 to-green-900 text-gray-50">
-    <Header />
-    <div className="flex h-full flex-grow flex-col pb-4 sm:px-4">{children}</div>
-    <Footer />
-  </div>
-);
 
 export default App;
