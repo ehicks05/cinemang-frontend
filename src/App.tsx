@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { ReactNode, useEffect } from 'react';
 import { Route, Routes } from 'react-router-dom';
 
 import { useAtom } from 'jotai';
@@ -17,28 +17,47 @@ function App() {
     if (data) setSystemData(data);
   }, [data]);
 
-  if (error || isLoading) return <Loading error={error} loading={isLoading} />;
-  if (!data) {
-    return <Loading error="systemData is undefined" loading={isLoading} />;
-  }
-  const { genres, languages, watchProviders } = data;
+  const systemDataLoaded =
+    data &&
+    data.genres.length > 0 &&
+    data.languages.length > 0 &&
+    data.watchProviders.length > 0;
 
-  if (!genres?.length || !languages?.length || !watchProviders?.length)
-    return <div>Missing system data</div>;
-
-  return (
-    <div className="flex min-h-screen flex-col bg-gradient-to-tr from-indigo-900 to-green-900 text-gray-50">
-      <Header />
-      <div className="flex h-full flex-grow flex-col pb-4 sm:px-4">
+  if (systemDataLoaded) {
+    return (
+      <Layout>
         <Routes>
           <Route element={<Home />} path="/" />
           <Route element={<FilmDetail />} path="/films/:id" />
           <Route element={<PersonDetail />} path="/people/:id" />
         </Routes>
-      </div>
-      <Footer />
-    </div>
-  );
+      </Layout>
+    );
+  }
+  if (isLoading || error) {
+    return (
+      <Layout>
+        <Loading error={error} loading />
+      </Layout>
+    );
+  }
+  if (!systemDataLoaded) {
+    return (
+      <Layout>
+        <Loading error="something went wrong" loading={false} />
+      </Layout>
+    );
+  }
+
+  return null;
 }
+
+const Layout = ({ children }: { children: ReactNode }) => (
+  <div className="flex min-h-screen flex-col bg-gradient-to-tr from-indigo-900 to-green-900 text-gray-50">
+    <Header />
+    <div className="flex h-full flex-grow flex-col pb-4 sm:px-4">{children}</div>
+    <Footer />
+  </div>
+);
 
 export default App;
