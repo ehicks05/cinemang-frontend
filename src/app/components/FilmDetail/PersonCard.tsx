@@ -29,14 +29,14 @@ const PersonCard = ({
   profilePath,
 }: Props) => {
   const profile = getTmdbImage({
-    defaultImage: getDefaultProfile(name, palette.darkVibrant.slice(1)),
+    defaultImage: getDefaultProfile(name, palette.darkMuted.slice(1)),
     path: profilePath,
   });
 
   return (
     <Link
       className="flex w-full flex-col rounded-lg p-0.5"
-      style={{ backgroundColor: palette.darkVibrant }}
+      style={{ backgroundColor: palette.darkMuted }}
       to={`/people/${personId}`}
     >
       <img alt="cast" className="rounded-t-lg" src={profile} />

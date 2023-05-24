@@ -93,7 +93,7 @@ const PersonDetail = ({ person }: { person: Person }) => {
             className="rounded-lg sm:w-80 md:w-96"
             src={profileUrl}
           />
-          <PersonStats bgColor={palette.darkVibrant || ''} data={toStats(person)} />
+          <PersonStats bgColor={palette.darkMuted || ''} data={toStats(person)} />
         </div>
 
         <div className="flex flex-col gap-4">
@@ -119,10 +119,10 @@ const PersonDetail = ({ person }: { person: Person }) => {
 
       {person.cast_credit.length !== 0 && (
         <>
-          <h1 className="items-end flex justify-between text-xl font-bold">
+          <h1 className="flex items-end justify-between text-xl font-bold">
             Cast
             <SortOptions
-              darkVibrant={palette.darkVibrant}
+              darkVibrant={palette.darkMuted}
               setSort={setSort}
               sort={sort}
             />
@@ -130,7 +130,7 @@ const PersonDetail = ({ person }: { person: Person }) => {
 
           {castCredits.map(c => (
             <PersonCredit
-              bgColor={palette.darkVibrant}
+              bgColor={palette.darkMuted}
               credit={c}
               genres={genres}
               key={c.credit_id}
@@ -144,7 +144,7 @@ const PersonDetail = ({ person }: { person: Person }) => {
           <h1 className="flex items-center justify-between text-xl font-bold">
             crew
             <SortOptions
-              darkVibrant={palette.darkVibrant}
+              darkVibrant={palette.darkMuted}
               setSort={setSort}
               sort={sort}
             />
@@ -155,7 +155,7 @@ const PersonDetail = ({ person }: { person: Person }) => {
             )
             .map(c => (
               <PersonCredit
-                bgColor={palette.darkVibrant}
+                bgColor={palette.darkMuted}
                 credit={c}
                 genres={genres}
                 key={c.credit_id}
