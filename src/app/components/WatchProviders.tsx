@@ -24,12 +24,12 @@ const WatchProviders: FC<Props> = ({ selectedIds }) => {
   const providers = selectedIds
     .map(id => watchProviders.find(wp => wp.id === id.id))
     .filter((p): p is IWatchProvider => p !== null && p !== undefined)
-    // .filter((p) => p.display_priority <= 16)
+    .filter(p => p.display_priority <= 22)
     .sort((p1, p2) => p1.display_priority - p2.display_priority);
 
   if (providers.length === 0) return null;
   return (
-    <div className="flex flex-wrap gap-2">
+    <div className="flex flex-wrap gap-0.5">
       {providers.map(provider => (
         <WatchProvider key={provider.id} provider={provider} />
       ))}
