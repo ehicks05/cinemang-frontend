@@ -9,7 +9,7 @@ import FilmStats from '../FilmStats';
 import WatchProviders from '../WatchProviders';
 import { Film as IFilm } from '../../../types';
 import { useFetchFilm } from '@/hooks/useFetchFilms';
-import Trailers from './Trailers';
+import Trailer from './Trailer';
 import Credits from './Credits';
 import { systemDataAtom } from '../../../atoms';
 import { getTmdbImage } from '../../../utils';
@@ -37,9 +37,21 @@ const FilmDetail = ({ film }: { film: IFilm }) => {
       className="m-auto flex max-w-screen-lg flex-col gap-4 p-4 sm:rounded-lg"
       style={palette.bgStyles}
     >
+      <div>
+        <div className="text-2xl font-semibold sm:text-3xl">{film.title}</div>
+        <div className="text-sm text-gray-300">
+          <span title={film.released_at}>{year}</span>
+          {' • '}
+          <span>{`${runtime.hours}h ${runtime.minutes}m`}</span>
+        </div>
+      </div>
       <div className="flex flex-col gap-4 sm:flex-row">
         <div className="flex-shrink-0">
-          <img alt="poster" className="rounded-lg sm:w-80 md:w-96" src={posterUrl} />
+          <img
+            alt="poster"
+            className="mx-auto rounded-lg sm:w-80 md:w-96"
+            src={posterUrl}
+          />
           <div className="mt-4 flex flex-col justify-between gap-4">
             <FilmStats
               bgColor={palette.darkVibrant}
@@ -49,23 +61,15 @@ const FilmDetail = ({ film }: { film: IFilm }) => {
         </div>
         <div className="flex flex-col gap-4">
           <div className="flex flex-col gap-1">
-            <div>
-              <span className="text-2xl font-semibold">{film.title}</span>{' '}
-              <span className="text-xs text-gray-300" title={film.released_at}>
-                <span className="font-semibold"> {year} </span>
-                <span className="whitespace-nowrap">{`${runtime.hours}h ${runtime.minutes}m`}</span>
-              </span>
-            </div>
-            <div>{film.director}</div>
-            <div>{film.cast}</div>
-            <div className="text-justify text-sm">{film.overview}</div>
+            <Trailer movieId={film.id} />
+            <div>Director: {film.director}</div>
+            <div>Starring: {film.cast}</div>
+            <div className="text-justify text-sm sm:text-base">{film.overview}</div>
           </div>
 
           {film.watch_provider.length > 0 && (
             <WatchProviders selectedIds={film.watch_provider} />
           )}
-
-          <Trailers movieId={film.id} palette={palette} />
         </div>
       </div>
       <Credits film={film} palette={palette} />
