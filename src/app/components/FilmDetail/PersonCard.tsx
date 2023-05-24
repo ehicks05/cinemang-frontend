@@ -35,7 +35,7 @@ const PersonCard = ({
 
   return (
     <Link
-      className="flex w-full flex-col gap-2 rounded-lg p-0.5"
+      className="flex w-full flex-col rounded-lg p-0.5"
       style={{ backgroundColor: palette.darkVibrant }}
       to={`/people/${personId}`}
     >
