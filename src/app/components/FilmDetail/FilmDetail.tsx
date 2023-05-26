@@ -3,7 +3,7 @@ import { addMinutes, intervalToDuration, parseISO, format } from 'date-fns';
 import { useParams } from 'react-router-dom';
 import { useAtom } from 'jotai';
 import { useTitle } from 'react-use';
-import { Loading } from '../../../core-components';
+import { Loading, OriginalImageLink } from '../../../core-components';
 import { usePalette } from '@/hooks/usePalette';
 import FilmStats from '../FilmStats';
 import WatchProviders from '../WatchProviders';
@@ -47,11 +47,14 @@ const FilmDetail = ({ film }: { film: IFilm }) => {
       </div>
       <div className="flex flex-col gap-4 sm:flex-row">
         <div className="flex-shrink-0">
-          <img
-            alt="poster"
-            className="mx-auto rounded-lg sm:w-80 md:w-96"
-            src={posterUrl}
-          />
+          <div className="relative">
+            <img
+              alt="poster"
+              className="w-full rounded-lg sm:w-80 md:w-96"
+              src={posterUrl}
+            />
+            <OriginalImageLink path={film.poster_path} />
+          </div>
           <div className="mt-4 flex flex-col justify-between gap-4">
             <FilmStats
               bgColor={palette.darkVibrant}

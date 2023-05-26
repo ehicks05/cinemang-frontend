@@ -6,7 +6,7 @@ import { FaCalendar, FaHeart, FaStar } from 'react-icons/fa';
 import { useParams } from 'react-router-dom';
 import { useTitle } from 'react-use';
 import { systemDataAtom } from '../../../atoms';
-import { Loading } from '../../../core-components';
+import { Loading, OriginalImageLink } from '@/core-components';
 import { Person } from '../../../types';
 import { getTmdbImage } from '../../../utils';
 import { useFetchPerson } from '@/hooks/useFetchPersons';
@@ -88,11 +88,14 @@ const PersonDetail = ({ person }: { person: Person }) => {
     >
       <div className="flex flex-col gap-4 sm:flex-row">
         <div className="flex flex-shrink-0 flex-col gap-4">
-          <img
-            alt="poster"
-            className="rounded-lg sm:w-80 md:w-96"
-            src={profileUrl}
-          />
+          <div className="relative">
+            <img
+              alt="poster"
+              className="w-full rounded-lg sm:w-80 md:w-96"
+              src={profileUrl}
+            />
+            <OriginalImageLink path={person.profile_path} />
+          </div>
           <PersonStats bgColor={palette.darkMuted || ''} data={toStats(person)} />
         </div>
 
