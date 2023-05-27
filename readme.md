@@ -14,3 +14,7 @@
    npm i
    npm run dev
    ```
+
+## why is it called cinemang
+
+Take the word 'cinema' and add a very good cat named Mang and you get cinemang.
