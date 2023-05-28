@@ -1,5 +1,14 @@
 # cinemang-backend
 
+## Overview
+
+This repo contains data importing logic for https://github.com/ehicks05/cinemang-frontend. On a high level, what it does is:
+
+1. Take data from TMDB
+3. Filter out a lot of noise. For example, it skips films over a month old with < 64 votes. This is partly to save db space and partly to avoid lots of movies that most people will be uninterested in.
+2. Convert it into the schema for Cinemang and save it in a Supabase instance.
+5. Tries to get clever in many ways to minimize requests to TMDB and Supabase.
+
 ## Prereqs
 
 1. node
