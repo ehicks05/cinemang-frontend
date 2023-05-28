@@ -40,6 +40,8 @@ daily file:
 
 Seeder: runs daily@10AM
 
+
+### Pseudo-code, probably outdated 
 ```
 getGenres();
   fetch genres
