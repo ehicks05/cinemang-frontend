@@ -27,11 +27,16 @@ This repo contains data importing logic for https://github.com/ehicks05/cinemang
 
 daily file:
 
-- https://developers.themoviedb.org/3/getting-started/daily-file-exports
-- contains valid ids
+- docs: https://developers.themoviedb.org/3/getting-started/daily-file-exports
+- sample URL: http://files.tmdb.org/p/exports/movie_ids_05_28_2023.json.gz
+- contains all the valid ids on TMDB
 - each row is a json record
 - available by 8AM UTC
-- example URL: http://files.tmdb.org/p/exports/movie_ids_04_28_2017.json.gz
+
+```json
+// sample row
+{"adult":false,"id":89,"original_title":"Indiana Jones and the Last Crusade","popularity":41.495,"video":false}
+```
 
 Seeder: runs daily@10AM
 
