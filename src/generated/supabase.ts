@@ -7,7 +7,7 @@ export type Json =
   | Json[]
 
 export interface Database {
-  cinemang: {
+  public: {
     Tables: {
       cast_credit: {
         Row: {
