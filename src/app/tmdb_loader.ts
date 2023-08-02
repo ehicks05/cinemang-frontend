@@ -114,73 +114,6 @@ const processMovies = async (ids: number[]) => {
   }
 };
 
-const processIdChunk = async (movieIds: number[], personIdsProcessed: number[]) => {
-  const loadedMovies = await processMovies(movieIds);
-  if (!loadedMovies || loadedMovies.length === 0) return;
-
-  const personIds = getPersonIds(loadedMovies, personIdsProcessed);
-  logger.info('fetching person data');
-  const remote = (
-    await Bluebird.map(personIds, id => getPerson(id), options)
-  ).filter(o => o) as unknown as PersonResponse[];
-  const parsed = remote
-    .map(parsePerson)
-    .filter(o => o) as Prisma.PersonCreateInput[];
-  const parsedById = keyBy(parsed, toId);
-
-  const local = await prisma.person.findMany({
-    where: { id: { in: personIds } },
-  });
-  const localById = keyBy(local, toId);
-
-  logger.info('determining new vs updated');
-  const toCreate = differenceBy(parsed, local, toId);
-  const remoteThatExist = intersectionBy(parsed, local, toId);
-  const toUpdate = remoteThatExist.filter(o => {
-    const p = localById[o.id];
-    return p && !isEqual(o, p);
-  });
-
-  const [remoteValid, remoteInvalid] = partition(remote, o => parsedById[o.id]);
-
-  await prisma.ignoredPerson.createMany({
-    data: remoteInvalid.map(o => ({ id: o.id })),
-  });
-
-  try {
-    const createResult = await prisma.person.createMany({
-      data: toCreate as any,
-    });
-
-    const updateOne = async (o: Prisma.PersonCreateInput) => {
-      try {
-        await prisma.person.update({ where: { id: o.id }, data: o });
-        return { result: 'ok', id: o.id };
-      } catch (e) {
-        logger.error(e);
-        return { result: 'error', id: o.id };
-      }
-    };
-
-    await Bluebird.map(toUpdate, updateOne, options);
-
-    logger.info('person', {
-      ids: personIds.length,
-      fetched: remote.length,
-      created: createResult?.count,
-      updated: toUpdate.length,
-      unchanged: remoteThatExist.length - toUpdate.length,
-      invalid: personIds.length - parsed.length,
-    });
-
-    await updateRelationships(loadedMovies);
-
-    return personIds;
-  } catch (e) {
-    logger.error('error while saving', e);
-  }
-};
-
 interface WithCredits {
   credits: {
     cast: { id: number }[];
@@ -199,31 +132,6 @@ const getPersonIds = (
     .flat();
   const deduped = uniq(personIds);
   return difference(deduped, ignoreList);
-};
-
-const updateMovies = async () => {
-  const ids = await getValidIds('MOVIE');
-  if (!ids) {
-    throw new Error('Unable to fetch ids');
-  }
-  const ignoredMovies = (await prisma.ignoredMovie.findMany()).map(o => o.id);
-  const ignoredPersons = (await prisma.ignoredPerson.findMany()).map(o => o.id);
-  const validIds = difference(ids, ignoredMovies);
-  logger.info(`found ${validIds?.length} movie ids to load`);
-
-  let personIdsProcessed = ignoredPersons;
-
-  const chunks = chunk(validIds, 500);
-  await Bluebird.each(chunks, async (ids, i) => {
-    try {
-      logger.info(`processing chunk ${i + 1}/${chunks.length}`);
-      logger.info(`processed ${personIdsProcessed.length} persons`);
-      const personIds = await processIdChunk(ids, personIdsProcessed);
-      personIdsProcessed = personIdsProcessed.concat(personIds || []);
-    } catch (e) {
-      logger.error(e);
-    }
-  });
 };
 
 const toCastCreditCreateInput = (movie: MovieResponse) =>
@@ -457,6 +365,98 @@ const updateRelationships = async (movies: MovieResponse[]) => {
   await updateCastCredits(movies, movieIds, personIdMap);
   await updateCrewCredits(movies, movieIds, personIdMap);
   await updateMovieWatchProviders(movies, movieIds);
+};
+
+const processIdChunk = async (movieIds: number[], personIdsProcessed: number[]) => {
+  const loadedMovies = await processMovies(movieIds);
+  if (!loadedMovies || loadedMovies.length === 0) return;
+
+  const personIds = getPersonIds(loadedMovies, personIdsProcessed);
+  logger.info('fetching person data');
+  const remote = (
+    await Bluebird.map(personIds, id => getPerson(id), options)
+  ).filter(o => o) as unknown as PersonResponse[];
+  const parsed = remote
+    .map(parsePerson)
+    .filter(o => o) as Prisma.PersonCreateInput[];
+  const parsedById = keyBy(parsed, toId);
+
+  const local = await prisma.person.findMany({
+    where: { id: { in: personIds } },
+  });
+  const localById = keyBy(local, toId);
+
+  logger.info('determining new vs updated');
+  const toCreate = differenceBy(parsed, local, toId);
+  const remoteThatExist = intersectionBy(parsed, local, toId);
+  const toUpdate = remoteThatExist.filter(o => {
+    const p = localById[o.id];
+    return p && !isEqual(o, p);
+  });
+
+  const [remoteValid, remoteInvalid] = partition(remote, o => parsedById[o.id]);
+
+  await prisma.ignoredPerson.createMany({
+    data: remoteInvalid.map(o => ({ id: o.id })),
+  });
+
+  try {
+    const createResult = await prisma.person.createMany({
+      data: toCreate as any,
+    });
+
+    const updateOne = async (o: Prisma.PersonCreateInput) => {
+      try {
+        await prisma.person.update({ where: { id: o.id }, data: o });
+        return { result: 'ok', id: o.id };
+      } catch (e) {
+        logger.error(e);
+        return { result: 'error', id: o.id };
+      }
+    };
+
+    await Bluebird.map(toUpdate, updateOne, options);
+
+    logger.info('person', {
+      ids: personIds.length,
+      fetched: remote.length,
+      created: createResult?.count,
+      updated: toUpdate.length,
+      unchanged: remoteThatExist.length - toUpdate.length,
+      invalid: personIds.length - parsed.length,
+    });
+
+    await updateRelationships(loadedMovies);
+
+    return personIds;
+  } catch (e) {
+    logger.error('error while saving', e);
+  }
+};
+
+const updateMovies = async () => {
+  const ids = await getValidIds('MOVIE');
+  if (!ids) {
+    throw new Error('Unable to fetch ids');
+  }
+  const ignoredMovies = (await prisma.ignoredMovie.findMany()).map(o => o.id);
+  const ignoredPersons = (await prisma.ignoredPerson.findMany()).map(o => o.id);
+  const validIds = difference(ids, ignoredMovies);
+  logger.info(`found ${validIds?.length} movie ids to load`);
+
+  let personIdsProcessed = ignoredPersons;
+
+  const chunks = chunk(validIds, 500);
+  await Bluebird.each(chunks, async (ids, i) => {
+    try {
+      logger.info(`processing chunk ${i + 1}/${chunks.length}`);
+      logger.info(`processed ${personIdsProcessed.length} persons`);
+      const personIds = await processIdChunk(ids, personIdsProcessed);
+      personIdsProcessed = personIdsProcessed.concat(personIds || []);
+    } catch (e) {
+      logger.error(e);
+    }
+  });
 };
 
 const updateDb = async () => {
