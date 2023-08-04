@@ -4,14 +4,14 @@ import { Link } from 'react-router-dom';
 import { useWindowSize } from 'react-use';
 import { pick } from 'lodash';
 import * as HoverCard from '@radix-ui/react-hover-card';
-import { CastCredit, CrewCredit, Genre, Language } from '../../../../types';
+import { Credit, Genre, Language } from '../../../../types';
 import FilmStats from '../../FilmStats';
 import { toStats } from '../../utils';
 import HoverFilm from './HoverFilm';
 
 interface Props {
   bgColor: string;
-  credit: CastCredit | CrewCredit;
+  credit: Credit;
   genres: Genre[];
   languages: Language[];
 }

@@ -10,7 +10,7 @@ import {
 import { PAGE_SIZE } from '../constants';
 import { supabase } from '../supabase';
 import { tmdb } from '../tmdb';
-import { Film, Video } from '../types';
+import { Film, TvSeries, Video } from '../types';
 
 const idQuery = async (form: DecodedValueMap<QueryParamConfigMap>, page: number) => {
   let castPersonIds;
@@ -35,7 +35,9 @@ const idQuery = async (form: DecodedValueMap<QueryParamConfigMap>, page: number)
   }
 
   const select = `id${
-    form.watchProviders.length > 0 ? ', wp: watch_provider!inner(id)' : ''
+    form.watchProviders.length > 0
+      ? ', wp: media_watch_provider!inner(watchProviderId)'
+      : ''
   }${
     form.castCreditName.length > 0
       ? ', cast_credit: cast_credit!inner(personId)'
@@ -80,7 +82,7 @@ const idQuery = async (form: DecodedValueMap<QueryParamConfigMap>, page: number)
   }
 
   if (form.watchProviders.length > 0) {
-    query.in('wp.id', form.watchProviders);
+    query.in('wp.watchProviderId', form.watchProviders);
   }
 
   if ((castPersonIds || []).length > 0) {
@@ -102,7 +104,10 @@ const hydrationQuery = async (
   ids: number[],
   form: DecodedValueMap<QueryParamConfigMap>,
 ) => {
-  const select = ['*', 'watch_provider(id)'].join(',');
+  const select = [
+    '*',
+    'watch_provider: media_watch_provider(id: watchProviderId)',
+  ].join(',');
 
   const result = await supabase
     .from('movie')
@@ -145,9 +150,8 @@ export const useSearchFilms = ({ page }: { page: number }) => {
 const fetchFilmQuery = async (id: number) => {
   const select = [
     '*',
-    'watch_provider(id)',
-    'cast_credit(*, person(*))',
-    'crew_credit(*, person(*))',
+    'watch_provider: media_watch_provider(id: watchProviderId)',
+    'credits: credit(*, person(*))',
   ].join(',');
 
   const result = await supabase.from('movie').select(select).eq('id', id).single();
@@ -174,3 +178,20 @@ export const useFetchTrailers = (id: number) =>
 
     return trailers;
   });
+
+const fetchTvSeries = async () => {
+  const select = [
+    '*',
+    'credits: credit(*, person(*))',
+    'watch_provider: media_watch_provider(id: watchProviderId)',
+  ].join(',');
+
+  const result = await supabase
+    .from('tv_series')
+    .select(select as any)
+    .order('first_air_date', { ascending: true })
+    .order('id', { ascending: true });
+  return result.data as unknown as TvSeries[];
+};
+
+export const useFetchTvSerieses = () => useQuery(['tvSerieses'], fetchTvSeries);

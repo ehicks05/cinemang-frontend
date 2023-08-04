@@ -1,32 +1,32 @@
 import { Database } from './generated/supabase';
 
 // Prefix with 'T' if we need to hydrate joined tables
-export type TCastCredit = Database['cinemang']['Tables']['cast_credit']['Row'];
-export type TCrewCredit = Database['cinemang']['Tables']['crew_credit']['Row'];
-export type Genre = Database['cinemang']['Tables']['genre']['Row'];
-export type Language = Database['cinemang']['Tables']['language']['Row'];
-export type TPerson = Database['cinemang']['Tables']['person']['Row'];
-export type TMovie = Database['cinemang']['Tables']['movie']['Row'];
-export type WatchProvider = Database['cinemang']['Tables']['watch_provider']['Row'];
+export type TCredit = Database['public']['Tables']['credit']['Row'];
+export type Genre = Database['public']['Tables']['genre']['Row'];
+export type Language = Database['public']['Tables']['language']['Row'];
+export type TPerson = Database['public']['Tables']['person']['Row'];
+export type TMovie = Database['public']['Tables']['movie']['Row'];
+export type TTvSeries = Database['public']['Tables']['tv_series']['Row'];
+export type WatchProvider = Database['public']['Tables']['watch_provider']['Row'];
 
-export interface CastCredit extends TCastCredit {
-  movie: Film;
-  person: TPerson;
-}
-export interface CrewCredit extends TCrewCredit {
-  movie: Film;
+export interface Credit extends TCredit {
+  movie?: Film;
+  series?: TTvSeries;
   person: TPerson;
 }
 
 export interface Film extends TMovie {
-  cast_credit: CastCredit[];
-  crew_credit: CrewCredit[];
+  credits: Credit[];
+  watch_provider: WatchProvider[];
+}
+
+export interface TvSeries extends TTvSeries {
+  credits: Credit[];
   watch_provider: WatchProvider[];
 }
 
 export interface Person extends TPerson {
-  cast_credit: CastCredit[];
-  crew_credit: CrewCredit[];
+  credits: Credit[];
 }
 
 export interface ISearchForm {
