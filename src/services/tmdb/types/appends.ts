@@ -50,4 +50,10 @@ export interface AppendedRelease {
   release_date: string;
 }
 
+export interface AppendedContentRating {
+  descriptors: unknown[];
+  iso_3166_1: string;
+  rating: string;
+}
+
 export type AppendedWatchProvider = Omit<WatchProvider, 'display_priority'>;

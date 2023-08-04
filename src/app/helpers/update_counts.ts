@@ -31,7 +31,7 @@ export const updateWatchProviderCounts = async () => {
     include: {
       _count: {
         select: {
-          movies: true,
+          medias: true,
         },
       },
     },
@@ -39,7 +39,7 @@ export const updateWatchProviderCounts = async () => {
 
   const watchProviders = watchProvidersWithCounts.map(wp => ({
     ...omit(wp, ['_count']),
-    count: wp._count.movies,
+    count: wp._count.medias,
   }));
 
   await Promise.all(

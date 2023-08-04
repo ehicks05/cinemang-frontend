@@ -8,8 +8,9 @@
     "generate": "npx prisma generate",
     "dev": "set NODE_OPTIONS=--max_old_space_size=480&&set NODE_ENV=development&&nodemon --exec node --loader ts-node/esm src/app.ts",
     "build": "tsc && npx prisma generate",
-    "start": "set NODE_OPTIONS=--max_old_space_size=480&&set NODE_ENV=production&&node ./dist/app.js --syncOnStart"
-  },
+    "start": "set NODE_OPTIONS=--max_old_space_size=480&&set NODE_ENV=production&&node ./dist/app.js --syncOnStart",
+    "supabase-generate-local": "npx supabase gen types typescript --local --schema public > ./supabase.ts"
+},
   "author": "",
   "license": "ISC",
   "dependencies": {

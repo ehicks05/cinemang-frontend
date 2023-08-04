@@ -88,10 +88,7 @@ export interface RecentChange {
 }
 
 export interface TvSeries extends Media {
-  created_by: Pick<
-    CrewCredit,
-    'id' | 'credit_id' | 'name' | 'gender' | 'profile_path'
-  >[];
+  created_by: Pick<Person, 'id' | 'name' | 'gender' | 'profile_path'>[];
   episode_run_time: number[];
   first_air_date: string;
   in_production: boolean;

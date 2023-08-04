@@ -24,9 +24,8 @@ model Movie {
   voteAverage   Float    @map("vote_average")
   voteCount     Int      @map("vote_count")
 
-  castCredits    CastCredit[]
-  crewCredits    CrewCredit[]
-  watchProviders MovieWatchProvider[]
+  credits        Credit[]
+  watchProviders MediaWatchProvider[]
 
   @@index([languageId])
   @@index([releasedAt])
@@ -48,11 +47,18 @@ model IgnoredPerson {
   @@map("ignored_person")
 }
 
+enum TvSeriesStatus {
+  ENDED
+  CANCELED
+  RETURNING_SERIES
+  IN_PRODUCTION
+}
+
 model TvSeries {
   id            Int      @id
   cast          String
   contentRating String?  @map("content_rating")
-  createdBy     String   @map("created_by")
+  createdById   Int?     @map("created_by_id")
   firstAirDate  DateTime @map("first_air_date") @db.Date
   genreId       Int      @map("genre_id")
   languageId    String   @map("language_id")
@@ -62,12 +68,14 @@ model TvSeries {
   popularity    Float
   posterPath    String   @map("poster_path")
   status        String
+  tagline       String?
   voteAverage   Float    @map("vote_average")
   voteCount     Int      @map("vote_count")
 
-  // castCredits    CastCredit[]
-  // crewCredits    CrewCredit[]
-  // watchProviders MovieWatchProvider[]
+  credits        Credit[]
+  createdBy      Person?              @relation(fields: [createdById], references: [id])
+  seasons        Season[]
+  watchProviders MediaWatchProvider[]
 
   @@index([firstAirDate])
   @@index([languageId])
@@ -78,56 +86,124 @@ model TvSeries {
   @@map("tv_series")
 }
 
+model Season {
+  id           String   @id
+  otherId      Int      @map("other_id")
+  tvSeriesId   Int
+  airDate      DateTime @map("air_date") @db.Date
+  name         String
+  overview     String
+  posterPath   String   @map("poster_path")
+  seasonNumber Int      @map("season_number")
+  voteAverage  Float    @map("vote_average")
+
+  episodes Episode[]
+  series   TvSeries  @relation(fields: [tvSeriesId], references: [id])
+
+  @@map("season")
+}
+
+model Episode {
+  id            Int    @id
+  seasonId      String
+  episodeNumber Int    @map("episode_number")
+  name          String
+  overview      String
+  runtime       Int
+  seasonNumber  Int    @map("season_number")
+  stillPath     String @map("still_path")
+  voteAverage   Float  @map("vote_average")
+  voteCount     Int    @map("vote_count")
+
+  season Season @relation(fields: [seasonId], references: [id])
+
+  @@map("episode")
+}
+
 model Person {
-  id                 Int          @id
-  imdbId             String       @map("imdb_id")
+  id                 Int        @id
+  imdbId             String     @map("imdb_id")
   biography          String
-  birthday           DateTime?    @db.Date
-  deathday           DateTime?    @db.Date
+  birthday           DateTime?  @db.Date
+  deathday           DateTime?  @db.Date
   gender             Int
-  knownForDepartment String       @map("known_for_department")
+  knownForDepartment String     @map("known_for_department")
   name               String
-  placeOfBirth       String?      @map("place_of_birth")
+  placeOfBirth       String?    @map("place_of_birth")
   popularity         Float
-  profilePath        String       @map("profile_path")
-  castCredits        CastCredit[]
-  crewCredits        CrewCredit[]
+  profilePath        String     @map("profile_path")
+  // castCredits        CastCredit[]
+  // crewCredits        CrewCredit[]
+  createdSeries      TvSeries[]
+  credits            Credit[]
 
   @@index([name])
   @@map("person")
 }
 
-model CastCredit {
-  creditId String @id @map("credit_id")
+// model CastCredit {
+//   creditId String @id @map("credit_id")
 
-  movie    Movie  @relation(fields: [movieId], references: [id], onDelete: Cascade)
-  movieId  Int
-  person   Person @relation(fields: [personId], references: [id], onDelete: Cascade)
-  personId Int
+//   movie    Movie  @relation(fields: [movieId], references: [id], onDelete: Cascade)
+//   movieId  Int
+//   person   Person @relation(fields: [personId], references: [id], onDelete: Cascade)
+//   personId Int
 
-  castId    Int    @map("cast_id")
-  character String
-  order     Int
+//   castId    Int    @map("cast_id")
+//   character String
+//   order     Int
 
-  @@index([movieId])
-  @@index([personId])
-  @@map("cast_credit")
+//   @@index([movieId])
+//   @@index([personId])
+//   @@map("cast_credit")
+// }
+
+// model CrewCredit {
+//   creditId String @id @map("credit_id")
+
+//   movie    Movie  @relation(fields: [movieId], references: [id], onDelete: Cascade)
+//   movieId  Int
+//   person   Person @relation(fields: [personId], references: [id], onDelete: Cascade)
+//   personId Int
+
+//   department String
+//   job        String
+
+//   @@index([movieId])
+//   @@index([personId])
+//   @@map("crew_credit")
+// }
+
+enum CreditType {
+  CAST
+  CREW
+  GUEST_STAR // might be same as CAST
 }
 
-model CrewCredit {
-  creditId String @id @map("credit_id")
+model Credit {
+  creditId String     @id @map("credit_id")
+  type     CreditType
 
-  movie    Movie  @relation(fields: [movieId], references: [id], onDelete: Cascade)
-  movieId  Int
-  person   Person @relation(fields: [personId], references: [id], onDelete: Cascade)
-  personId Int
+  movie    Movie?    @relation(fields: [movieId], references: [id], onDelete: Cascade)
+  movieId  Int?      @map("movie_id")
+  series   TvSeries? @relation(fields: [seriesId], references: [id], onDelete: Cascade)
+  seriesId Int?      @map("series_id")
+  person   Person    @relation(fields: [personId], references: [id], onDelete: Cascade)
+  personId Int       @map("person_id")
 
-  department String
-  job        String
+  // cast specific
+  castId    Int?    @map("cast_id")
+  character String?
+  order     Int?
+
+  // crew specific
+  department String?
+  job        String?
 
   @@index([movieId])
+  @@index([seriesId])
   @@index([personId])
-  @@map("crew_credit")
+  @@map("credit")
 }
 
 model Genre {
@@ -151,19 +227,43 @@ model WatchProvider {
   name            String
   logoPath        String               @map("logo_path")
   count           Int                  @default(0)
-  movies          MovieWatchProvider[]
+  medias          MediaWatchProvider[]
 
   @@map("watch_provider")
 }
 
-model MovieWatchProvider {
-  movie           Movie         @relation(fields: [movieId], references: [id], onDelete: Cascade)
-  movieId         Int
+// model MovieWatchProvider {
+//   movie           Movie         @relation(fields: [movieId], references: [id], onDelete: Cascade)
+//   movieId         Int
+//   watchProvider   WatchProvider @relation(fields: [watchProviderId], references: [id], onDelete: Cascade)
+//   watchProviderId Int
+
+//   @@id([movieId, watchProviderId])
+//   @@map("movie_watch_provider")
+// }
+
+// model TvSeriesWatchProvider {
+//   series          TvSeries      @relation(fields: [seriesId], references: [id], onDelete: Cascade)
+//   seriesId        Int
+//   watchProvider   WatchProvider @relation(fields: [watchProviderId], references: [id], onDelete: Cascade)
+//   watchProviderId Int
+
+//   @@id([seriesId, watchProviderId])
+//   @@map("tv_series_watch_provider")
+// }
+
+model MediaWatchProvider {
+  id String @id @default(uuid())
+
+  movie           Movie?        @relation(fields: [movieId], references: [id], onDelete: Cascade)
+  movieId         Int?
+  series          TvSeries?     @relation(fields: [seriesId], references: [id], onDelete: Cascade)
+  seriesId        Int?
   watchProvider   WatchProvider @relation(fields: [watchProviderId], references: [id], onDelete: Cascade)
   watchProviderId Int
 
-  @@id([movieId, watchProviderId])
-  @@map("movie_watch_provider")
+  @@unique([movieId, seriesId, watchProviderId])
+  @@map("media_watch_provider")
 }
 
 model Company {

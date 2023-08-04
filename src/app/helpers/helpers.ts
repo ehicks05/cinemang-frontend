@@ -1,7 +1,7 @@
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-nocheck
-import _, { chunk, isNil, keyBy, omit, omitBy } from 'lodash';
-import Bluebird from 'bluebird';
+import _, { chunk, difference, isNil, keyBy, omit, omitBy, uniq } from 'lodash';
+import P from 'bluebird';
 import { Prisma, PrismaClient } from '@prisma/client';
 import logger from '../../services/logger';
 import prisma from '../../services/prisma';
@@ -92,7 +92,7 @@ export const update = async ({
   changes.unchanged = localRecords.length - toBeUpdated.length;
 
   if (toBeUpdated.length > 0) {
-    await Bluebird.map(toBeUpdated, async o => {
+    await P.map(toBeUpdated, async o => {
       const args = {
         where: { id: o[idField] },
         data: o,
@@ -126,10 +126,48 @@ export const removeInvalidMovies = async (validIds: number[]) => {
   );
   const invalidIds = existingIds.filter(e => !validIds?.includes(e));
   const chunks = chunk(invalidIds, 10_000);
-  await Bluebird.each(chunks, ids =>
+  await P.each(chunks, ids =>
     prisma.movie.deleteMany({
       where: { id: { in: ids } },
     }),
   );
   logger.info(`removed ${invalidIds.length} invalid records`);
+};
+
+interface WithCredits {
+  credits: {
+    cast: { id: number }[];
+    crew: { id: number }[];
+  };
+}
+export const creditsToPersonIds = (
+  work: WithCredits[],
+  ignoreList: number[] | undefined = [],
+) => {
+  const personIds = work
+    .map(({ credits: { cast, crew } }) => [
+      ...cast.map(c => c.id),
+      ...crew.map(c => c.id),
+    ])
+    .flat();
+  const deduped = uniq(personIds);
+  return difference(deduped, ignoreList);
+};
+
+/**
+ * Takes a list of medias, maps its credits to personIds, then returns
+ * the subset of ids that are also in the db.
+ */
+export const getExistingPersonIds = async (medias: MediaResponse[]) => {
+  const personIds = creditsToPersonIds(medias);
+  const chunks = chunk(personIds, 10_000);
+
+  const results = await P.map(chunks, async ids => {
+    const args = {
+      where: { id: { in: ids } },
+      select: { id: true },
+    };
+    return prisma.person.findMany(args);
+  });
+  return results.flat().map(o => o.id);
 };

@@ -21,7 +21,7 @@ const getFormattedDate = () => {
   // return '11_03_2022';
 };
 
-export const getFilename = (resource: ResourceKey) => {
+const getFilename = (resource: ResourceKey) => {
   const filename = RESOURCES[resource].DAILY_FILE_NAME;
   const date = getFormattedDate();
   return `${filename}_${date}${EXT}`;
@@ -32,14 +32,14 @@ const getUrl = (resource: ResourceKey) => {
   return `${HOST}${PATH}${filename}`;
 };
 
-export const fetchDailyFile = async (resource: ResourceKey) => {
+const fetchDailyFile = async (resource: ResourceKey) => {
   const result = await axios.get(getUrl(resource), CONFIG);
   const unzipped = zlib.gunzipSync(result.data);
   const decoded = new TextDecoder().decode(unzipped);
   return decoded;
 };
 
-export const getDailyFile = async (resource: ResourceKey) => {
+const getDailyFile = async (resource: ResourceKey) => {
   const filename = getFilename(resource);
 
   logger.info('checking file cache');
@@ -59,7 +59,7 @@ export const getDailyFile = async (resource: ResourceKey) => {
   return fromTmdb;
 };
 
-export const getValidIdRows = async (resource: ResourceKey) => {
+const getValidIdRows = async (resource: ResourceKey) => {
   const dailyFile = await getDailyFile(resource);
 
   const rows: DailyFileRow[] = dailyFile

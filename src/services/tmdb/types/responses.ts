@@ -4,8 +4,9 @@ import {
   AppendedImage,
   CastCredit,
   CrewCredit,
+  AppendedContentRating,
 } from './appends';
-import { Genre, Movie, Person, RecentChange, WatchProvider } from './base';
+import { Genre, Movie, Person, RecentChange, TvSeries, WatchProvider } from './base';
 
 /**
  * These types account for the way some api responses are packaged
@@ -44,6 +45,29 @@ export interface MovieResponse extends Movie {
     >;
   };
 }
+
+export interface TvSeriesResponse extends TvSeries {
+  credits: { cast: CastCredit[]; crew: CrewCredit[] };
+  images: {
+    backdrops: AppendedImage[];
+    logos: AppendedImage[];
+    posters: AppendedImage[];
+  };
+  content_ratings: { results: AppendedContentRating[] };
+  'watch/providers': {
+    results: Record<
+      string,
+      {
+        link: string;
+        flatrate: AppendedWatchProvider[];
+        buy: AppendedWatchProvider[];
+        rent: AppendedWatchProvider[];
+      }
+    >;
+  };
+}
+
+export type MediaResponse = MovieResponse | TvSeriesResponse;
 
 export interface PersonResponse extends Person {
   images: { profiles: AppendedImage[] };
