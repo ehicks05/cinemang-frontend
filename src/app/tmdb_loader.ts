@@ -4,7 +4,7 @@ import { Prisma } from '@prisma/client';
 import P from 'bluebird';
 import { discoverMediaIds, getMovie, getTvSeries } from '../services/tmdb';
 import {
-  creditsToPersonIds,
+  creditsToValidPersonIds,
   isEqual,
   updateGenres,
   updateLanguages,
@@ -156,6 +156,11 @@ const loadTvSeries = async (ids: number[]) => {
   }
 };
 
+/**
+ * Find all ids, chunk them, then serially for each chunk,
+ * load them and then pull out the personIds and load them.
+ * finally, update relationships (like credits and providers)
+ */
 const updateMediaByType = async (
   media: 'movie' | 'tv',
   personIdsProcessed: number[],
@@ -175,7 +180,10 @@ const updateMediaByType = async (
         media === 'movie' ? await loadMovies(ids) : await loadTvSeries(ids);
       if (!loadedMedias || loadedMedias.length === 0) return;
 
-      const personIds = creditsToPersonIds(loadedMedias, personIdsProcessed);
+      const personIds = creditsToValidPersonIds(
+        loadedMedias,
+        personIdsProcessedLocal,
+      );
       const loadedPersonIds = await loadPersons(personIds);
       if (!loadedPersonIds || loadedPersonIds.length === 0) return;
 
@@ -202,8 +210,7 @@ const runLoader = async (fullMode: boolean) => {
       await prisma.ignoredPerson.deleteMany();
     }
 
-    const ignoredPersonIds = (await prisma.ignoredPerson.findMany()).map(o => o.id);
-    let personIdsProcessed = ignoredPersonIds;
+    let personIdsProcessed: number[] = [];
     personIdsProcessed = await updateMediaByType('movie', personIdsProcessed);
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     personIdsProcessed = await updateMediaByType('tv', personIdsProcessed);

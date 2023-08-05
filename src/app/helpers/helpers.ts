@@ -6,6 +6,7 @@ import { Prisma, PrismaClient } from '@prisma/client';
 import logger from '../../services/logger';
 import prisma from '../../services/prisma';
 import { getGenres, getLanguages, getWatchProviders } from '../../services/tmdb';
+import { MediaResponse } from '../../services/tmdb/types/responses';
 
 export const updateGenres = () =>
   update({
@@ -134,22 +135,14 @@ export const removeInvalidMovies = async (validIds: number[]) => {
   logger.info(`removed ${invalidIds.length} invalid records`);
 };
 
-interface WithCredits {
-  credits: {
-    cast: { id: number }[];
-    crew: { id: number }[];
-  };
-}
-export const creditsToPersonIds = (
-  work: WithCredits[],
-  ignoreList: number[] | undefined = [],
+export const creditsToValidPersonIds = (
+  media: MediaResponse[],
+  ignoreList?: number[] = [],
 ) => {
-  const personIds = work
-    .map(({ credits: { cast, crew } }) => [
-      ...cast.map(c => c.id),
-      ...crew.map(c => c.id),
-    ])
-    .flat();
+  const personIds = media
+    .flatMap(({ credits: { cast, crew } }) => [...cast, ...crew])
+    .filter(credit => credit.profile_path)
+    .map(credit => credit.id);
   const deduped = uniq(personIds);
   return difference(deduped, ignoreList);
 };
@@ -159,7 +152,7 @@ export const creditsToPersonIds = (
  * the subset of ids that are also in the db.
  */
 export const getExistingPersonIds = async (medias: MediaResponse[]) => {
-  const personIds = creditsToPersonIds(medias);
+  const personIds = creditsToValidPersonIds(medias);
   const chunks = chunk(personIds, 10_000);
 
   const results = await P.map(chunks, async ids => {
