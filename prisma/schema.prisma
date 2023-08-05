@@ -122,7 +122,7 @@ model Episode {
 
 model Person {
   id                 Int        @id
-  imdbId             String     @map("imdb_id")
+  imdbId             String?    @map("imdb_id")
   biography          String
   birthday           DateTime?  @db.Date
   deathday           DateTime?  @db.Date
