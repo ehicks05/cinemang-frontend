@@ -82,7 +82,7 @@ const loadCredits = async (
 
     await P.map(creditsToUpdate, updateOne, options);
 
-    logger.info('castCredit', {
+    logger.info('credit', {
       remote: remoteCredits.length,
       unchanged: existingCredits.length - creditsToUpdate.length,
       created: creditCreateResult.count,
