@@ -35,18 +35,6 @@ model Movie {
   @@map("movie")
 }
 
-model IgnoredMovie {
-  id Int @id
-
-  @@map("ignored_movie")
-}
-
-model IgnoredPerson {
-  id Int @id
-
-  @@map("ignored_person")
-}
-
 enum TvSeriesStatus {
   ENDED
   CANCELED

@@ -206,8 +206,7 @@ const runLoader = async (fullMode: boolean) => {
     await Promise.all([updateGenres(), updateLanguages(), updateWatchProviders()]);
 
     if (fullMode) {
-      logger.info('truncating ignored_person tables');
-      await prisma.ignoredPerson.deleteMany();
+      logger.info('TODO: determine special behavior (if any) for full mode');
     }
 
     let personIdsProcessed: number[] = [];

@@ -20,7 +20,6 @@ export const loadPersons = async (personIds: number[]) => {
   const parsed = remote
     .map(parsePerson)
     .filter(o => o) as Prisma.PersonCreateInput[];
-  const parsedById = keyBy(parsed, toId);
 
   const local = await prisma.person.findMany({
     where: { id: { in: personIds } },
@@ -33,11 +32,6 @@ export const loadPersons = async (personIds: number[]) => {
   const toUpdate = remoteThatExist.filter(o => {
     const p = localById[o.id];
     return p && !isEqual(o, p);
-  });
-
-  const remoteInvalid = remote.filter(o => !parsedById[o.id]);
-  await prisma.ignoredPerson.createMany({
-    data: remoteInvalid.map(o => ({ id: o.id })),
   });
 
   try {
