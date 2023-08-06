@@ -8,6 +8,7 @@ import { useFetchTvSerieses } from '../hooks/useFetchFilms';
 import { getTmdbImage } from '../utils';
 import { DEFAULT_PALETTE, Palette, toPalette } from '../hooks/usePalette';
 import Show from './components/Show';
+import { SHOW_QUERY_PARAMS } from '@/queryParams';
 
 const TvShows = ({ shows }: { shows: TvSeries[] }) => {
   const [loading, setLoading] = useState(true);
@@ -59,7 +60,7 @@ const TvShows = ({ shows }: { shows: TvSeries[] }) => {
 
 const TvShowsWrapper = () => {
   useTitle('Cinemang');
-  const [form, setForm] = useQueryParams();
+  const [form, setForm] = useQueryParams(SHOW_QUERY_PARAMS);
   const { page } = form;
   const setPage = (page: number) => setForm({ ...form, page });
 

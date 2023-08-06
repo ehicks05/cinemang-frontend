@@ -9,7 +9,7 @@ import {
   useQueryParams,
 } from 'use-query-params';
 import { useAtom } from 'jotai';
-import { DEFAULT_SEARCH_FORM } from '../../constants';
+import { DEFAULT_MOVIE_SEARCH_FORM } from '../../queryParams';
 import { systemDataAtom } from '../../atoms';
 import { Button, ComboBox } from '../../core-components';
 import { getTmdbImage } from '../../utils';
@@ -79,11 +79,11 @@ const FormFields = () => {
       </div>
       <div className="flex gap-2">
         <div className="w-full">
-          <div>Stream {getStreamLabel(form.watchProviders.length)}</div>
+          <div>Stream {getStreamLabel(form.providers.length)}</div>
           <div>
             <ComboBox
               form={form}
-              formKey="watchProviders"
+              formKey="providers"
               mapper={provider => ({
                 id: provider.id,
                 imageUrl: getTmdbImage({
@@ -96,7 +96,7 @@ const FormFields = () => {
               options={watchProviders
                 .sort((o1, o2) => o1.display_priority - o2.display_priority)
                 .filter(wp => wp.count > 0)}
-              selectedOptionIds={form.watchProviders}
+              selectedOptionIds={form.providers}
             />
           </div>
         </div>
@@ -257,7 +257,7 @@ const FormFields = () => {
         <div className="flex">
           <Button
             className="border-gray-500 bg-gray-700 px-3 py-2 text-base text-white"
-            onClick={() => setForm({ ...DEFAULT_SEARCH_FORM })}
+            onClick={() => setForm({ ...DEFAULT_MOVIE_SEARCH_FORM })}
           >
             Reset
           </Button>

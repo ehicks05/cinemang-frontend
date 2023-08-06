@@ -7,6 +7,7 @@ import { Film, FilmSkeleton, Paginator } from './components';
 import { useSearchFilms } from '../hooks/useFetchFilms';
 import { getTmdbImage } from '../utils';
 import { DEFAULT_PALETTE, Palette, toPalette } from '../hooks/usePalette';
+import { MOVIE_QUERY_PARAMS } from '@/queryParams';
 
 const Films = ({ films }: { films: IFilm[] }) => {
   const [loading, setLoading] = useState(true);
@@ -58,7 +59,7 @@ const Films = ({ films }: { films: IFilm[] }) => {
 
 const FilmsWrapper = () => {
   useTitle('Cinemang');
-  const [form, setForm] = useQueryParams();
+  const [form, setForm] = useQueryParams(MOVIE_QUERY_PARAMS);
   const { page } = form;
   const setPage = (page: number) => setForm({ ...form, page });
 

@@ -11,6 +11,7 @@ import { PAGE_SIZE } from '../constants';
 import { supabase } from '../supabase';
 import { tmdb } from '../tmdb';
 import { Film, TvSeries, Video } from '../types';
+import { MOVIE_QUERY_PARAMS } from '@/queryParams';
 
 const idQuery = async (form: DecodedValueMap<QueryParamConfigMap>, page: number) => {
   let creditPersonIds;
@@ -25,7 +26,7 @@ const idQuery = async (form: DecodedValueMap<QueryParamConfigMap>, page: number)
   }
 
   const select = `id${
-    form.watchProviders.length > 0
+    form.providers.length > 0
       ? ', wp: media_watch_provider!inner(watchProviderId)'
       : ''
   }${form.creditName.length > 0 ? ', credit: credit!inner(person_id)' : ''}`;
@@ -62,8 +63,8 @@ const idQuery = async (form: DecodedValueMap<QueryParamConfigMap>, page: number)
     query.like('language_id', form.language);
   }
 
-  if (form.watchProviders.length > 0) {
-    query.in('wp.watchProviderId', form.watchProviders);
+  if (form.providers.length > 0) {
+    query.in('wp.watchProviderId', form.providers);
   }
 
   if ((creditPersonIds || []).length > 0) {
@@ -97,7 +98,7 @@ const hydrationQuery = async (
 };
 
 export const useSearchFilms = ({ page }: { page: number }) => {
-  const [formParams] = useQueryParams();
+  const [formParams] = useQueryParams(MOVIE_QUERY_PARAMS);
 
   // a local, debounced copy of the form
   const [form, setForm] = useState(formParams);
