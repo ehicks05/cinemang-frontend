@@ -9,7 +9,7 @@ import {
   useQueryParams,
 } from 'use-query-params';
 import { useAtom } from 'jotai';
-import { DEFAULT_MOVIE_SEARCH_FORM } from '../../queryParams';
+import { DEFAULT_MOVIE_SEARCH_FORM, MOVIE_QUERY_PARAMS } from '../../queryParams';
 import { systemDataAtom } from '../../atoms';
 import { Button, ComboBox } from '../../core-components';
 import { getTmdbImage } from '../../utils';
@@ -36,7 +36,7 @@ const SearchForm = () => {
 };
 
 const FormFields = () => {
-  const [form, setFormInner] = useQueryParams();
+  const [form, setFormInner] = useQueryParams(MOVIE_QUERY_PARAMS);
   const [{ genres, languages, watchProviders }] = useAtom(systemDataAtom);
 
   const setForm = (updatedForm: DecodedValueMap<QueryParamConfigMap>) => {
@@ -96,7 +96,7 @@ const FormFields = () => {
               options={watchProviders
                 .sort((o1, o2) => o1.display_priority - o2.display_priority)
                 .filter(wp => wp.count > 0)}
-              selectedOptionIds={form.providers}
+              selectedOptionIds={form.providers as number[]}
             />
           </div>
         </div>

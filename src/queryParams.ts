@@ -16,7 +16,7 @@ export const DEFAULT_SEARCH_FORM = {
   minRating: 6,
   minVotes: 500,
   page: 0,
-  providers: [],
+  providers: [] as number[],
   sortColumn: 'released_at',
 };
 
