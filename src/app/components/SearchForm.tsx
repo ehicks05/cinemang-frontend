@@ -66,26 +66,13 @@ const FormFields = () => {
       </div>
       <div className="flex gap-2">
         <div className="flex-grow">
-          <div>Cast Includes</div>
+          <div>Credits Include</div>
           <div>
             <input
               className="w-full bg-gray-700"
-              onChange={e => setForm({ ...form, castCreditName: e.target.value })}
+              onChange={e => setForm({ ...form, creditName: e.target.value })}
               type="text"
-              value={form.castCreditName}
-            />
-          </div>
-        </div>
-      </div>
-      <div className="flex gap-2">
-        <div className="flex-grow">
-          <div>Crew Includes</div>
-          <div>
-            <input
-              className="w-full bg-gray-700"
-              onChange={e => setForm({ ...form, crewCreditName: e.target.value })}
-              type="text"
-              value={form.crewCreditName}
+              value={form.creditName}
             />
           </div>
         </div>

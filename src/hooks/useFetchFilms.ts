@@ -13,41 +13,22 @@ import { tmdb } from '../tmdb';
 import { Film, TvSeries, Video } from '../types';
 
 const idQuery = async (form: DecodedValueMap<QueryParamConfigMap>, page: number) => {
-  let castPersonIds;
-  if (form.castCreditName.length > 2) {
+  let creditPersonIds;
+  if (form.creditName.length > 2) {
     const query = supabase
       .from('person')
       .select('id')
-      .ilike('name', `%${form.castCreditName}%`)
+      .ilike('name', `%${form.creditName}%`)
       .order('popularity', { ascending: false })
       .range(0, 100);
-    castPersonIds = (await query).data?.map(o => o.id);
-  }
-  let crewPersonIds;
-  if (form.crewCreditName.length > 2) {
-    const query = supabase
-      .from('person')
-      .select('id')
-      .ilike('name', `%${form.crewCreditName}%`)
-      .order('popularity', { ascending: false })
-      .range(0, 100);
-    crewPersonIds = (await query).data?.map(o => o.id);
+    creditPersonIds = (await query).data?.map(o => o.id);
   }
 
   const select = `id${
     form.watchProviders.length > 0
       ? ', wp: media_watch_provider!inner(watchProviderId)'
       : ''
-  }${
-    form.castCreditName.length > 0
-      ? ', cast_credit: cast_credit!inner(personId)'
-      : ''
-  }
-  ${
-    form.crewCreditName.length > 0
-      ? ', crew_credit: crew_credit!inner(personId)'
-      : ''
-  }`;
+  }${form.creditName.length > 0 ? ', credit: credit!inner(person_id)' : ''}`;
   const query = supabase.from('movie').select(select, { count: 'exact' });
 
   if (form.title) {
@@ -85,11 +66,8 @@ const idQuery = async (form: DecodedValueMap<QueryParamConfigMap>, page: number)
     query.in('wp.watchProviderId', form.watchProviders);
   }
 
-  if ((castPersonIds || []).length > 0) {
-    query.in('cast_credit.personId', castPersonIds || []);
-  }
-  if ((crewPersonIds || []).length > 0) {
-    query.in('crew_credit.personId', crewPersonIds || []);
+  if ((creditPersonIds || []).length > 0) {
+    query.in('credit.person_id', creditPersonIds || []);
   }
 
   query

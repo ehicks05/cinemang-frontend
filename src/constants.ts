@@ -10,8 +10,7 @@ export const PAGE_SIZE = 20;
 
 export const DEFAULT_SEARCH_FORM = {
   ascending: false,
-  castCreditName: '',
-  crewCreditName: '',
+  creditName: '',
   genre: '',
   language: '',
   maxRating: 10,
@@ -28,8 +27,7 @@ export const DEFAULT_SEARCH_FORM = {
 
 export const QUERY_PARAMS = {
   ascending: withDefault(BooleanParam, DEFAULT_SEARCH_FORM.ascending),
-  castCreditName: withDefault(StringParam, DEFAULT_SEARCH_FORM.castCreditName),
-  crewCreditName: withDefault(StringParam, DEFAULT_SEARCH_FORM.crewCreditName),
+  creditName: withDefault(StringParam, DEFAULT_SEARCH_FORM.creditName),
   genre: withDefault(StringParam, DEFAULT_SEARCH_FORM.genre),
   language: withDefault(StringParam, DEFAULT_SEARCH_FORM.language),
   maxRating: withDefault(NumberParam, DEFAULT_SEARCH_FORM.maxRating),
