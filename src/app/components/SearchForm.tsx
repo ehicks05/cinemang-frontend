@@ -3,11 +3,7 @@ import { useState } from 'react';
 import { UnmountClosed } from 'react-collapse';
 import { FaChevronDown, FaChevronUp } from 'react-icons/fa';
 import { HiSortAscending, HiSortDescending } from 'react-icons/hi';
-import {
-  DecodedValueMap,
-  QueryParamConfigMap,
-  useQueryParams,
-} from 'use-query-params';
+import { useQueryParams } from 'use-query-params';
 import { useAtom } from 'jotai';
 import { DEFAULT_MOVIE_SEARCH_FORM, MOVIE_QUERY_PARAMS } from '../../queryParams';
 import { systemDataAtom } from '../../atoms';
@@ -35,15 +31,34 @@ const SearchForm = () => {
   );
 };
 
+const Title = ({
+  value,
+  onChange,
+}: {
+  value: any;
+  onChange: (value: any) => void;
+}) => (
+  <div className="flex gap-2">
+    <div className="flex-grow">
+      <div>Title</div>
+      <div>
+        <input
+          className="w-full bg-gray-700"
+          onChange={e => onChange(e.target.value)}
+          type="text"
+          value={value}
+        />
+      </div>
+    </div>
+  </div>
+);
+
 const FormFields = () => {
-  const [form, setFormInner] = useQueryParams(MOVIE_QUERY_PARAMS);
+  const [form, _setForm] = useQueryParams(MOVIE_QUERY_PARAMS);
   const [{ genres, languages, watchProviders }] = useAtom(systemDataAtom);
 
-  const setForm = (updatedForm: DecodedValueMap<QueryParamConfigMap>) => {
-    if (updatedForm.page === form.page) {
-      updatedForm.page = 0;
-    }
-    setFormInner(updatedForm);
+  const setForm = (update: Record<string, any>) => {
+    _setForm({ ...form, ...update, ...(!update.page && { page: 0 }) });
   };
 
   const getStreamLabel = (count: number) =>
@@ -51,26 +66,17 @@ const FormFields = () => {
 
   return (
     <div className="grid gap-4 text-sm sm:grid-cols-2 sm:text-sm lg:grid-cols-3 xl:grid-cols-4">
-      <div className="flex gap-2">
-        <div className="flex-grow">
-          <div>Title</div>
-          <div>
-            <input
-              className="w-full bg-gray-700"
-              onChange={e => setForm({ ...form, title: e.target.value })}
-              type="text"
-              value={form.title}
-            />
-          </div>
-        </div>
-      </div>
+      <Title
+        value={form.title}
+        onChange={(value: any) => setForm({ title: value })}
+      />
       <div className="flex gap-2">
         <div className="flex-grow">
           <div>Credits Include</div>
           <div>
             <input
               className="w-full bg-gray-700"
-              onChange={e => setForm({ ...form, creditName: e.target.value })}
+              onChange={e => setForm({ creditName: e.target.value })}
               type="text"
               value={form.creditName}
             />
@@ -109,19 +115,10 @@ const FormFields = () => {
               className="w-full bg-gray-700"
               max={form.maxVotes || undefined}
               min={1}
-              onChange={e => setForm({ ...form, minVotes: Number(e.target.value) })}
+              onChange={e => setForm({ minVotes: Number(e.target.value) })}
               type="number"
               value={form.minVotes}
             />
-            {/* <input
-              type="number"
-              min={form.minVotes || undefined}
-              className="w-full bg-gray-700"
-              value={form.maxVotes}
-              onChange={(e) =>
-                setForm({ ...form, maxVotes: Number(e.target.value) })
-              }
-            /> */}
           </div>
         </div>
         <div className="flex-shrink">
@@ -129,23 +126,13 @@ const FormFields = () => {
           <div className="flex gap-2">
             <input
               className="w-full bg-gray-700"
-              onChange={e =>
-                setForm({
-                  ...form,
-                  minRating: Number(e.target.value),
-                })
-              }
+              onChange={e => setForm({ minRating: Number(e.target.value) })}
               type="number"
               value={form.minRating}
             />
             <input
               className="w-full bg-gray-700"
-              onChange={e =>
-                setForm({
-                  ...form,
-                  maxRating: Number(e.target.value),
-                })
-              }
+              onChange={e => setForm({ maxRating: Number(e.target.value) })}
               type="number"
               value={form.maxRating}
             />
@@ -157,23 +144,13 @@ const FormFields = () => {
         <div className="flex flex-col gap-2 sm:flex-row">
           <input
             className="w-full bg-gray-700"
-            onChange={e =>
-              setForm({
-                ...form,
-                minReleasedAt: e.target.value,
-              })
-            }
+            onChange={e => setForm({ minReleasedAt: e.target.value })}
             type="date"
             value={form.minReleasedAt}
           />
           <input
             className="w-full bg-gray-700"
-            onChange={e =>
-              setForm({
-                ...form,
-                maxReleasedAt: e.target.value,
-              })
-            }
+            onChange={e => setForm({ maxReleasedAt: e.target.value })}
             type="date"
             value={form.maxReleasedAt}
           />
@@ -186,7 +163,7 @@ const FormFields = () => {
           <div>
             <select
               className="w-full bg-gray-700"
-              onChange={e => setForm({ ...form, language: e.target.value })}
+              onChange={e => setForm({ language: e.target.value })}
               value={form.language}
             >
               <option value="">Any</option>
@@ -207,7 +184,7 @@ const FormFields = () => {
           <div>
             <select
               className="w-full bg-gray-700"
-              onChange={e => setForm({ ...form, genre: e.target.value })}
+              onChange={e => setForm({ genre: e.target.value })}
               value={form.genre}
             >
               <option value="">Any</option>
@@ -226,7 +203,7 @@ const FormFields = () => {
         <div className="flex">
           <select
             className="w-full bg-gray-700"
-            onChange={e => setForm({ ...form, sortColumn: e.target.value })}
+            onChange={e => setForm({ sortColumn: e.target.value })}
             value={form.sortColumn}
           >
             {[
@@ -241,7 +218,7 @@ const FormFields = () => {
           </select>
           <Button
             className="border-l-0 border-gray-500 bg-gray-700 px-3 text-white"
-            onClick={() => setForm({ ...form, ascending: !form.ascending })}
+            onClick={() => setForm({ ascending: !form.ascending })}
           >
             {form.ascending ? (
               <HiSortAscending className="text-xl" />
