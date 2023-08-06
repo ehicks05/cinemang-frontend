@@ -46,7 +46,7 @@ const Paginator: FC<PaginatorProps> = ({
 
   const currentlyShowing = `Showing ${nf.format(first_result + 1)}-${nf.format(
     last_result + 1,
-  )} of ${nf.format(count)} films`;
+  )} of ${nf.format(count)}`;
 
   return (
     <div className="bg-gray-800 p-4 sm:rounded-lg">
