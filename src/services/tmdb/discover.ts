@@ -6,7 +6,7 @@ const MIN_VOTES = 64;
 const START_YEAR = 2023;
 
 const YEAR_KEY = {
-  movie: 'year',
+  movie: 'primary_release_year',
   tv: 'first_air_date_year',
 };
 
