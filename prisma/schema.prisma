@@ -196,7 +196,8 @@ model MediaWatchProvider {
   watchProvider   WatchProvider @relation(fields: [watchProviderId], references: [id], onDelete: Cascade)
   watchProviderId Int
 
-  @@unique([movieId, seriesId, watchProviderId])
+  @@unique([movieId, watchProviderId])
+  @@unique([seriesId, watchProviderId])
   @@map("media_watch_provider")
 }
 

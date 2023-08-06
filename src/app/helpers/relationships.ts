@@ -97,7 +97,7 @@ const toComparisonId = (o: {
   movieId?: number | null;
   seriesId?: number | null;
   watchProviderId: number;
-}) => `${o.movieId}-${o.seriesId}-${o.watchProviderId}`;
+}) => `${o.movieId || o.seriesId}-${o.watchProviderId}`;
 
 const getProvidersById = async () => {
   const providers = await prisma.watchProvider.findMany({
