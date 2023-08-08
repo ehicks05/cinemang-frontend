@@ -1,14 +1,14 @@
 import { useTimeout } from 'react-use';
 import { getTmdbImage } from '../../../../utils';
-import { useFetchFilm } from '@/hooks/useFetchFilms';
+import { useFetchShow } from '@/hooks/useFetchShows';
 import { usePalette } from '@/hooks/usePalette';
-import Film from '../../Film';
+import Show from '../../Show';
 import HoverLoading from './HoverLoading';
 import { container } from './constants';
 
-const HoverFilm = ({ id }: { id: number }) => {
-  const { data: film, error, isLoading } = useFetchFilm(id);
-  const posterPath = getTmdbImage({ path: film?.poster_path });
+const HoverShow = ({ id }: { id: number }) => {
+  const { data: show, error, isLoading } = useFetchShow(id);
+  const posterPath = getTmdbImage({ path: show?.poster_path });
   const {
     data: palette,
     error: paletteError,
@@ -28,9 +28,9 @@ const HoverFilm = ({ id }: { id: number }) => {
 
   return (
     <div className={container}>
-      {film && palette && <Film film={film} palette={palette} />}
+      {show && palette && <Show show={show} palette={palette} />}
     </div>
   );
 };
 
-export default HoverFilm;
+export default HoverShow;

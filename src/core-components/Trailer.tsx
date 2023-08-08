@@ -1,17 +1,24 @@
 import React from 'react';
 import LiteYouTubeEmbed from 'react-lite-youtube-embed';
-import { Video } from '../../../types';
-import { useFetchTrailers } from '@/hooks/useFetchFilms';
+import { Video } from '../types';
+import { useFetchTrailers } from '@/hooks/useFetchVideos';
 import 'react-lite-youtube-embed/dist/LiteYouTubeEmbed.css';
 
 const nameIncludesOfficial = (t: Video) => t.name.includes('Official');
 
-interface Props {
-  movieId: number;
-}
+type Props =
+  | { movieId: number }
+  | { showId: number }
+  | { showId: number; season?: number };
 
-const Trailer = ({ movieId }: Props) => {
-  const { data } = useFetchTrailers(movieId);
+const Trailer = (props: Props) => {
+  const key =
+    'movieId' in props
+      ? { movieId: props.movieId }
+      : 'season' in props
+      ? { showId: props.showId, season: props.season }
+      : { showId: props.showId };
+  const { data } = useFetchTrailers(key);
   if (!data || data.length === 0) return null;
 
   const trailers =

@@ -3,7 +3,7 @@ import { addMinutes, intervalToDuration, parseISO, format } from 'date-fns';
 import { truncate } from 'lodash';
 import { Link } from 'react-router-dom';
 import { useAtom } from 'jotai';
-import FilmStats from './FilmStats';
+import MediaStats from './MediaStats';
 import WatchProviders from './WatchProviders';
 import { Film as IFilm } from '../../types';
 import { SCALED_IMAGE } from '../../constants';
@@ -54,7 +54,7 @@ const Film = ({ film, palette }: { film: IFilm; palette: Palette }) => {
         </div>
       </div>
       <div className="flex h-full flex-col justify-start gap-4">
-        <FilmStats
+        <MediaStats
           bgColor={palette.darkVibrant}
           data={toStats(genres, languages, film)}
         />

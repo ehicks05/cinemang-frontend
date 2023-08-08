@@ -8,6 +8,7 @@ import { FilmDetail, PersonDetail } from './app/components';
 import { useFetchSystemData } from './hooks/useFetchSystemData';
 import { systemDataAtom } from './atoms';
 import TvShows from './app/TvShows';
+import ShowDetail from './app/components/FilmDetail/ShowDetail';
 
 function App() {
   const { data, error, isLoading } = useFetchSystemData();
@@ -35,6 +36,7 @@ function App() {
           <Route element={<Home />} path="/" />
           <Route element={<TvShows />} path="/tv" />
           <Route element={<FilmDetail />} path="/films/:id" />
+          <Route element={<ShowDetail />} path="/tv/:id" />
           <Route element={<PersonDetail />} path="/people/:id" />
         </Routes>
       </div>

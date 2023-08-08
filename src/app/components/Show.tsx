@@ -3,7 +3,7 @@ import { parseISO, format } from 'date-fns';
 import { truncate } from 'lodash';
 import { Link } from 'react-router-dom';
 import { useAtom } from 'jotai';
-import FilmStats from './FilmStats';
+import MediaStats from './MediaStats';
 import WatchProviders from './WatchProviders';
 import { TvSeries } from '../../types';
 import { SCALED_IMAGE } from '../../constants';
@@ -35,7 +35,7 @@ const Show = ({ show, palette }: { show: TvSeries; palette: Palette }) => {
         </div>
         <div className="flex flex-col gap-1">
           <div>
-            <Link className="text-lg font-bold" to={`/films/${show.id}`}>
+            <Link className="text-lg font-bold" to={`/tv/${show.id}`}>
               {show.name}
             </Link>
             <span className="text-xs text-gray-300">
@@ -51,7 +51,7 @@ const Show = ({ show, palette }: { show: TvSeries; palette: Palette }) => {
         </div>
       </div>
       <div className="flex h-full flex-col justify-start gap-4">
-        <FilmStats
+        <MediaStats
           bgColor={palette.darkVibrant}
           data={toStats(genres, languages, show)}
         />

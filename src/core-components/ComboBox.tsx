@@ -1,23 +1,18 @@
 import { Fragment, useState } from 'react';
 import { Combobox } from '@headlessui/react';
 import { HiCheck, HiChevronDown, HiChevronUp } from 'react-icons/hi';
-import { SetQuery, QueryParamConfigMap, DecodedValueMap } from 'use-query-params';
-
-type Id = string | number;
 
 export interface Option {
-  id: Id;
+  id: number;
   imageUrl: string;
   label: string;
 }
 
 interface Props<T> {
-  form: DecodedValueMap<QueryParamConfigMap>;
-  formKey: string;
   mapper: (input: T) => Option;
-  onChange: SetQuery<QueryParamConfigMap>;
+  onChange: (value: number[]) => void;
   options: T[];
-  selectedOptionIds: Id[];
+  selectedOptionIds: number[];
 }
 
 // reasoning for the T,:
@@ -25,8 +20,6 @@ interface Props<T> {
 const ComboBox = <T,>({
   options,
   selectedOptionIds,
-  formKey,
-  form,
   onChange,
   mapper,
 }: Props<T>) => {
@@ -41,16 +34,12 @@ const ComboBox = <T,>({
           label.toLowerCase().includes(query.toLowerCase()),
         );
 
-  const handleChange = (values: Id[]) => {
-    onChange({ ...form, [formKey]: values });
-  };
-
   return (
     <div className="relative">
       <Combobox
         defaultValue={selectedOptionIds}
         multiple
-        onChange={values => handleChange(values)}
+        onChange={values => onChange(values)}
       >
         <Combobox.Input
           className="w-full bg-gray-700"

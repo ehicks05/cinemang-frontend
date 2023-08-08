@@ -3,8 +3,8 @@ import { useQueryParams } from 'use-query-params';
 import { useTitle, useWindowSize } from 'react-use';
 import { Loading } from '../core-components';
 import { TvSeries } from '../types';
-import { FilmSkeleton, Paginator } from './components';
-import { useFetchTvSerieses } from '../hooks/useFetchFilms';
+import { MediaSkeleton, Paginator, SearchForm } from './components';
+import { useSearchShows } from '../hooks/useFetchShows';
 import { getTmdbImage } from '../utils';
 import { DEFAULT_PALETTE, Palette, toPalette } from '../hooks/usePalette';
 import Show from './components/Show';
@@ -45,7 +45,7 @@ const TvShows = ({ shows }: { shows: TvSeries[] }) => {
         gridTemplateColumns: `repeat( auto-fill, minmax(${minColumnWidth}px, 1fr) )`,
       }}
     >
-      {loading && shows.map(show => <FilmSkeleton key={show.id} />)}
+      {loading && shows.map(show => <MediaSkeleton key={show.id} />)}
       {!loading &&
         shows.map(show => (
           <Show
@@ -64,28 +64,30 @@ const TvShowsWrapper = () => {
   const { page } = form;
   const setPage = (page: number) => setForm({ ...form, page });
 
-  const { data, error, isLoading } = useFetchTvSerieses();
+  const { data, error, isLoading } = useSearchShows({ page });
 
   if (error) return <Loading error={error} loading={isLoading} />;
-  const shows = data || [];
-  const count = 42;
+  const { shows, count } = data || {};
 
   return (
     <div className="flex flex-col sm:gap-4">
-      <Paginator
-        count={count}
-        isLoading={isLoading}
-        pageIndex={page}
-        setPage={setPage}
-      />
-      {isLoading && <Loading loading={isLoading} />}
-      {!isLoading && <TvShows shows={shows} key={page} />}
-      <Paginator
-        count={count}
-        isLoading={isLoading}
-        pageIndex={page}
-        setPage={setPage}
-      />
+      <SearchForm />
+      <div className="flex flex-col sm:gap-4">
+        <Paginator
+          count={count}
+          isLoading={isLoading}
+          pageIndex={page}
+          setPage={setPage}
+        />
+        {isLoading && <Loading loading={isLoading} />}
+        {!isLoading && <TvShows shows={shows || []} key={page} />}
+        <Paginator
+          count={count}
+          isLoading={isLoading}
+          pageIndex={page}
+          setPage={setPage}
+        />
+      </div>
     </div>
   );
 };

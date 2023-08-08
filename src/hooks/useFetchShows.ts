@@ -1,15 +1,11 @@
 import { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { useDebounce } from 'react-use';
-import {
-  DecodedValueMap,
-  QueryParamConfigMap,
-  useQueryParams,
-} from 'use-query-params';
+import { DecodedValueMap, useQueryParams } from 'use-query-params';
 import { PAGE_SIZE } from '../constants';
 import { supabase } from '../supabase';
-import { Film } from '../types';
-import { MOVIE_QUERY_PARAMS } from '@/queryParams';
+import { TvSeries } from '../types';
+import { SHOW_QUERY_PARAMS } from '@/queryParams';
 import { PROVIDER_JOIN, CREDIT_PERSON_JOIN } from './constants';
 
 const queryPersonIdsByName = async (name: string) => {
@@ -23,7 +19,7 @@ const queryPersonIdsByName = async (name: string) => {
 };
 
 const queryFilms = async (
-  form: DecodedValueMap<QueryParamConfigMap>,
+  form: DecodedValueMap<typeof SHOW_QUERY_PARAMS>,
   page: number,
 ) => {
   const creditPersonIds: number[] =
@@ -40,10 +36,10 @@ const queryFilms = async (
 
   const select = ['*', PROVIDER_JOIN, ...providerSearch, ...creditSearch].join(', ');
 
-  const query = supabase.from('movie').select(select, { count: 'exact' });
+  const query = supabase.from('tv_series').select(select, { count: 'exact' });
 
-  if (form.title) {
-    query.ilike('title', `%${form.title}%`);
+  if (form.name) {
+    query.ilike('name', `%${form.name}%`);
   }
 
   if (form.minVotes !== 0) {
@@ -59,11 +55,11 @@ const queryFilms = async (
     query.lte('vote_average', form.maxRating);
   }
 
-  if (form.minReleasedAt) {
-    query.gte('released_at', form.minReleasedAt);
+  if (form.minFirstAirDate) {
+    query.gte('first_air_date', form.minFirstAirDate);
   }
-  if (form.maxReleasedAt) {
-    query.lte('released_at', form.maxReleasedAt);
+  if (form.maxFirstAirDate) {
+    query.lte('first_air_date', form.maxFirstAirDate);
   }
 
   if (form.genre) {
@@ -82,15 +78,15 @@ const queryFilms = async (
   }
 
   query
-    .order(form.sortColumn, { ascending: form.ascending })
+    .order(form.sortColumn, { ascending: form.ascending, foreignTable: '' })
     .order('id', { ascending: true })
     .range(page * PAGE_SIZE, (page + 1) * PAGE_SIZE - 1);
 
   return query;
 };
 
-export const useSearchFilms = ({ page }: { page: number }) => {
-  const [formParams] = useQueryParams(MOVIE_QUERY_PARAMS);
+export const useSearchShows = ({ page }: { page: number }) => {
+  const [formParams] = useQueryParams(SHOW_QUERY_PARAMS);
 
   // a local, debounced copy of the form
   const [form, setForm] = useState(formParams);
@@ -103,22 +99,26 @@ export const useSearchFilms = ({ page }: { page: number }) => {
     [formParams],
   );
 
-  return useQuery(['films', form, page], async () => {
-    const { data: films, count } = (await queryFilms(form, page)) as unknown as {
-      data: Film[];
+  return useQuery(['shows', form, page], async () => {
+    const { data: shows, count } = (await queryFilms(form, page)) as unknown as {
+      data: TvSeries[];
       count: number;
     };
 
-    return { count: count || 0, films };
+    return { count: count || 0, shows };
   });
 };
 
-const fetchFilmQuery = async (id: number) => {
+const fetchShowQuery = async (id: number) => {
   const select = ['*', PROVIDER_JOIN, CREDIT_PERSON_JOIN].join(',');
 
-  const result = await supabase.from('movie').select(select).eq('id', id).single();
-  return result.data as unknown as Film;
+  const result = await supabase
+    .from('tv_series')
+    .select(select)
+    .eq('id', id)
+    .single();
+  return result.data as unknown as TvSeries;
 };
 
-export const useFetchFilm = (id: number) =>
-  useQuery(['films', id], async () => fetchFilmQuery(id));
+export const useFetchShow = (id: number) =>
+  useQuery(['shows', id], async () => fetchShowQuery(id));

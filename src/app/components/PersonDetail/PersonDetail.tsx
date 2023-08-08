@@ -7,7 +7,7 @@ import { useParams } from 'react-router-dom';
 import { useTitle } from 'react-use';
 import { systemDataAtom } from '../../../atoms';
 import { Loading, OriginalImageLink } from '@/core-components';
-import { Person } from '../../../types';
+import { Credit, Person } from '../../../types';
 import { getTmdbImage } from '../../../utils';
 import { useFetchPerson } from '@/hooks/useFetchPersons';
 import { usePalette } from '@/hooks/usePalette';
@@ -58,6 +58,16 @@ const SortOptions = ({
   </div>
 );
 
+const toSortValue = (credit: Credit, sort: SortKey) => {
+  if (credit.movie) {
+    return credit.movie[sort];
+  }
+  if (credit.series) {
+    const sortKey = sort === 'released_at' ? 'first_air_date' : sort;
+    return credit.series[sortKey];
+  }
+};
+
 const PersonDetail = ({ person }: { person: Person }) => {
   const [{ genres, languages }] = useAtom(systemDataAtom);
   useTitle(person.name, { restoreOnUnmount: true });
@@ -70,12 +80,12 @@ const PersonDetail = ({ person }: { person: Person }) => {
 
   const castCredits = orderBy(
     person.credits.filter(c => c.type === 'CAST'),
-    o => o.movie[sort],
+    o => toSortValue(o, sort),
     'desc',
   );
   const crewCredits = orderBy(
     person.credits.filter(c => c.type === 'CREW'),
-    o => o.movie[sort],
+    o => toSortValue(o, sort),
     'desc',
   );
 
@@ -161,19 +171,15 @@ const PersonDetail = ({ person }: { person: Person }) => {
               sort={sort}
             />
           </h1>
-          {crewCredits
-            .sort((c1, c2) =>
-              c2.movie.released_at.localeCompare(c1.movie.released_at),
-            )
-            .map(c => (
-              <PersonCredit
-                bgColor={palette.darkMuted}
-                credit={c}
-                genres={genres}
-                key={c.credit_id}
-                languages={languages}
-              />
-            ))}
+          {crewCredits.map(c => (
+            <PersonCredit
+              bgColor={palette.darkMuted}
+              credit={c}
+              genres={genres}
+              key={c.credit_id}
+              languages={languages}
+            />
+          ))}
         </>
       )}
     </div>

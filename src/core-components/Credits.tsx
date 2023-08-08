@@ -1,22 +1,19 @@
 import React from 'react';
 import { groupBy } from 'lodash';
 
-import { Film as IFilm } from '../../../types';
+import { Credit } from '../types';
 import PersonCard from './PersonCard';
 import { Palette } from '@/hooks/usePalette';
 
 interface Props {
-  film: IFilm;
+  credits: Credit[];
   palette: Palette;
 }
 
-const Credits = ({ film, palette }: Props) => {
-  const cast = film.credits.filter(c => c.type === 'CAST');
-  const crew = film.credits.filter(c => c.type === 'CREW');
+const Credits = ({ credits, palette }: Props) => {
+  const cast = credits.filter(c => c.type === 'CAST');
+  const crew = credits.filter(c => c.type === 'CREW');
   const groupedCrew = groupBy(crew, c => c.person_id);
-
-  console.log({ cast });
-  console.log({ crew });
 
   return (
     <>

@@ -1,5 +1,5 @@
 import React from 'react';
-import { addMinutes, intervalToDuration, parseISO, format } from 'date-fns';
+import { parseISO, format } from 'date-fns';
 import { useParams } from 'react-router-dom';
 import { useAtom } from 'jotai';
 import { useTitle } from 'react-use';
@@ -7,24 +7,22 @@ import { Loading, OriginalImageLink } from '../../../core-components';
 import { usePalette } from '@/hooks/usePalette';
 import FilmStats from '../MediaStats';
 import WatchProviders from '../WatchProviders';
-import { Film as IFilm } from '../../../types';
-import { useFetchFilm } from '@/hooks/useFetchFilms';
+import { TvSeries } from '../../../types';
+import { useFetchShow } from '@/hooks/useFetchShows';
 import Trailer from '../../../core-components/Trailer';
 import Credits from '../../../core-components/Credits';
 import { systemDataAtom } from '../../../atoms';
 import { getTmdbImage } from '../../../utils';
 import { toStats } from '../utils';
 
-const FilmDetail = ({ film }: { film: IFilm }) => {
-  useTitle(film.title, { restoreOnUnmount: true });
+const ShowDetail = ({ show }: { show: TvSeries }) => {
+  useTitle(show.name, { restoreOnUnmount: true });
   const [{ genres, languages }] = useAtom(systemDataAtom);
 
-  const posterUrl = getTmdbImage({ path: film.poster_path, width: 'w500' });
-  const year = format(parseISO(film.released_at), 'yyyy');
-  const runtime = intervalToDuration({
-    end: addMinutes(new Date(), Number(film.runtime)),
-    start: new Date(),
-  });
+  const posterUrl = getTmdbImage({ path: show.poster_path, width: 'w500' });
+  const firstYear = format(parseISO(show.first_air_date), 'yyyy');
+  const lastYear = format(parseISO(show.last_air_date), 'yyyy');
+  const years = firstYear === lastYear ? firstYear : `${firstYear}-${lastYear}`;
 
   const { data, isLoading, error } = usePalette(posterUrl);
 
@@ -38,11 +36,9 @@ const FilmDetail = ({ film }: { film: IFilm }) => {
       style={palette.bgStyles}
     >
       <div>
-        <div className="text-2xl font-semibold sm:text-3xl">{film.title}</div>
+        <div className="text-2xl font-semibold sm:text-3xl">{show.name}</div>
         <div className="text-sm text-gray-300">
-          <span title={film.released_at}>{year}</span>
-          {' • '}
-          <span>{`${runtime.hours}h ${runtime.minutes}m`}</span>
+          <span>{years}</span>
         </div>
       </div>
       <div className="flex flex-col gap-4 sm:flex-row">
@@ -53,44 +49,43 @@ const FilmDetail = ({ film }: { film: IFilm }) => {
               className="w-full rounded-lg sm:w-80 md:w-96"
               src={posterUrl}
             />
-            <OriginalImageLink path={film.poster_path} />
+            <OriginalImageLink path={show.poster_path} />
           </div>
           <div className="mt-4 flex flex-col justify-between gap-4">
             <FilmStats
               bgColor={palette.darkVibrant}
-              data={toStats(genres, languages, film)}
+              data={toStats(genres, languages, show)}
             />
           </div>
         </div>
         <div className="flex flex-col gap-4">
           <div className="flex flex-col gap-1">
-            <Trailer movieId={film.id} />
-            <div>Director: {film.director}</div>
-            <div>Starring: {film.cast}</div>
-            <div className="text-justify text-sm sm:text-base">{film.overview}</div>
+            <Trailer showId={show.id} />
+            <div>Starring: {show.cast}</div>
+            <div className="text-justify text-sm sm:text-base">{show.overview}</div>
           </div>
 
-          {film.watch_provider.length > 0 && (
-            <WatchProviders selectedIds={film.watch_provider} />
+          {show.watch_provider.length > 0 && (
+            <WatchProviders selectedIds={show.watch_provider} />
           )}
         </div>
       </div>
-      <Credits credits={film.credits} palette={palette} />
+      <Credits credits={show.credits} palette={palette} />
     </div>
   );
 };
 
-const FilmDetailWrapper = () => {
+const Wrapper = () => {
   const { id } = useParams();
 
-  const { data: film, error, isLoading } = useFetchFilm(Number(id) || 0);
+  const { data: show, error, isLoading } = useFetchShow(Number(id) || 0);
 
   if (error || isLoading) return <Loading error={error} loading={isLoading} />;
-  if (!film) {
-    return <Loading error="films are not defined" loading={isLoading} />;
+  if (!show) {
+    return <Loading error="shows are not defined" loading={isLoading} />;
   }
 
-  return <FilmDetail film={film} />;
+  return <ShowDetail show={show} />;
 };
 
-export default FilmDetailWrapper;
+export default Wrapper;

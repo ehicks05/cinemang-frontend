@@ -3,7 +3,7 @@ import { useQueryParams } from 'use-query-params';
 import { useTitle, useWindowSize } from 'react-use';
 import { Loading } from '../core-components';
 import { Film as IFilm } from '../types';
-import { Film, FilmSkeleton, Paginator } from './components';
+import { Film, MediaSkeleton, Paginator } from './components';
 import { useSearchFilms } from '../hooks/useFetchFilms';
 import { getTmdbImage } from '../utils';
 import { DEFAULT_PALETTE, Palette, toPalette } from '../hooks/usePalette';
@@ -44,7 +44,7 @@ const Films = ({ films }: { films: IFilm[] }) => {
         gridTemplateColumns: `repeat( auto-fill, minmax(${minColumnWidth}px, 1fr) )`,
       }}
     >
-      {loading && films.map(film => <FilmSkeleton key={film.id} />)}
+      {loading && films.map(film => <MediaSkeleton key={film.id} />)}
       {!loading &&
         films.map(film => (
           <Film
