@@ -2,9 +2,10 @@ import P from 'bluebird';
 import { range } from 'lodash';
 import tmdb from './tmdb';
 
+const OPTIONS = { concurrency: 32 };
 const MIN_VOTES = 64;
-// const START_YEAR = 1874;
-const START_YEAR = 2023;
+const START_YEAR = 1874;
+// const START_YEAR = 2023;
 
 const YEAR_KEY = {
   movie: 'primary_release_year',
@@ -30,6 +31,10 @@ const getIdsForYear = async (media: 'movie' | 'tv', year: number) => {
 
 export const discoverMediaIds = async (media: 'movie' | 'tv') => {
   const years = range(START_YEAR, new Date().getFullYear() + 1);
-  const idsByYear = await P.map(years, (year: number) => getIdsForYear(media, year));
+  const idsByYear = await P.map(
+    years,
+    (year: number) => getIdsForYear(media, year),
+    OPTIONS,
+  );
   return idsByYear.flat();
 };
