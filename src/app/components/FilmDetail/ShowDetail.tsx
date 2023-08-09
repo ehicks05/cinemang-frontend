@@ -3,7 +3,7 @@ import { parseISO, format } from 'date-fns';
 import { useParams } from 'react-router-dom';
 import { useAtom } from 'jotai';
 import { useTitle } from 'react-use';
-import { FaCalendar, FaClock, FaHeart, FaStar } from 'react-icons/fa';
+import { FaClock, FaHeart, FaStar } from 'react-icons/fa';
 import { HiChevronRight } from 'react-icons/hi2';
 import { Disclosure, Transition } from '@headlessui/react';
 import { Button, Loading, OriginalImageLink } from '../../../core-components';
@@ -85,7 +85,7 @@ const ShowDetail = ({ show }: { show: Show }) => {
 const Episodes = ({ episodes }: { episodes: Episode[] }) => (
   <div className="flex flex-col gap-4">
     {episodes.map(episode => (
-      <div className="flex flex-col gap-1 bg-neutral-800 p-2">
+      <div key={episode.id} className="flex flex-col gap-1 bg-neutral-800 p-2">
         <div className="flex items-center justify-between gap-2">
           <span>
             {episode.episode_number}. {episode.name}{' '}
@@ -183,7 +183,7 @@ const Seasons = ({ seasons }: { seasons: Season[] }) => (
   <div className="flex flex-col gap-4">
     <div className="text-xl font-bold">Seasons</div>
     {seasons.map(season => (
-      <SeasonCard season={season} />
+      <SeasonCard key={season.id} season={season} />
     ))}
   </div>
 );
