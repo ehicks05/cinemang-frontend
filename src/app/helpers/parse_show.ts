@@ -1,23 +1,23 @@
 import { Prisma } from '@prisma/client';
-import { TvSeriesResponse } from '../../services/tmdb/types/responses';
+import { ShowResponse } from '../../services/tmdb/types/responses';
 
 const MIN_VOTES = 64;
 
-export const isValid = (series: TvSeriesResponse) =>
+export const isValid = (show: ShowResponse) =>
   !!(
-    series.credits &&
-    series.credits.cast
+    show.credits &&
+    show.credits.cast
       .slice(0, 3)
       .map(c => c.name)
       .join(', ')?.length &&
-    series.genres[0] &&
-    series.overview &&
-    series.poster_path &&
-    series.content_ratings?.results.find(r => r.iso_3166_1 === 'US' && r.rating) &&
-    series.vote_count >= MIN_VOTES
+    show.genres[0] &&
+    show.overview &&
+    show.poster_path &&
+    show.content_ratings?.results.find(r => r.iso_3166_1 === 'US' && r.rating) &&
+    show.vote_count >= MIN_VOTES
   );
 
-export const parseTvSeries = (data: TvSeriesResponse) => {
+export const parseShow = (data: ShowResponse) => {
   if (!isValid(data)) {
     return undefined;
   }
@@ -31,14 +31,14 @@ export const parseTvSeries = (data: TvSeriesResponse) => {
       ?.rating || '';
   const genreId = data.genres[0].id;
 
-  const create: Prisma.TvSeriesCreateInput = {
+  const create: Prisma.ShowUncheckedCreateInput = {
     id: data.id,
     name: data.name,
     popularity: data.popularity,
     status: data.status,
     tagline: data.tagline,
     ...{ cast, contentRating, genreId },
-    // createdBy: data.created_by[0].id,
+    // createdById: data.created_by[0]?.id,
     firstAirDate: new Date(data.first_air_date),
     languageId: data.original_language,
     lastAirDate: new Date(data.last_air_date),

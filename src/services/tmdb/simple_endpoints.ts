@@ -5,8 +5,9 @@ import {
   PersonResponse,
   MovieResponse,
   GenreResponse,
-  WatchProviderResponse,
-  TvSeriesResponse,
+  ProviderResponse,
+  ShowResponse,
+  SeasonResponse,
 } from './types/responses';
 import { logAxiosError } from './utils';
 
@@ -23,22 +24,23 @@ export const getMovie = async (id: number) => {
   }
 };
 
-export const getTvSeries = async (id: number) => {
+export const getShow = async (id: number) => {
   try {
     const subRequests = ['credits', 'watch/providers', 'content_ratings'];
     const config = {
       params: { append_to_response: subRequests.join(',') },
     };
-    const result = await tmdb.get<TvSeriesResponse>(`/tv/${id}`, config);
+    const result = await tmdb.get<ShowResponse>(`/tv/${id}`, config);
     return result.data;
   } catch (e) {
     logAxiosError(e as AxiosError);
   }
 };
 
-export const getTvSeason = async (seriesId: number, season: number) => {
+export const getSeason = async (showId: number, season: number) => {
   try {
-    const result = await tmdb.get<MovieResponse>(`/tv/${seriesId}/season/${season}`);
+    const path = `/tv/${showId}/season/${season}`;
+    const result = await tmdb.get<SeasonResponse>(path);
     return result.data;
   } catch (e) {
     logAxiosError(e as AxiosError);
@@ -68,9 +70,9 @@ export const getLanguages = async () => {
   return result.data;
 };
 
-export const getWatchProviders = async () => {
+export const getProviders = async () => {
   const url = '/watch/providers/movie';
   const config = { params: { watch_region: 'US' } };
-  const result = await tmdb.get<WatchProviderResponse>(url, config);
+  const result = await tmdb.get<ProviderResponse>(url, config);
   return result.data.results;
 };

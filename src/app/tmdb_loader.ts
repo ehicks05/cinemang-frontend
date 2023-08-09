@@ -2,26 +2,24 @@ import { chunk, differenceBy, intersectionBy, keyBy, partition } from 'lodash';
 import { formatDuration, intervalToDuration, isFirstDayOfMonth } from 'date-fns';
 import { Prisma } from '@prisma/client';
 import P from 'bluebird';
-import { discoverMediaIds, getMovie, getTvSeries } from '../services/tmdb';
+import { discoverMediaIds, getMovie, getSeason, getShow } from '../services/tmdb';
 import {
   creditsToValidPersonIds,
   isEqual,
   updateGenres,
   updateLanguages,
-  updateWatchProviders,
+  updateProviders,
 } from './helpers/helpers';
 import { argv } from '../services/args';
 import logger from '../services/logger';
 import prisma from '../services/prisma';
-import {
-  updateLanguageCounts,
-  updateWatchProviderCounts,
-} from './helpers/update_counts';
+import { updateLanguageCounts, updateProviderCounts } from './helpers/update_counts';
 import { parseMovie } from './helpers/parse_movie';
-import { parseTvSeries } from './helpers/parse_tv_series';
-import { MovieResponse, TvSeriesResponse } from '../services/tmdb/types/responses';
+import { parseShow } from './helpers/parse_show';
+import { MovieResponse, ShowResponse } from '../services/tmdb/types/responses';
 import { updateRelationships } from './helpers/relationships';
 import { loadPersons } from './helpers/load_persons';
+import { Episode, SeasonSummary } from '../services/tmdb/types/base';
 
 const OPTIONS = { concurrency: 32 };
 
@@ -89,18 +87,16 @@ const loadMovies = async (ids: number[]) => {
   }
 };
 
-const loadTvSeries = async (ids: number[]) => {
-  logger.info('fetching tv series data');
-  const remote = (await P.map(ids, getTvSeries, OPTIONS)).filter(
-    (o): o is TvSeriesResponse => !!o,
+const loadShows = async (ids: number[]) => {
+  logger.info('fetching show data');
+  const remote = (await P.map(ids, getShow, OPTIONS)).filter(
+    (o): o is ShowResponse => !!o,
   );
 
-  const parsed = remote
-    .map(parseTvSeries)
-    .filter(m => m) as Prisma.TvSeriesCreateInput[];
+  const parsed = remote.map(parseShow).filter(m => m) as Prisma.ShowCreateInput[];
   const parsedById = keyBy(parsed, toId);
   const [remoteValid, remoteInvalid] = partition(remote, o => parsedById[o.id]);
-  const local = await prisma.tvSeries.findMany({
+  const local = await prisma.show.findMany({
     where: { id: { in: ids } },
   });
   const localById = keyBy(local, toId);
@@ -115,13 +111,13 @@ const loadTvSeries = async (ids: number[]) => {
   // TODO: either rethrow, or track which movies actually made
   // it to the db, so we don't get foreign key errors later
   try {
-    const createResult = await prisma.tvSeries.createMany({
+    const createResult = await prisma.show.createMany({
       data: toCreate,
     });
 
-    const updateOne = async (o: Prisma.TvSeriesCreateInput) => {
+    const updateOne = async (o: Prisma.ShowCreateInput) => {
       try {
-        await prisma.tvSeries.update({ where: { id: o.id }, data: o });
+        await prisma.show.update({ where: { id: o.id }, data: o });
         return { result: 'ok', id: o.id };
       } catch (e) {
         logger.error(e);
@@ -134,7 +130,7 @@ const loadTvSeries = async (ids: number[]) => {
     const updateErrors = updateResults.filter(o => o.result === 'error');
     const updateErrorsById = keyBy(updateErrors, toId);
 
-    logger.info('tvSeries', {
+    logger.info('shows', {
       ids: ids.length,
       fetched: remote.length,
       validated: parsed.length,
@@ -144,13 +140,72 @@ const loadTvSeries = async (ids: number[]) => {
       unchanged: existing.length - toUpdate.length,
     });
 
-    // create seasons and episodes here?
-    // Bluebird.map(toCreate, () => {})
-
     const mutatedIds = [...toCreate.map(o => o.id), ...toUpdate.map(o => o.id)];
-    return remoteValid
+    const mutated = remoteValid
       .filter(o => mutatedIds.includes(o.id))
       .filter(o => !updateErrorsById[o.id]);
+
+    // as long as seasons+episodes have no relationships, may be easier to just delete + createMany
+    // delete
+    const seasons = await prisma.season.findMany({
+      where: { showId: { in: mutatedIds } },
+    });
+    await prisma.episode.deleteMany({
+      where: { seasonId: { in: seasons.map(s => s.id) } },
+    });
+    await prisma.season.deleteMany({ where: { showId: { in: mutatedIds } } });
+
+    const toSeasonCreateInput = (o: SeasonSummary & { showId: number }) => ({
+      id: o.id,
+      showId: o.showId,
+      airDate: new Date(o.air_date),
+      episodeCount: o.episode_count,
+      name: o.name,
+      overview: o.overview,
+      posterPath: o.poster_path,
+      seasonNumber: o.season_number,
+      voteAverage: o.vote_average,
+    });
+
+    const seasonCreateInputs = mutated
+      .flatMap(show => show.seasons.map(season => ({ ...season, showId: show.id })))
+      .map(toSeasonCreateInput);
+
+    // create
+    await prisma.season.createMany({ data: seasonCreateInputs });
+
+    P.map(
+      seasonCreateInputs,
+      async ({ showId, seasonNumber }) => {
+        const season = await getSeason(showId, seasonNumber);
+        if (!season) {
+          return;
+        }
+        const toEpisodeCreateInput = (
+          o: Episode & { seasonId: number; showId: number },
+        ) => ({
+          id: o.id,
+          seasonId: o.seasonId,
+          showId: o.showId,
+          airDate: new Date(o.air_date),
+          episodeNumber: o.episode_number,
+          name: o.name,
+          overview: o.overview,
+          runtime: o.runtime,
+          seasonNumber: o.season_number,
+          voteAverage: o.vote_average,
+          voteCount: o.vote_count,
+        });
+
+        const episodeCreateInputs = season.episodes.map(episode =>
+          toEpisodeCreateInput({ ...episode, seasonId: season.id, showId }),
+        );
+        await prisma.episode.createMany({ data: episodeCreateInputs });
+      },
+      OPTIONS,
+    );
+
+    return mutated;
   } catch (e) {
     logger.error('error while saving', e);
   }
@@ -177,7 +232,7 @@ const updateMediaByType = async (
       logger.info(`processed ${personIdsProcessed.length} persons`);
 
       const loadedMedias =
-        media === 'movie' ? await loadMovies(ids) : await loadTvSeries(ids);
+        media === 'movie' ? await loadMovies(ids) : await loadShows(ids);
       if (!loadedMedias || loadedMedias.length === 0) return;
 
       const personIds = creditsToValidPersonIds(
@@ -203,20 +258,20 @@ const updateMediaByType = async (
 const runLoader = async (fullMode: boolean) => {
   try {
     logger.info('updating genres, languages, and watch providers...');
-    await Promise.all([updateGenres(), updateLanguages(), updateWatchProviders()]);
+    await Promise.all([updateGenres(), updateLanguages(), updateProviders()]);
 
     if (fullMode) {
       logger.info('TODO: determine special behavior (if any) for full mode');
     }
 
     let personIdsProcessed: number[] = [];
-    personIdsProcessed = await updateMediaByType('movie', personIdsProcessed);
+    // personIdsProcessed = await updateMediaByType('movie', personIdsProcessed);
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     personIdsProcessed = await updateMediaByType('tv', personIdsProcessed);
 
     logger.info('updating counts for languages and watch providers');
     await updateLanguageCounts();
-    await updateWatchProviderCounts();
+    await updateProviderCounts();
 
     if (fullMode) {
       logger.info('cleaning up dead movies [TODO]');
@@ -230,12 +285,7 @@ const runLoader = async (fullMode: boolean) => {
 const wrapper = async () => {
   try {
     logger.info('starting tmdb_loader script');
-    const start = new Date();
-    await prisma.systemInfo.upsert({
-      create: { id: 1, loadStartedAt: start, loadFinishedAt: start },
-      update: { loadStartedAt: start, loadFinishedAt: start },
-      where: { id: 1 },
-    });
+    const { id: logId } = await prisma.syncRunLog.create({ data: {} });
 
     if (argv.full !== 'auto') {
       logger.info('--full arg detected.');
@@ -252,12 +302,11 @@ const wrapper = async () => {
 
     await runLoader(fullMode);
 
-    const end = new Date();
-    await prisma.systemInfo.update({
-      data: { loadStartedAt: start, loadFinishedAt: end },
-      where: { id: 1 },
+    const log = await prisma.syncRunLog.update({
+      data: { endedAt: new Date() },
+      where: { id: logId },
     });
-    const duration = intervalToDuration({ start, end });
+    const duration = intervalToDuration({ start: log.createdAt, end: log.endedAt! });
     logger.info(`finished tmdb_loader script in ${formatDuration(duration)}`);
   } catch (err) {
     logger.error(err);

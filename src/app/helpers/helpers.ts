@@ -5,7 +5,7 @@ import P from 'bluebird';
 import { Prisma, PrismaClient } from '@prisma/client';
 import logger from '../../services/logger';
 import prisma from '../../services/prisma';
-import { getGenres, getLanguages, getWatchProviders } from '../../services/tmdb';
+import { getGenres, getLanguages, getProviders } from '../../services/tmdb';
 import { MediaResponse } from '../../services/tmdb/types/responses';
 
 export const updateGenres = () =>
@@ -24,10 +24,10 @@ export const updateLanguages = () =>
     }),
   });
 
-export const updateWatchProviders = () =>
+export const updateProviders = () =>
   update({
-    model: 'watchProvider',
-    fetcher: getWatchProviders,
+    model: 'provider',
+    fetcher: getProviders,
     remoteMapper: o => ({
       displayPriority: o.display_priorities.US,
       id: o.provider_id,

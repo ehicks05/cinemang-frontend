@@ -1,12 +1,13 @@
 import {
-  AppendedWatchProvider,
   AppendedRelease,
-  AppendedImage,
   CastCredit,
   CrewCredit,
   AppendedContentRating,
+  AppendedProviders,
+  AppendedImages,
+  AppendedImage,
 } from './appends';
-import { Genre, Movie, Person, RecentChange, TvSeries, WatchProvider } from './base';
+import { Genre, Movie, Person, RecentChange, Show, Provider, Season } from './base';
 
 /**
  * These types account for the way some api responses are packaged
@@ -25,49 +26,17 @@ export interface GenreResponse {
   genres: Genre[];
 }
 
-export interface MovieResponse extends Movie {
+export interface MovieResponse extends Movie, AppendedImages, AppendedProviders {
   credits: { cast: CastCredit[]; crew: CrewCredit[] };
-  images: {
-    backdrops: AppendedImage[];
-    logos: AppendedImage[];
-    posters: AppendedImage[];
-  };
   releases: { countries: AppendedRelease[] };
-  'watch/providers': {
-    results: Record<
-      string,
-      {
-        link: string;
-        flatrate: AppendedWatchProvider[];
-        buy: AppendedWatchProvider[];
-        rent: AppendedWatchProvider[];
-      }
-    >;
-  };
 }
 
-export interface TvSeriesResponse extends TvSeries {
+export interface ShowResponse extends Show, AppendedImages, AppendedProviders {
   credits: { cast: CastCredit[]; crew: CrewCredit[] };
-  images: {
-    backdrops: AppendedImage[];
-    logos: AppendedImage[];
-    posters: AppendedImage[];
-  };
   content_ratings: { results: AppendedContentRating[] };
-  'watch/providers': {
-    results: Record<
-      string,
-      {
-        link: string;
-        flatrate: AppendedWatchProvider[];
-        buy: AppendedWatchProvider[];
-        rent: AppendedWatchProvider[];
-      }
-    >;
-  };
 }
 
-export type MediaResponse = MovieResponse | TvSeriesResponse;
+export type MediaResponse = MovieResponse | ShowResponse;
 
 export interface PersonResponse extends Person {
   images: { profiles: AppendedImage[] };
@@ -77,6 +46,9 @@ export interface RecentChangesResponse {
   results: RecentChange[];
 }
 
-export interface WatchProviderResponse {
-  results: WatchProvider[];
+export interface ProviderResponse {
+  results: Provider[];
 }
+
+// eslint-disable-next-line @typescript-eslint/no-empty-interface
+export interface SeasonResponse extends Season {}

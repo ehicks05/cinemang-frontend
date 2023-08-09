@@ -3,6 +3,7 @@ import { range } from 'lodash';
 import tmdb from './tmdb';
 
 const MIN_VOTES = 64;
+// const START_YEAR = 1874;
 const START_YEAR = 2023;
 
 const YEAR_KEY = {

@@ -31,13 +31,13 @@ const toCreditCreateInput = (media: MediaResponse) =>
 
 const mediaToRelationshipKey = (media: MediaResponse) => {
   if ('title' in media) return { movieId: media.id };
-  if ('name' in media) return { seriesId: media.id };
+  if ('name' in media) return { showId: media.id };
   throw new Error('unrecognized media object');
 };
 
 const mediaToWhereClauseKey = (media: MediaResponse) => {
   if ('title' in media) return 'movieId';
-  if ('name' in media) return 'seriesId';
+  if ('name' in media) return 'showId';
   throw new Error('unrecognized media object');
 };
 
@@ -95,12 +95,12 @@ const loadCredits = async (
 
 const toComparisonId = (o: {
   movieId?: number | null;
-  seriesId?: number | null;
-  watchProviderId: number;
-}) => `${o.movieId || o.seriesId}-${o.watchProviderId}`;
+  showId?: number | null;
+  providerId: number;
+}) => `${o.movieId || o.showId}-${o.providerId}`;
 
 const getProvidersById = async () => {
-  const providers = await prisma.watchProvider.findMany({
+  const providers = await prisma.provider.findMany({
     select: { id: true },
   });
   return keyBy(providers, toId);
@@ -114,21 +114,20 @@ const toMediaProviderCreateInput = (media: MediaResponse) => {
       .filter(p => p.provider_id !== 78)
       .map(p => ({
         ...mediaToRelationshipKey(media),
-        watchProviderId: p.provider_id,
+        providerId: p.provider_id,
       }))
   );
 };
 
 const loadProviders = async (medias: MediaResponse[], mediaIds: number[]) => {
   const providersById = await getProvidersById();
-  const remoteMediaProviders: Prisma.MediaWatchProviderUncheckedCreateInput[] =
-    medias
-      .map(toMediaProviderCreateInput)
-      .flat()
-      .filter(o => o && providersById[o.watchProviderId]);
+  const remoteMediaProviders: Prisma.MediaProviderUncheckedCreateInput[] = medias
+    .map(toMediaProviderCreateInput)
+    .flat()
+    .filter(o => o && providersById[o.providerId]);
 
   const whereClauseKey = mediaToWhereClauseKey(medias[0]);
-  const localMediaProviders = await prisma.mediaWatchProvider.findMany({
+  const localMediaProviders = await prisma.mediaProvider.findMany({
     where: {
       [whereClauseKey]: { in: mediaIds },
     },
@@ -151,20 +150,20 @@ const loadProviders = async (medias: MediaResponse[], mediaIds: number[]) => {
     return p && !isEqual(o, p);
   });
 
-  const mediaProviderCreateResult = await prisma.mediaWatchProvider.createMany({
+  const mediaProviderCreateResult = await prisma.mediaProvider.createMany({
     data: newMediaProviders,
   });
 
-  const updateOne = async (o: Prisma.MediaWatchProviderUncheckedUpdateInput) => {
+  const updateOne = async (o: Prisma.MediaProviderUncheckedUpdateInput) => {
     const id = localMediaProviders.find(
       local =>
         local.movieId === o.movieId &&
-        local.seriesId === o.seriesId &&
-        local.watchProviderId === o.watchProviderId,
+        local.showId === o.showId &&
+        local.providerId === o.providerId,
     )?.id;
     try {
       const where = { id };
-      prisma.mediaWatchProvider.update({ where, data: o });
+      prisma.mediaProvider.update({ where, data: o });
     } catch (e) {
       logger.error(e);
     }

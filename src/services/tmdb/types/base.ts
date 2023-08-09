@@ -87,7 +87,7 @@ export interface RecentChange {
   adult: boolean;
 }
 
-export interface TvSeries extends Media {
+export interface Show extends Media {
   created_by: Pick<Person, 'id' | 'name' | 'gender' | 'profile_path'>[];
   episode_run_time: number[];
   first_air_date: string;
@@ -102,28 +102,29 @@ export interface TvSeries extends Media {
   number_of_seasons: number;
   origin_country: string[];
   original_name: string;
-  seasons: TvSeasonSummary[];
+  seasons: SeasonSummary[];
   spoken_languages: Language[];
   status: TmdbTvStatus;
   type: string;
 }
 
-export type TvSeasonSummary = Omit<TvSeason, 'episodes' | '_id'> & {
+export type SeasonSummary = Omit<Season, 'episodes' | '_id'> & {
   episode_count: number;
 };
 
-export interface TvSeason {
+export interface Season {
   _id: string;
   air_date: string;
-  episodes: TvEpisode[];
+  episodes: Episode[];
   name: string;
   overview: string;
   id: number;
   poster_path?: string;
   season_number: number;
+  vote_average: number;
 }
 
-export interface TvEpisode {
+export interface Episode {
   air_date: string;
   crew: CrewCredit[];
   episode_number: number;
@@ -132,13 +133,14 @@ export interface TvEpisode {
   name: string;
   overview: string;
   production_code?: string;
+  runtime?: number;
   season_number: number;
   still_path?: string;
   vote_average: number;
   vote_count: number;
 }
 
-export interface WatchProvider {
+export interface Provider {
   display_priorities: Record<string, number>;
   display_priority: number;
   logo_path: string;

@@ -1,4 +1,4 @@
-import { Person, WatchProvider } from './base';
+import { Person, Provider } from './base';
 
 /**
  * Variations of the base types that generally omit a few fields
@@ -43,6 +43,14 @@ export interface AppendedImage {
   width: number;
 }
 
+export interface AppendedImages {
+  images: {
+    backdrops: AppendedImage[];
+    logos: AppendedImage[];
+    posters: AppendedImage[];
+  };
+}
+
 export interface AppendedRelease {
   certification: string;
   iso_3166_1: string;
@@ -56,4 +64,18 @@ export interface AppendedContentRating {
   rating: string;
 }
 
-export type AppendedWatchProvider = Omit<WatchProvider, 'display_priority'>;
+type AppendedProvider = Omit<Provider, 'display_priority'>;
+
+export interface AppendedProviders {
+  'watch/providers': {
+    results: Record<
+      string,
+      {
+        link: string;
+        flatrate: AppendedProvider[];
+        buy: AppendedProvider[];
+        rent: AppendedProvider[];
+      }
+    >;
+  };
+}
