@@ -162,14 +162,17 @@ export interface Database {
         Row: {
           id: number
           name: string
+          type: Database["public"]["Enums"]["GenreType"]
         }
         Insert: {
           id: number
           name: string
+          type?: Database["public"]["Enums"]["GenreType"]
         }
         Update: {
           id?: number
           name?: string
+          type?: Database["public"]["Enums"]["GenreType"]
         }
         Relationships: []
       }
@@ -515,6 +518,7 @@ export interface Database {
     }
     Enums: {
       CreditType: "CAST" | "CREW" | "GUEST_STAR"
+      GenreType: "MOVIE" | "SHOW" | "BOTH"
       ShowStatus: "ENDED" | "CANCELED" | "RETURNING_SERIES" | "IN_PRODUCTION"
     }
     CompositeTypes: {

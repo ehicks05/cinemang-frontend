@@ -291,7 +291,11 @@ const Language = () => {
 };
 
 const Genre = () => {
+  const { pathname } = useLocation();
   const [{ genres }] = useAtom(systemDataAtom);
+  const mediaGenres = genres.filter(
+    o => o.type !== (pathname === '/tv' ? 'MOVIE' : 'SHOW'),
+  );
   const [form, _setForm] = useQueryParams(QUERY_PARAMS);
 
   const setForm = (update: Record<string, any>) => {
@@ -308,7 +312,7 @@ const Genre = () => {
           value={form.genre}
         >
           <option value="">Any</option>
-          {genres.map(genre => (
+          {mediaGenres.map(genre => (
             <option key={genre.id} value={genre.id}>
               {genre.name}
             </option>
