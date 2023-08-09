@@ -60,8 +60,13 @@ export const getPerson = async (id: number) => {
   }
 };
 
-export const getGenres = async () => {
+export const getMovieGenres = async () => {
   const result = await tmdb.get<GenreResponse>(`/genre/movie/list`);
+  return result.data.genres;
+};
+
+export const getShowGenres = async () => {
+  const result = await tmdb.get<GenreResponse>(`/genre/tv/list`);
   return result.data.genres;
 };
 

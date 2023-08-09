@@ -164,9 +164,16 @@ model Credit {
   @@map("credit")
 }
 
+enum GenreType {
+  MOVIE
+  SHOW
+  BOTH
+}
+
 model Genre {
-  id   Int    @id
+  id   Int       @id
   name String
+  type GenreType
 
   @@map("genre")
 }

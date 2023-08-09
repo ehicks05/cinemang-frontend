@@ -1,20 +1,49 @@
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-nocheck
-import _, { chunk, difference, isNil, keyBy, omit, omitBy, uniq } from 'lodash';
+import _, {
+  chunk,
+  difference,
+  groupBy,
+  isNil,
+  keyBy,
+  omit,
+  omitBy,
+  uniq,
+} from 'lodash';
 import P from 'bluebird';
-import { Prisma, PrismaClient } from '@prisma/client';
+import { GenreType, Prisma, PrismaClient } from '@prisma/client';
 import logger from '../../services/logger';
 import prisma from '../../services/prisma';
-import { getGenres, getLanguages, getProviders } from '../../services/tmdb';
+import {
+  getMovieGenres,
+  getLanguages,
+  getProviders,
+  getShowGenres,
+} from '../../services/tmdb';
 import { MediaResponse } from '../../services/tmdb/types/responses';
 
-export const updateGenres = () =>
+export const updateGenres = async () => {
+  const movieGenres = (await getMovieGenres()).map(o => ({
+    ...o,
+    type: GenreType.MOVIE,
+  }));
+  const showGenres = (await getShowGenres()).map(o => ({
+    ...o,
+    type: GenreType.SHOW,
+  }));
+
+  const genresById = groupBy([...movieGenres, ...showGenres], o => o.id);
+  const genres = Object.values(genresById).map(o =>
+    o.length === 1 ? o[0] : { ...o[0], type: GenreType.BOTH },
+  );
+
   update({
     model: 'genre',
-    fetcher: getGenres,
+    fetcher: () => Promise.resolve(genres),
   });
+};
 
-export const updateLanguages = () =>
+export const updateLanguages = async () =>
   update({
     model: 'language',
     fetcher: getLanguages,
@@ -24,7 +53,7 @@ export const updateLanguages = () =>
     }),
   });
 
-export const updateProviders = () =>
+export const updateProviders = async () =>
   update({
     model: 'provider',
     fetcher: getProviders,
@@ -36,6 +65,11 @@ export const updateProviders = () =>
     }),
   });
 
+/**
+ * Determine if two records are the same, ignoring nullish fields in either record.
+ * Also ignores `popularity` and `count` fields, and `vote_count` if the difference
+ * is <= 10% of the smaller value
+ */
 export const isEqual = (value: Record<string, any>, other: Record<string, any>) => {
   const a = omitBy(value, isNil);
   const b = omitBy(other, isNil);
