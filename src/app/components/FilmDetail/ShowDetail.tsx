@@ -125,7 +125,7 @@ const SeasonCard = ({ season }: { season: Season }) => (
     {({ open }) => (
       <div className="flex w-full flex-col gap-2 rounded-lg bg-neutral-900 p-4">
         <div className="flex w-full flex-col gap-2 rounded-lg bg-neutral-900 sm:flex-row">
-          <div className="relative w-full sm:w-40">
+          <div className="relative w-full flex-shrink-0 sm:w-40">
             <img
               alt="poster"
               className="w-full rounded-lg"
@@ -156,7 +156,7 @@ const SeasonCard = ({ season }: { season: Season }) => (
         </div>
         <div className="w-full">
           <Disclosure.Button as="span" className="w-full">
-            <Button className="flex w-full items-center justify-between gap-2 border-none py-2 sm:w-auto">
+            <Button className="flex w-full items-center justify-between gap-2 border-none bg-neutral-800 py-2 sm:w-auto">
               Episodes
               <HiChevronRight className={open ? 'rotate-90 transform' : ''} />
             </Button>
