@@ -4,7 +4,7 @@ import { truncate } from 'lodash';
 import { Link } from 'react-router-dom';
 import { useAtom } from 'jotai';
 import MediaStats from './MediaStats';
-import WatchProviders from './WatchProviders';
+import MediaProviders from './MediaProviders';
 import { Film as IFilm } from '../../types';
 import { SCALED_IMAGE } from '../../constants';
 import { systemDataAtom } from '../../atoms';
@@ -48,9 +48,7 @@ const Film = ({ film, palette }: { film: IFilm; palette: Palette }) => {
           <div>{film.director}</div>
           <div>{film.cast}</div>
           <div className="flex-grow" />
-          {film.watch_provider && (
-            <WatchProviders selectedIds={film.watch_provider} />
-          )}
+          {film.providers && <MediaProviders selectedIds={film.providers} />}
         </div>
       </div>
       <div className="flex h-full flex-col justify-start gap-4">

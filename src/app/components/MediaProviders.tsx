@@ -1,10 +1,10 @@
 import { useAtom } from 'jotai';
 import { FC } from 'react';
-import { WatchProvider as IWatchProvider } from '../../types';
 import { systemDataAtom } from '../../atoms';
 import { getTmdbImage } from '../../utils';
+import { Provider } from '@/types';
 
-const WatchProvider: FC<{ provider: IWatchProvider }> = ({
+const MediaProvider: FC<{ provider: Provider }> = ({
   provider: { name, logo_path },
 }) => (
   <img
@@ -19,22 +19,25 @@ interface Props {
   selectedIds: { id: number }[];
 }
 
-const WatchProviders: FC<Props> = ({ selectedIds }) => {
-  const [{ watchProviders }] = useAtom(systemDataAtom);
-  const providers = selectedIds
-    .map(id => watchProviders.find(wp => wp.id === id.id))
-    .filter((p): p is IWatchProvider => p !== null && p !== undefined)
+const MediaProviders: FC<Props> = ({ selectedIds }) => {
+  const [{ providers }] = useAtom(systemDataAtom);
+
+  console.log({ providers, selectedIds });
+
+  const filteredProviders = selectedIds
+    .map(id => providers.find(p => p.id === id.id))
+    .filter((p): p is Provider => p !== null && p !== undefined)
     .filter(p => p.display_priority <= 22)
     .sort((p1, p2) => p1.display_priority - p2.display_priority);
 
-  if (providers.length === 0) return null;
+  if (filteredProviders.length === 0) return null;
   return (
     <div className="flex flex-wrap gap-0.5">
-      {providers.map(provider => (
-        <WatchProvider key={provider.id} provider={provider} />
+      {filteredProviders.map(provider => (
+        <MediaProvider key={provider.id} provider={provider} />
       ))}
     </div>
   );
 };
 
-export default WatchProviders;
+export default MediaProviders;

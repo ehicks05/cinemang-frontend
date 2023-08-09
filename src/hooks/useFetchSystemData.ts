@@ -14,22 +14,22 @@ const fetchLanguages = async () => {
   return result.data || [];
 };
 
-const fetchWatchProviders = async () => {
+const fetchProviders = async () => {
   const result = await supabase
-    .from('watch_provider')
+    .from('provider')
     .select('*')
     .order('display_priority');
   return result.data || [];
 };
 
 const fetchData = async () => {
-  const [genres, languages, watchProviders] = await Promise.all([
+  const [genres, languages, providers] = await Promise.all([
     fetchGenres(),
     fetchLanguages(),
-    fetchWatchProviders(),
+    fetchProviders(),
   ]);
 
-  return { genres, languages, watchProviders };
+  return { genres, languages, providers };
 };
 
 export const useFetchSystemData = () =>

@@ -52,8 +52,8 @@ export interface Database {
           movie_id: number | null
           order: number | null
           person_id: number
-          series_id: number | null
-          type: "CAST" | "CREW" | "GUEST_STAR"
+          show_id: number | null
+          type: Database["public"]["Enums"]["CreditType"]
         }
         Insert: {
           cast_id?: number | null
@@ -64,8 +64,8 @@ export interface Database {
           movie_id?: number | null
           order?: number | null
           person_id: number
-          series_id?: number | null
-          type: "CAST" | "CREW" | "GUEST_STAR"
+          show_id?: number | null
+          type: Database["public"]["Enums"]["CreditType"]
         }
         Update: {
           cast_id?: number | null
@@ -76,8 +76,8 @@ export interface Database {
           movie_id?: number | null
           order?: number | null
           person_id?: number
-          series_id?: number | null
-          type?: "CAST" | "CREW" | "GUEST_STAR"
+          show_id?: number | null
+          type?: Database["public"]["Enums"]["CreditType"]
         }
         Relationships: [
           {
@@ -93,55 +93,67 @@ export interface Database {
             referencedColumns: ["id"]
           },
           {
-            foreignKeyName: "credit_series_id_fkey"
-            columns: ["series_id"]
-            referencedRelation: "tv_series"
+            foreignKeyName: "credit_show_id_fkey"
+            columns: ["show_id"]
+            referencedRelation: "show"
             referencedColumns: ["id"]
           }
         ]
       }
       episode: {
         Row: {
+          air_date: string
           episode_number: number
           id: number
           name: string
           overview: string
-          runtime: number
+          runtime: number | null
+          season_id: number
           season_number: number
-          seasonId: string
-          still_path: string
+          show_id: number
+          still_path: string | null
           vote_average: number
           vote_count: number
         }
         Insert: {
+          air_date: string
           episode_number: number
           id: number
           name: string
           overview: string
-          runtime: number
+          runtime?: number | null
+          season_id: number
           season_number: number
-          seasonId: string
-          still_path: string
+          show_id: number
+          still_path?: string | null
           vote_average: number
           vote_count: number
         }
         Update: {
+          air_date?: string
           episode_number?: number
           id?: number
           name?: string
           overview?: string
-          runtime?: number
+          runtime?: number | null
+          season_id?: number
           season_number?: number
-          seasonId?: string
-          still_path?: string
+          show_id?: number
+          still_path?: string | null
           vote_average?: number
           vote_count?: number
         }
         Relationships: [
           {
-            foreignKeyName: "episode_seasonId_fkey"
-            columns: ["seasonId"]
+            foreignKeyName: "episode_season_id_fkey"
+            columns: ["season_id"]
             referencedRelation: "season"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "episode_show_id_fkey"
+            columns: ["show_id"]
+            referencedRelation: "show"
             referencedColumns: ["id"]
           }
         ]
@@ -158,30 +170,6 @@ export interface Database {
         Update: {
           id?: number
           name?: string
-        }
-        Relationships: []
-      }
-      ignored_movie: {
-        Row: {
-          id: number
-        }
-        Insert: {
-          id: number
-        }
-        Update: {
-          id?: number
-        }
-        Relationships: []
-      }
-      ignored_person: {
-        Row: {
-          id: number
-        }
-        Insert: {
-          id: number
-        }
-        Update: {
-          id?: number
         }
         Relationships: []
       }
@@ -203,42 +191,42 @@ export interface Database {
         }
         Relationships: []
       }
-      media_watch_provider: {
+      media_provider: {
         Row: {
           id: string
-          movieId: number | null
-          seriesId: number | null
-          watchProviderId: number
+          movie_id: number | null
+          provider_id: number
+          show_id: number | null
         }
         Insert: {
           id: string
-          movieId?: number | null
-          seriesId?: number | null
-          watchProviderId: number
+          movie_id?: number | null
+          provider_id: number
+          show_id?: number | null
         }
         Update: {
           id?: string
-          movieId?: number | null
-          seriesId?: number | null
-          watchProviderId?: number
+          movie_id?: number | null
+          provider_id?: number
+          show_id?: number | null
         }
         Relationships: [
           {
-            foreignKeyName: "media_watch_provider_movieId_fkey"
-            columns: ["movieId"]
+            foreignKeyName: "media_provider_movie_id_fkey"
+            columns: ["movie_id"]
             referencedRelation: "movie"
             referencedColumns: ["id"]
           },
           {
-            foreignKeyName: "media_watch_provider_seriesId_fkey"
-            columns: ["seriesId"]
-            referencedRelation: "tv_series"
+            foreignKeyName: "media_provider_provider_id_fkey"
+            columns: ["provider_id"]
+            referencedRelation: "provider"
             referencedColumns: ["id"]
           },
           {
-            foreignKeyName: "media_watch_provider_watchProviderId_fkey"
-            columns: ["watchProviderId"]
-            referencedRelation: "watch_provider"
+            foreignKeyName: "media_provider_show_id_fkey"
+            columns: ["show_id"]
+            referencedRelation: "show"
             referencedColumns: ["id"]
           }
         ]
@@ -297,110 +285,7 @@ export interface Database {
         }
         Relationships: []
       }
-      person: {
-        Row: {
-          biography: string
-          birthday: string | null
-          deathday: string | null
-          gender: number
-          id: number
-          imdb_id: string
-          known_for_department: string
-          name: string
-          place_of_birth: string | null
-          popularity: number
-          profile_path: string
-        }
-        Insert: {
-          biography: string
-          birthday?: string | null
-          deathday?: string | null
-          gender: number
-          id: number
-          imdb_id: string
-          known_for_department: string
-          name: string
-          place_of_birth?: string | null
-          popularity: number
-          profile_path: string
-        }
-        Update: {
-          biography?: string
-          birthday?: string | null
-          deathday?: string | null
-          gender?: number
-          id?: number
-          imdb_id?: string
-          known_for_department?: string
-          name?: string
-          place_of_birth?: string | null
-          popularity?: number
-          profile_path?: string
-        }
-        Relationships: []
-      }
-      season: {
-        Row: {
-          air_date: string
-          id: string
-          name: string
-          other_id: number
-          overview: string
-          poster_path: string
-          season_number: number
-          tvSeriesId: number
-          vote_average: number
-        }
-        Insert: {
-          air_date: string
-          id: string
-          name: string
-          other_id: number
-          overview: string
-          poster_path: string
-          season_number: number
-          tvSeriesId: number
-          vote_average: number
-        }
-        Update: {
-          air_date?: string
-          id?: string
-          name?: string
-          other_id?: number
-          overview?: string
-          poster_path?: string
-          season_number?: number
-          tvSeriesId?: number
-          vote_average?: number
-        }
-        Relationships: [
-          {
-            foreignKeyName: "season_tvSeriesId_fkey"
-            columns: ["tvSeriesId"]
-            referencedRelation: "tv_series"
-            referencedColumns: ["id"]
-          }
-        ]
-      }
-      system_info: {
-        Row: {
-          id: number
-          loadFinishedAt: string
-          loadStartedAt: string
-        }
-        Insert: {
-          id: number
-          loadFinishedAt: string
-          loadStartedAt: string
-        }
-        Update: {
-          id?: number
-          loadFinishedAt?: string
-          loadStartedAt?: string
-        }
-        Relationships: []
-      }
-      tv_network: {
+      network: {
         Row: {
           headquarters: string
           homepage: string
@@ -430,7 +315,116 @@ export interface Database {
         }
         Relationships: []
       }
-      tv_series: {
+      person: {
+        Row: {
+          biography: string
+          birthday: string | null
+          deathday: string | null
+          gender: number
+          id: number
+          imdb_id: string | null
+          known_for_department: string
+          name: string
+          place_of_birth: string | null
+          popularity: number
+          profile_path: string
+        }
+        Insert: {
+          biography: string
+          birthday?: string | null
+          deathday?: string | null
+          gender: number
+          id: number
+          imdb_id?: string | null
+          known_for_department: string
+          name: string
+          place_of_birth?: string | null
+          popularity: number
+          profile_path: string
+        }
+        Update: {
+          biography?: string
+          birthday?: string | null
+          deathday?: string | null
+          gender?: number
+          id?: number
+          imdb_id?: string | null
+          known_for_department?: string
+          name?: string
+          place_of_birth?: string | null
+          popularity?: number
+          profile_path?: string
+        }
+        Relationships: []
+      }
+      provider: {
+        Row: {
+          count: number
+          display_priority: number
+          id: number
+          logo_path: string
+          name: string
+        }
+        Insert: {
+          count?: number
+          display_priority: number
+          id: number
+          logo_path: string
+          name: string
+        }
+        Update: {
+          count?: number
+          display_priority?: number
+          id?: number
+          logo_path?: string
+          name?: string
+        }
+        Relationships: []
+      }
+      season: {
+        Row: {
+          air_date: string
+          episode_count: number
+          id: number
+          name: string
+          overview: string
+          poster_path: string | null
+          season_number: number
+          show_id: number
+          vote_average: number
+        }
+        Insert: {
+          air_date: string
+          episode_count: number
+          id: number
+          name: string
+          overview: string
+          poster_path?: string | null
+          season_number: number
+          show_id: number
+          vote_average: number
+        }
+        Update: {
+          air_date?: string
+          episode_count?: number
+          id?: number
+          name?: string
+          overview?: string
+          poster_path?: string | null
+          season_number?: number
+          show_id?: number
+          vote_average?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "season_show_id_fkey"
+            columns: ["show_id"]
+            referencedRelation: "show"
+            referencedColumns: ["id"]
+          }
+        ]
+      }
+      show: {
         Row: {
           cast: string
           content_rating: string | null
@@ -487,34 +481,28 @@ export interface Database {
         }
         Relationships: [
           {
-            foreignKeyName: "tv_series_created_by_id_fkey"
+            foreignKeyName: "show_created_by_id_fkey"
             columns: ["created_by_id"]
             referencedRelation: "person"
             referencedColumns: ["id"]
           }
         ]
       }
-      watch_provider: {
+      sync_run_log: {
         Row: {
-          count: number
-          display_priority: number
-          id: number
-          logo_path: string
-          name: string
+          created_at: string
+          ended_at: string | null
+          id: string
         }
         Insert: {
-          count?: number
-          display_priority: number
-          id: number
-          logo_path: string
-          name: string
+          created_at?: string
+          ended_at?: string | null
+          id: string
         }
         Update: {
-          count?: number
-          display_priority?: number
-          id?: number
-          logo_path?: string
-          name?: string
+          created_at?: string
+          ended_at?: string | null
+          id?: string
         }
         Relationships: []
       }
@@ -527,11 +515,7 @@ export interface Database {
     }
     Enums: {
       CreditType: "CAST" | "CREW" | "GUEST_STAR"
-      TvSeriesStatus:
-        | "ENDED"
-        | "CANCELED"
-        | "RETURNING_SERIES"
-        | "IN_PRODUCTION"
+      ShowStatus: "ENDED" | "CANCELED" | "RETURNING_SERIES" | "IN_PRODUCTION"
     }
     CompositeTypes: {
       [_ in never]: never

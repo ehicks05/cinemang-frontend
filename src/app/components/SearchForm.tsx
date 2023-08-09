@@ -111,7 +111,7 @@ const CreditName = () => {
 };
 
 const Providers = () => {
-  const [{ watchProviders }] = useAtom(systemDataAtom);
+  const [{ providers }] = useAtom(systemDataAtom);
   const [form, _setForm] = useQueryParams(QUERY_PARAMS);
 
   const setForm = (update: Record<string, any>) => {
@@ -127,18 +127,18 @@ const Providers = () => {
         <div>Stream {getStreamLabel(form.providers.length)}</div>
         <div>
           <ComboBox
-            mapper={provider => ({
-              id: provider.id,
+            mapper={p => ({
+              id: p.id,
               imageUrl: getTmdbImage({
-                path: provider.logo_path,
+                path: p.logo_path,
                 width: 'original',
               }),
-              label: provider.name,
+              label: p.name,
             })}
             onChange={value => setForm({ providers: value })}
-            options={watchProviders
+            options={providers
               .sort((o1, o2) => o1.display_priority - o2.display_priority)
-              .filter(wp => wp.count > 0)}
+              .filter(p => p.count > 0)}
             selectedOptionIds={form.providers as number[]}
           />
         </div>

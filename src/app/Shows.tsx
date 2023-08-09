@@ -2,15 +2,15 @@ import React, { useMemo, useState } from 'react';
 import { useQueryParams } from 'use-query-params';
 import { useTitle, useWindowSize } from 'react-use';
 import { Loading } from '../core-components';
-import { TvSeries } from '../types';
+import { Show } from '../types';
 import { MediaSkeleton, Paginator, SearchForm } from './components';
 import { useSearchShows } from '../hooks/useFetchShows';
 import { getTmdbImage } from '../utils';
 import { DEFAULT_PALETTE, Palette, toPalette } from '../hooks/usePalette';
-import Show from './components/Show';
+import ShowCard from './components/Show';
 import { SHOW_QUERY_PARAMS } from '@/queryParams';
 
-const TvShows = ({ shows }: { shows: TvSeries[] }) => {
+const Shows = ({ shows }: { shows: Show[] }) => {
   const [loading, setLoading] = useState(true);
   const [palettes, setPalettes] = useState<Record<number, Palette> | undefined>(
     undefined,
@@ -48,7 +48,7 @@ const TvShows = ({ shows }: { shows: TvSeries[] }) => {
       {loading && shows.map(show => <MediaSkeleton key={show.id} />)}
       {!loading &&
         shows.map(show => (
-          <Show
+          <ShowCard
             show={show}
             key={show.id}
             palette={palettes?.[show.id] || DEFAULT_PALETTE}
@@ -58,7 +58,7 @@ const TvShows = ({ shows }: { shows: TvSeries[] }) => {
   );
 };
 
-const TvShowsWrapper = () => {
+const ShowsWrapper = () => {
   useTitle('Cinemang');
   const [form, setForm] = useQueryParams(SHOW_QUERY_PARAMS);
   const { page } = form;
@@ -80,7 +80,7 @@ const TvShowsWrapper = () => {
           setPage={setPage}
         />
         {isLoading && <Loading loading={isLoading} />}
-        {!isLoading && <TvShows shows={shows || []} key={page} />}
+        {!isLoading && <Shows shows={shows || []} key={page} />}
         <Paginator
           count={count}
           isLoading={isLoading}
@@ -92,4 +92,4 @@ const TvShowsWrapper = () => {
   );
 };
 
-export default TvShowsWrapper;
+export default ShowsWrapper;

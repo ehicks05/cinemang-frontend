@@ -4,15 +4,15 @@ import { truncate } from 'lodash';
 import { Link } from 'react-router-dom';
 import { useAtom } from 'jotai';
 import MediaStats from './MediaStats';
-import WatchProviders from './WatchProviders';
-import { TvSeries } from '../../types';
+import MediaProviders from './MediaProviders';
+import { Show } from '../../types';
 import { SCALED_IMAGE } from '../../constants';
 import { systemDataAtom } from '../../atoms';
 import { getTmdbImage } from '../../utils';
 import { toStats } from './utils';
 import { Palette } from '@/hooks/usePalette';
 
-const Show = ({ show, palette }: { show: TvSeries; palette: Palette }) => {
+const ShowCard = ({ show, palette }: { show: Show; palette: Palette }) => {
   const [{ genres, languages }] = useAtom(systemDataAtom);
 
   const posterUrl = getTmdbImage({ path: show.poster_path });
@@ -45,9 +45,7 @@ const Show = ({ show, palette }: { show: TvSeries; palette: Palette }) => {
           <div>{show.created_by_id}</div>
           <div>{show.cast}</div>
           <div className="flex-grow" />
-          {show.watch_provider && (
-            <WatchProviders selectedIds={show.watch_provider} />
-          )}
+          {show.providers && <MediaProviders selectedIds={show.providers} />}
         </div>
       </div>
       <div className="flex h-full flex-col justify-start gap-4">
@@ -69,4 +67,4 @@ const Show = ({ show, palette }: { show: TvSeries; palette: Palette }) => {
   );
 };
 
-export default Show;
+export default ShowCard;

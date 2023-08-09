@@ -4,7 +4,7 @@ import { useDebounce } from 'react-use';
 import { DecodedValueMap, useQueryParams } from 'use-query-params';
 import { PAGE_SIZE } from '../constants';
 import { supabase } from '../supabase';
-import { TvSeries } from '../types';
+import { Show } from '../types';
 import { SHOW_QUERY_PARAMS } from '@/queryParams';
 import { PROVIDER_JOIN, CREDIT_PERSON_JOIN } from './constants';
 
@@ -27,16 +27,14 @@ const queryFilms = async (
 
   // filtered providers for a movie, for searching
   const providerSearch =
-    form.providers.length > 0
-      ? ['wp: media_watch_provider!inner(watchProviderId)']
-      : [];
+    form.providers.length > 0 ? ['wp: media_provider!inner(provider_id)'] : [];
 
   const creditSearch =
     form.creditName.length > 0 ? ['credit: credit!inner(person_id)'] : [];
 
   const select = ['*', PROVIDER_JOIN, ...providerSearch, ...creditSearch].join(', ');
 
-  const query = supabase.from('tv_series').select(select, { count: 'exact' });
+  const query = supabase.from('show').select(select, { count: 'exact' });
 
   if (form.name) {
     query.ilike('name', `%${form.name}%`);
@@ -70,7 +68,7 @@ const queryFilms = async (
   }
 
   if (form.providers.length > 0) {
-    query.in('wp.watchProviderId', form.providers);
+    query.in('wp.provider_id', form.providers);
   }
 
   if (creditPersonIds.length > 0) {
@@ -101,7 +99,7 @@ export const useSearchShows = ({ page }: { page: number }) => {
 
   return useQuery(['shows', form, page], async () => {
     const { data: shows, count } = (await queryFilms(form, page)) as unknown as {
-      data: TvSeries[];
+      data: Show[];
       count: number;
     };
 
@@ -110,14 +108,15 @@ export const useSearchShows = ({ page }: { page: number }) => {
 };
 
 const fetchShowQuery = async (id: number) => {
-  const select = ['*', PROVIDER_JOIN, CREDIT_PERSON_JOIN].join(',');
+  const select = [
+    '*',
+    PROVIDER_JOIN,
+    CREDIT_PERSON_JOIN,
+    'seasons: season(*, episodes: episode(*))',
+  ].join(',');
 
-  const result = await supabase
-    .from('tv_series')
-    .select(select)
-    .eq('id', id)
-    .single();
-  return result.data as unknown as TvSeries;
+  const result = await supabase.from('show').select(select).eq('id', id).single();
+  return result.data as unknown as Show;
 };
 
 export const useFetchShow = (id: number) =>

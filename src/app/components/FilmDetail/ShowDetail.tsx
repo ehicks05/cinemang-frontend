@@ -6,8 +6,8 @@ import { useTitle } from 'react-use';
 import { Loading, OriginalImageLink } from '../../../core-components';
 import { usePalette } from '@/hooks/usePalette';
 import FilmStats from '../MediaStats';
-import WatchProviders from '../WatchProviders';
-import { TvSeries } from '../../../types';
+import MediaProviders from '../MediaProviders';
+import { Show } from '../../../types';
 import { useFetchShow } from '@/hooks/useFetchShows';
 import Trailer from '../../../core-components/Trailer';
 import Credits from '../../../core-components/Credits';
@@ -15,7 +15,7 @@ import { systemDataAtom } from '../../../atoms';
 import { getTmdbImage } from '../../../utils';
 import { toStats } from '../utils';
 
-const ShowDetail = ({ show }: { show: TvSeries }) => {
+const ShowDetail = ({ show }: { show: Show }) => {
   useTitle(show.name, { restoreOnUnmount: true });
   const [{ genres, languages }] = useAtom(systemDataAtom);
 
@@ -65,11 +65,14 @@ const ShowDetail = ({ show }: { show: TvSeries }) => {
             <div className="text-justify text-sm sm:text-base">{show.overview}</div>
           </div>
 
-          {show.watch_provider.length > 0 && (
-            <WatchProviders selectedIds={show.watch_provider} />
+          {show.providers.length > 0 && (
+            <MediaProviders selectedIds={show.providers} />
           )}
         </div>
       </div>
+
+      <pre className="text-xs">{JSON.stringify(show.seasons, null, 2)}</pre>
+
       <Credits credits={show.credits} palette={palette} />
     </div>
   );

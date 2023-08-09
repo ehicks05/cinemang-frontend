@@ -62,9 +62,9 @@ const toSortValue = (credit: Credit, sort: SortKey) => {
   if (credit.movie) {
     return credit.movie[sort];
   }
-  if (credit.series) {
+  if (credit.show) {
     const sortKey = sort === 'released_at' ? 'first_air_date' : sort;
-    return credit.series[sortKey];
+    return credit.show[sortKey];
   }
 };
 

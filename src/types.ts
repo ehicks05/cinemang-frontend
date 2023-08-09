@@ -6,44 +6,34 @@ export type Genre = Database['public']['Tables']['genre']['Row'];
 export type Language = Database['public']['Tables']['language']['Row'];
 export type TPerson = Database['public']['Tables']['person']['Row'];
 export type TMovie = Database['public']['Tables']['movie']['Row'];
-export type TTvSeries = Database['public']['Tables']['tv_series']['Row'];
-export type WatchProvider = Database['public']['Tables']['watch_provider']['Row'];
+export type TShow = Database['public']['Tables']['show']['Row'];
+export type TSeason = Database['public']['Tables']['season']['Row'];
+export type Episode = Database['public']['Tables']['episode']['Row'];
+export type Provider = Database['public']['Tables']['provider']['Row'];
 
 export interface Credit extends TCredit {
   movie?: Film;
-  series?: TTvSeries;
+  show?: TShow;
   person: TPerson;
 }
 
 export interface Film extends TMovie {
   credits: Credit[];
-  watch_provider: WatchProvider[];
+  providers: Provider[];
 }
 
-export interface TvSeries extends TTvSeries {
+export interface Season extends TSeason {
+  episodes: Episode[];
+}
+
+export interface Show extends TShow {
   credits: Credit[];
-  watch_provider: WatchProvider[];
+  providers: Provider[];
+  seasons: Season[];
 }
 
 export interface Person extends TPerson {
   credits: Credit[];
-}
-
-export interface ISearchForm {
-  ascending: boolean;
-  genre?: string;
-  language?: string;
-  maxRating?: number;
-  maxReleasedAt?: string;
-  maxVotes?: number;
-  minRating?: number;
-  minReleasedAt?: string;
-  minVotes?: number;
-  page: number;
-
-  sortColumn: string;
-  title?: string;
-  watchProviders?: number[];
 }
 
 export interface Video {

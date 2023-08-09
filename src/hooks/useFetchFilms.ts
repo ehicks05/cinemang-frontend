@@ -31,9 +31,7 @@ const queryFilms = async (
 
   // filtered providers for a movie, for searching
   const providerSearch =
-    form.providers.length > 0
-      ? ['wp: media_watch_provider!inner(watchProviderId)']
-      : [];
+    form.providers.length > 0 ? ['wp: media_provider!inner(provider_id)'] : [];
 
   const creditSearch =
     form.creditName.length > 0 ? ['credit: credit!inner(person_id)'] : [];
@@ -74,7 +72,7 @@ const queryFilms = async (
   }
 
   if (form.providers.length > 0) {
-    query.in('wp.watchProviderId', form.providers);
+    query.in('wp.watchProvider_id', form.providers);
   }
 
   if (creditPersonIds.length > 0) {

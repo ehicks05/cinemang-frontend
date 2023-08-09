@@ -6,7 +6,7 @@ import { useTitle } from 'react-use';
 import { Loading, OriginalImageLink } from '../../../core-components';
 import { usePalette } from '@/hooks/usePalette';
 import FilmStats from '../MediaStats';
-import WatchProviders from '../WatchProviders';
+import MediaProviders from '../MediaProviders';
 import { Film as IFilm } from '../../../types';
 import { useFetchFilm } from '@/hooks/useFetchFilms';
 import Trailer from '../../../core-components/Trailer';
@@ -71,7 +71,7 @@ const FilmDetail = ({ film }: { film: IFilm }) => {
           </div>
 
           {film.watch_provider.length > 0 && (
-            <WatchProviders selectedIds={film.watch_provider} />
+            <MediaProviders selectedIds={film.watch_provider} />
           )}
         </div>
       </div>

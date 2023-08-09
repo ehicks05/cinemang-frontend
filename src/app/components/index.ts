@@ -3,7 +3,7 @@ import FilmDetail from './FilmDetail';
 import MediaSkeleton from './MediaSkeleton';
 import PersonDetail from './PersonDetail';
 import SearchForm from './SearchForm';
-import WatchProvider from './WatchProviders';
+import MediaProvider from './MediaProviders';
 import Paginator from './Paginator';
 
 export {
@@ -12,6 +12,6 @@ export {
   MediaSkeleton,
   PersonDetail,
   SearchForm,
-  WatchProvider,
+  MediaProvider,
   Paginator,
 };
