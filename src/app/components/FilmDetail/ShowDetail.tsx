@@ -155,7 +155,7 @@ const SeasonCard = ({ season }: { season: Season }) => (
           </div>
         </div>
         <div className="w-full">
-          <Disclosure.Button className="w-full">
+          <Disclosure.Button as="span" className="w-full">
             <Button className="flex w-full items-center justify-between gap-2 border-none py-2 sm:w-auto">
               Episodes
               <HiChevronRight className={open ? 'rotate-90 transform' : ''} />
