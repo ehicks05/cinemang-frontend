@@ -16,7 +16,7 @@ const querySeries = async (id: number) => {
       console.log(status);
     }
   } catch (err) {
-    // console.log(`unable to fetch ${id}`);
+    // noop
   }
 };
 
