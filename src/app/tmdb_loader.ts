@@ -158,7 +158,7 @@ const loadShows = async (ids: number[]) => {
     const toSeasonCreateInput = (o: SeasonSummary & { showId: number }) => ({
       id: o.id,
       showId: o.showId,
-      airDate: new Date(o.air_date),
+      airDate: o.air_date ? new Date(o.air_date) : undefined,
       episodeCount: o.episode_count,
       name: o.name,
       overview: o.overview,
@@ -187,7 +187,7 @@ const loadShows = async (ids: number[]) => {
           id: o.id,
           seasonId: o.seasonId,
           showId: o.showId,
-          airDate: new Date(o.air_date),
+          airDate: o.air_date ? new Date(o.air_date) : undefined,
           episodeNumber: o.episode_number,
           name: o.name,
           overview: o.overview,

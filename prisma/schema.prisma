@@ -76,15 +76,15 @@ model Show {
 }
 
 model Season {
-  id           Int      @id
-  showId       Int      @map("show_id")
-  airDate      DateTime @map("air_date") @db.Date
-  episodeCount Int      @map("episode_count")
+  id           Int       @id
+  showId       Int       @map("show_id")
+  airDate      DateTime? @map("air_date") @db.Date
+  episodeCount Int       @map("episode_count")
   name         String
   overview     String
-  posterPath   String?  @map("poster_path")
-  seasonNumber Int      @map("season_number")
-  voteAverage  Float    @map("vote_average")
+  posterPath   String?   @map("poster_path")
+  seasonNumber Int       @map("season_number")
+  voteAverage  Float     @map("vote_average")
 
   episodes Episode[]
   show     Show      @relation(fields: [showId], references: [id])
@@ -93,18 +93,18 @@ model Season {
 }
 
 model Episode {
-  id            Int      @id
-  seasonId      Int      @map("season_id")
-  showId        Int      @map("show_id")
-  airDate       DateTime @map("air_date") @db.Date
-  episodeNumber Int      @map("episode_number")
+  id            Int       @id
+  seasonId      Int       @map("season_id")
+  showId        Int       @map("show_id")
+  airDate       DateTime? @map("air_date") @db.Date
+  episodeNumber Int       @map("episode_number")
   name          String
   overview      String
   runtime       Int?
-  seasonNumber  Int      @map("season_number")
-  stillPath     String?  @map("still_path")
-  voteAverage   Float    @map("vote_average")
-  voteCount     Int      @map("vote_count")
+  seasonNumber  Int       @map("season_number")
+  stillPath     String?   @map("still_path")
+  voteAverage   Float     @map("vote_average")
+  voteCount     Int       @map("vote_count")
 
   season Season @relation(fields: [seasonId], references: [id])
   show   Show   @relation(fields: [showId], references: [id])
