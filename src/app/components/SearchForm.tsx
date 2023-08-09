@@ -239,7 +239,7 @@ const FirstAirDate = () => {
 
   return (
     <div>
-      <div>Released</div>
+      <div>First Aired</div>
       <div className="flex flex-col gap-2 sm:flex-row">
         <input
           className="w-full bg-gray-700"
@@ -333,7 +333,7 @@ const Sort = () => {
     { label: 'User Votes', value: 'vote_count' },
     'minReleasedAt' in queryConfig
       ? { label: 'Released', value: 'released_at' }
-      : { label: 'First Air Date', value: 'first_air_date' },
+      : { label: 'First Aired', value: 'first_air_date' },
   ];
 
   return (

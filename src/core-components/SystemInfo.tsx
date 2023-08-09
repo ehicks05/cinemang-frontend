@@ -7,7 +7,7 @@ import { HiX } from 'react-icons/hi';
 import { supabase } from '../supabase';
 
 const SHORT = 'hh:mm:ss a';
-const DEFAULT = `MMM dd ${SHORT}`;
+const DEFAULT = `yyyy-MM-dd'T'${SHORT}`;
 
 const SystemInfo = () => {
   const { data: syncRunLogs } = useQuery(
@@ -19,8 +19,8 @@ const SystemInfo = () => {
   const latestRun = syncRunLogs[syncRunLogs.length - 1];
 
   const createdAt = new Date(latestRun.created_at);
-  const endedAt = new Date(latestRun?.ended_at || 0);
-  const df = createdAt.getDate() === endedAt.getDate() ? SHORT : DEFAULT;
+  const endedAt = latestRun.ended_at ? new Date(latestRun.ended_at) : undefined;
+  const duration = endedAt ? formatDistance(endedAt, createdAt) : undefined;
 
   return (
     <Popover.Root>
@@ -40,18 +40,18 @@ const SystemInfo = () => {
               </thead>
               <tr>
                 <td className="text-left">start</td>
-                <td className="text-right">{format(createdAt, df)}</td>
+                <td className="text-right">{format(createdAt, DEFAULT)}</td>
               </tr>
               <tr>
                 <td className="text-left">end</td>
-                <td className="text-right">{format(endedAt, df)}</td>
+                <td className="text-right">
+                  {endedAt ? format(endedAt, DEFAULT) : 'pending'}
+                </td>
               </tr>
               <tfoot>
                 <tr>
                   <th className="text-left">duration</th>
-                  <th className="text-right">
-                    {formatDistance(endedAt, createdAt)}
-                  </th>
+                  <th className="text-right">{duration || 'pending'}</th>
                 </tr>
               </tfoot>
             </table>

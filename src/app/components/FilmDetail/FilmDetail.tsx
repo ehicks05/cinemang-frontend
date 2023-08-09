@@ -70,8 +70,8 @@ const FilmDetail = ({ film }: { film: IFilm }) => {
             <div className="text-justify text-sm sm:text-base">{film.overview}</div>
           </div>
 
-          {film.watch_provider.length > 0 && (
-            <MediaProviders selectedIds={film.watch_provider} />
+          {film.providers.length > 0 && (
+            <MediaProviders selectedIds={film.providers} />
           )}
         </div>
       </div>
