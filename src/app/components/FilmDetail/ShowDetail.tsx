@@ -1,14 +1,16 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { parseISO, format } from 'date-fns';
 import { useParams } from 'react-router-dom';
 import { useAtom } from 'jotai';
 import { useTitle } from 'react-use';
 import { FaCalendar, FaClock, FaHeart, FaStar } from 'react-icons/fa';
-import { Loading, OriginalImageLink } from '../../../core-components';
+import { HiChevronRight } from 'react-icons/hi2';
+import { Disclosure, Transition } from '@headlessui/react';
+import { Button, Loading, OriginalImageLink } from '../../../core-components';
 import { usePalette } from '@/hooks/usePalette';
 import FilmStats from '../MediaStats';
 import MediaProviders from '../MediaProviders';
-import { Season, Show } from '../../../types';
+import { Episode, Season, Show } from '../../../types';
 import { useFetchShow } from '@/hooks/useFetchShows';
 import Trailer from '../../../core-components/Trailer';
 import Credits from '../../../core-components/Credits';
@@ -73,7 +75,6 @@ const ShowDetail = ({ show }: { show: Show }) => {
         </div>
       </div>
 
-      <pre className="text-xs">{JSON.stringify(show.seasons, null, 2)}</pre>
       <Seasons seasons={show.seasons} />
 
       <Credits credits={show.credits} palette={palette} />
@@ -81,72 +82,102 @@ const ShowDetail = ({ show }: { show: Show }) => {
   );
 };
 
-const SeasonCard = ({ season }: { season: Season }) => {
-  const [isExpanded, setIsExpanded] = useState(false);
+const Episodes = ({ episodes }: { episodes: Episode[] }) => (
+  <div className="flex flex-col gap-4">
+    {episodes.map(episode => (
+      <div className="flex flex-col gap-1 bg-neutral-800 p-2">
+        <div className="flex items-center justify-between gap-2">
+          <span>
+            {episode.episode_number}. {episode.name}{' '}
+            <span className="text-sm opacity-75">{episode.air_date}</span>
+          </span>
+        </div>
+        <div>{episode.overview}</div>
+        <div>
+          <span className="flex gap-2">
+            <Stat
+              icon={FaClock}
+              label={episode.runtime || '?'}
+              bgColor="#333"
+              color="text-blue-500"
+            />
+            <Stat
+              icon={FaHeart}
+              label={episode.vote_average.toFixed(1)}
+              bgColor="#333"
+              color="text-red-600"
+            />
+            <Stat
+              icon={FaStar}
+              label={episode.vote_count}
+              bgColor="#333"
+              color="text-yellow-500"
+            />
+          </span>
+        </div>
+      </div>
+    ))}
+  </div>
+);
 
-  return (
-    <div className="flex w-full flex-col gap-2 rounded-lg bg-neutral-800 p-4">
-      <div className="flex justify-between gap-2">
-        <span className="font-semibold">
-          {season.season_number}. {season.name}
-        </span>
-        <span className="flex items-center gap-2">
-          <Stat
-            icon={FaCalendar}
-            label={season.air_date}
-            bgColor="#333"
-            color="text-green-700"
-          />{' '}
-          <Stat
-            icon={FaHeart}
-            label={season.vote_average}
-            bgColor="#333"
-            color="text-red-600"
-          />
-        </span>
-      </div>
-      <div>{season.overview}</div>
-      <div className="flex flex-col gap-4">
-        {season.episodes.map(episode => (
-          <div className="flex flex-col gap-1 bg-neutral-700 p-2">
-            <div className="flex items-center justify-between gap-2">
-              <span>
-                {episode.episode_number}. {episode.name}
-              </span>
-              <span className="flex  gap-2">
-                <Stat
-                  icon={FaCalendar}
-                  label={episode.air_date}
-                  bgColor="#333"
-                  color="text-green-700"
-                />
-                <Stat
-                  icon={FaClock}
-                  label={episode.runtime || '?'}
-                  bgColor="#333"
-                  color="text-blue-500"
-                />
-                <Stat
-                  icon={FaHeart}
-                  label={episode.vote_average.toFixed(1)}
-                  bgColor="#333"
-                  color="text-red-600"
-                />
-                <Stat
-                  icon={FaStar}
-                  label={episode.vote_count}
-                  bgColor="#333"
-                  color="text-yellow-500"
-                />
-              </span>
-            </div>
-            <div>{episode.overview}</div>
+const SeasonCard = ({ season }: { season: Season }) => (
+  <Disclosure>
+    {({ open }) => (
+      <div className="flex w-full flex-col gap-2 rounded-lg bg-neutral-900 p-4">
+        <div className="flex w-full flex-col gap-2 rounded-lg bg-neutral-900 sm:flex-row">
+          <div className="relative w-full sm:w-40">
+            <img
+              alt="poster"
+              className="w-full rounded-lg"
+              src={getTmdbImage({
+                path: season.poster_path || undefined,
+                width: 'w500',
+              })}
+            />
+            <OriginalImageLink path={season.poster_path || undefined} />
           </div>
-        ))}
+
+          <div className="flex flex-col">
+            <div className="flex items-center gap-2">
+              <span className="font-semibold">{season.name}</span>
+              <span className="text-sm opacity-75">{season.air_date}</span>
+            </div>
+            <div>{season.overview}</div>
+            <span className="mt-2 flex w-full items-center gap-2">
+              <Stat
+                icon={FaHeart}
+                label={season.vote_average || '?.?'}
+                bgColor="#333"
+                color="text-red-600"
+                width="w-full sm:w-auto"
+              />
+            </span>
+          </div>
+        </div>
+        <div className="w-full">
+          <Disclosure.Button className="w-full">
+            <Button className="flex w-full items-center justify-between gap-2 border-none py-2 sm:w-auto">
+              Episodes
+              <HiChevronRight className={open ? 'rotate-90 transform' : ''} />
+            </Button>
+          </Disclosure.Button>
+          <Transition
+            enter="transition duration-100 ease-out"
+            enterFrom="transform scale-95 opacity-0"
+            enterTo="transform scale-100 opacity-100"
+            leave="transition duration-75 ease-out"
+            leaveFrom="transform scale-100 opacity-100"
+            leaveTo="transform scale-95 opacity-0"
+          >
+            <Disclosure.Panel>
+              <Episodes episodes={season.episodes} />
+            </Disclosure.Panel>
+          </Transition>
+        </div>
       </div>
-    </div>
-  );
-};
+    )}
+  </Disclosure>
+);
 
 const Seasons = ({ seasons }: { seasons: Season[] }) => (
   <div className="flex flex-col gap-4">
