@@ -102,7 +102,7 @@ export interface Database {
       }
       episode: {
         Row: {
-          air_date: string
+          air_date: string | null
           episode_number: number
           id: number
           name: string
@@ -116,7 +116,7 @@ export interface Database {
           vote_count: number
         }
         Insert: {
-          air_date: string
+          air_date?: string | null
           episode_number: number
           id: number
           name: string
@@ -130,7 +130,7 @@ export interface Database {
           vote_count: number
         }
         Update: {
-          air_date?: string
+          air_date?: string | null
           episode_number?: number
           id?: number
           name?: string
@@ -383,7 +383,7 @@ export interface Database {
       }
       season: {
         Row: {
-          air_date: string
+          air_date: string | null
           episode_count: number
           id: number
           name: string
@@ -394,7 +394,7 @@ export interface Database {
           vote_average: number
         }
         Insert: {
-          air_date: string
+          air_date?: string | null
           episode_count: number
           id: number
           name: string
@@ -405,7 +405,7 @@ export interface Database {
           vote_average: number
         }
         Update: {
-          air_date?: string
+          air_date?: string | null
           episode_count?: number
           id?: number
           name?: string
