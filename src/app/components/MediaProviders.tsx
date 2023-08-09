@@ -22,8 +22,6 @@ interface Props {
 const MediaProviders: FC<Props> = ({ selectedIds }) => {
   const [{ providers }] = useAtom(systemDataAtom);
 
-  console.log({ providers, selectedIds });
-
   const filteredProviders = selectedIds
     .map(id => providers.find(p => p.id === id.id))
     .filter((p): p is Provider => p !== null && p !== undefined)
