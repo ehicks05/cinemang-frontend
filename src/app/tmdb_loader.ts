@@ -265,10 +265,10 @@ const runLoader = async (fullMode: boolean) => {
     }
 
     let personIdsProcessed: number[] = [];
-    // personIdsProcessed = await updateMediaByType('movie', personIdsProcessed);
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    personIdsProcessed = await updateMediaByType('movie', personIdsProcessed);
     personIdsProcessed = await updateMediaByType('tv', personIdsProcessed);
 
+    logger.debug(`processed ${personIdsProcessed.length} personIds`);
     logger.info('updating counts for languages and watch providers');
     await updateLanguageCounts();
     await updateProviderCounts();
