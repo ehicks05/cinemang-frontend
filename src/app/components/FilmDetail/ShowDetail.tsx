@@ -6,6 +6,7 @@ import { useTitle } from 'react-use';
 import { FaClock, FaHeart, FaStar } from 'react-icons/fa';
 import { HiChevronRight } from 'react-icons/hi2';
 import { Disclosure, Transition } from '@headlessui/react';
+import { sortBy } from 'lodash';
 import { Button, Loading, OriginalImageLink } from '../../../core-components';
 import { usePalette } from '@/hooks/usePalette';
 import FilmStats from '../MediaStats';
@@ -46,13 +47,9 @@ const ShowDetail = ({ show }: { show: Show }) => {
         </div>
       </div>
       <div className="flex flex-col gap-4 sm:flex-row">
-        <div className="flex-shrink-0">
-          <div className="relative">
-            <img
-              alt="poster"
-              className="w-full rounded-lg sm:w-80 md:w-96"
-              src={posterUrl}
-            />
+        <div className="w-full sm:w-2/5">
+          <div className="relative w-full">
+            <img alt="poster" className="w-full rounded-lg" src={posterUrl} />
             <OriginalImageLink path={show.poster_path} />
           </div>
           <div className="mt-4 flex flex-col justify-between gap-4">
@@ -62,16 +59,21 @@ const ShowDetail = ({ show }: { show: Show }) => {
             />
           </div>
         </div>
-        <div className="flex flex-col gap-4">
-          <div className="flex flex-col gap-1">
+        <div className="flex w-full flex-col gap-4 sm:w-3/5">
+          <div className="flex flex-grow flex-col gap-4">
             <Trailer showId={show.id} />
-            <div>Starring: {show.cast}</div>
-            <div className="text-justify text-sm sm:text-base">{show.overview}</div>
+            {show.providers.length > 0 && (
+              <MediaProviders selectedIds={show.providers} />
+            )}
+            <div className="flex flex-col gap-2 rounded-lg bg-neutral-900 p-4">
+              <div>Starring: {show.cast}</div>
+              <div className="text-justify text-sm sm:text-base">
+                <div className="overflow-x-auto sm:max-h-24 md:max-h-32 lg:max-h-48">
+                  {show.overview}
+                </div>
+              </div>
+            </div>
           </div>
-
-          {show.providers.length > 0 && (
-            <MediaProviders selectedIds={show.providers} />
-          )}
         </div>
       </div>
 
@@ -84,12 +86,13 @@ const ShowDetail = ({ show }: { show: Show }) => {
 
 const Episodes = ({ episodes }: { episodes: Episode[] }) => (
   <div className="flex flex-col gap-4">
-    {episodes.map(episode => (
+    {sortBy(episodes, o => o.episode_number).map(episode => (
       <div key={episode.id} className="flex flex-col gap-1 bg-neutral-800 p-2">
         <div className="flex items-center justify-between gap-2">
           <span>
-            {episode.episode_number}. {episode.name}{' '}
-            <span className="text-sm opacity-75">{episode.air_date}</span>
+            <span className="text-neutral-400">{episode.episode_number}.</span>{' '}
+            {episode.name}{' '}
+            <span className="text-sm text-neutral-300">{episode.air_date}</span>
           </span>
         </div>
         <div>{episode.overview}</div>
@@ -157,7 +160,7 @@ const SeasonCard = ({ season }: { season: Season }) => (
         <div className="w-full">
           <Disclosure.Button as="span" className="w-full">
             <Button className="flex w-full items-center justify-between gap-2 border-none bg-neutral-800 py-2 sm:w-auto">
-              Episodes
+              {season.episodes.filter(o => o.episode_number > 0).length} Episodes
               <HiChevronRight className={open ? 'rotate-90 transform' : ''} />
             </Button>
           </Disclosure.Button>
@@ -181,8 +184,10 @@ const SeasonCard = ({ season }: { season: Season }) => (
 
 const Seasons = ({ seasons }: { seasons: Season[] }) => (
   <div className="flex flex-col gap-4">
-    <div className="text-xl font-bold">Seasons</div>
-    {seasons.map(season => (
+    <div className="text-xl font-bold">
+      {seasons.filter(o => o.season_number > 0).length} Seasons
+    </div>
+    {sortBy(seasons, o => o.season_number).map(season => (
       <SeasonCard key={season.id} season={season} />
     ))}
   </div>
