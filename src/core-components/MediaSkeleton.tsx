@@ -1,5 +1,5 @@
 import React from 'react';
-import { Sk } from '../../core-components';
+import { Sk } from '.';
 
 const MediaSkeleton = () => (
   <div className="bg-gray-800 sm:rounded-lg">

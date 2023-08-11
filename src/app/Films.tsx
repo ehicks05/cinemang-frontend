@@ -1,8 +1,13 @@
 import React, { useMemo, useState } from 'react';
-import { useTitle, useWindowSize } from 'react-use';
-import { Loading } from '../core-components';
+import { useTitle } from 'react-use';
+import {
+  Loading,
+  MediaLayout,
+  MediaSkeleton,
+  MediaSkeletons,
+} from '../core-components';
 import { Film as IFilm } from '../types';
-import { Film, MediaSkeleton, Paginator } from './components';
+import { Film, Paginator } from './components';
 import { useSearchFilms } from '../hooks/useFetchFilms';
 import { getTmdbImage } from '../utils';
 import { DEFAULT_PALETTE, Palette, toPalette } from '../hooks/usePalette';
@@ -31,17 +36,8 @@ const Films = ({ films }: { films: IFilm[] }) => {
     if (films.length !== 0) doIt();
   }, [films]);
 
-  const { width } = useWindowSize();
-
-  const minColumnWidth = width < 400 ? width - 16 - 16 - 16 - 16 : 360;
-
   return (
-    <div
-      className="grid sm:gap-4"
-      style={{
-        gridTemplateColumns: `repeat( auto-fill, minmax(${minColumnWidth}px, 1fr) )`,
-      }}
-    >
+    <MediaLayout>
       {loading && films.map(film => <MediaSkeleton key={film.id} />)}
       {!loading &&
         films.map(film => (
@@ -51,7 +47,7 @@ const Films = ({ films }: { films: IFilm[] }) => {
             palette={palettes?.[film.id] || DEFAULT_PALETTE}
           />
         ))}
-    </div>
+    </MediaLayout>
   );
 };
 
@@ -65,7 +61,7 @@ const FilmsWrapper = () => {
   return (
     <>
       <Paginator count={count} isLoading={isLoading} />
-      {isLoading && <Loading loading={isLoading} />}
+      {isLoading && <MediaSkeletons />}
       {!isLoading && <Films films={films || []} />}
       <Paginator count={count} isLoading={isLoading} />
     </>

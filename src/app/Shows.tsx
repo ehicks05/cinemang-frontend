@@ -1,8 +1,13 @@
 import React, { useMemo, useState } from 'react';
-import { useTitle, useWindowSize } from 'react-use';
-import { Loading } from '../core-components';
+import { useTitle } from 'react-use';
+import {
+  Loading,
+  MediaLayout,
+  MediaSkeleton,
+  MediaSkeletons,
+} from '../core-components';
 import { Show } from '../types';
-import { MediaSkeleton, Paginator, SearchForm } from './components';
+import { Paginator, SearchForm } from './components';
 import { useSearchShows } from '../hooks/useFetchShows';
 import { getTmdbImage } from '../utils';
 import { DEFAULT_PALETTE, Palette, toPalette } from '../hooks/usePalette';
@@ -32,17 +37,8 @@ const Shows = ({ shows }: { shows: Show[] }) => {
     if (shows.length !== 0) doIt();
   }, [shows]);
 
-  const { width } = useWindowSize();
-
-  const minColumnWidth = width < 400 ? width - 16 - 16 - 16 - 16 : 360;
-
   return (
-    <div
-      className="grid sm:gap-4"
-      style={{
-        gridTemplateColumns: `repeat( auto-fill, minmax(${minColumnWidth}px, 1fr) )`,
-      }}
-    >
+    <MediaLayout>
       {loading && shows.map(show => <MediaSkeleton key={show.id} />)}
       {!loading &&
         shows.map(show => (
@@ -52,7 +48,7 @@ const Shows = ({ shows }: { shows: Show[] }) => {
             palette={palettes?.[show.id] || DEFAULT_PALETTE}
           />
         ))}
-    </div>
+    </MediaLayout>
   );
 };
 
@@ -69,7 +65,7 @@ const ShowsWrapper = () => {
       <SearchForm />
       <div className="flex flex-col sm:gap-4">
         <Paginator count={count} isLoading={isLoading} />
-        {isLoading && <Loading loading={isLoading} />}
+        {isLoading && <MediaSkeletons />}
         {!isLoading && <Shows shows={shows || []} />}
         <Paginator count={count} isLoading={isLoading} />
       </div>
