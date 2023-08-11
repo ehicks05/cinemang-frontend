@@ -26,7 +26,7 @@ export const toPalette = async (url: string) => {
   const img = new Image();
   img.crossOrigin = 'Anonymous';
   img.src = url;
-  const p = await Vibrant.from(img).getPalette();
+  const p = await new Vibrant(img).getPalette();
 
   const lessMuted = chroma.mix(
     p.DarkVibrant?.getHex() || '#333',

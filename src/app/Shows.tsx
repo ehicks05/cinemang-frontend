@@ -1,5 +1,4 @@
 import React, { useMemo, useState } from 'react';
-import { useQueryParams } from 'use-query-params';
 import { useTitle, useWindowSize } from 'react-use';
 import { Loading } from '../core-components';
 import { Show } from '../types';
@@ -8,7 +7,6 @@ import { useSearchShows } from '../hooks/useFetchShows';
 import { getTmdbImage } from '../utils';
 import { DEFAULT_PALETTE, Palette, toPalette } from '../hooks/usePalette';
 import ShowCard from './components/Show';
-import { SHOW_QUERY_PARAMS } from '@/queryParams';
 
 const Shows = ({ shows }: { shows: Show[] }) => {
   const [loading, setLoading] = useState(true);
@@ -31,7 +29,7 @@ const Shows = ({ shows }: { shows: Show[] }) => {
       );
       setLoading(false);
     };
-    if (shows && shows.length !== 0) doIt();
+    if (shows.length !== 0) doIt();
   }, [shows]);
 
   const { width } = useWindowSize();
@@ -60,11 +58,8 @@ const Shows = ({ shows }: { shows: Show[] }) => {
 
 const ShowsWrapper = () => {
   useTitle('Cinemang');
-  const [form, setForm] = useQueryParams(SHOW_QUERY_PARAMS);
-  const { page } = form;
-  const setPage = (page: number) => setForm({ ...form, page });
 
-  const { data, error, isLoading } = useSearchShows({ page });
+  const { data, error, isLoading } = useSearchShows();
 
   if (error) return <Loading error={error} loading={isLoading} />;
   const { shows, count } = data || {};
@@ -73,20 +68,10 @@ const ShowsWrapper = () => {
     <div className="flex flex-col sm:gap-4">
       <SearchForm />
       <div className="flex flex-col sm:gap-4">
-        <Paginator
-          count={count}
-          isLoading={isLoading}
-          pageIndex={page}
-          setPage={setPage}
-        />
+        <Paginator count={count} isLoading={isLoading} />
         {isLoading && <Loading loading={isLoading} />}
-        {!isLoading && <Shows shows={shows || []} key={page} />}
-        <Paginator
-          count={count}
-          isLoading={isLoading}
-          pageIndex={page}
-          setPage={setPage}
-        />
+        {!isLoading && <Shows shows={shows || []} />}
+        <Paginator count={count} isLoading={isLoading} />
       </div>
     </div>
   );

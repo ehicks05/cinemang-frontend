@@ -2,24 +2,25 @@ import React, { FC, ReactNode } from 'react';
 import P from 'paginator';
 import { range } from 'lodash';
 import { IoIosPlay, IoIosSkipForward } from 'react-icons/io';
+import { useQueryParams } from 'use-query-params';
 import { PAGE_SIZE } from '../../constants';
+import { QUERY_PARAMS } from '@/queryParams';
 
 const nf = Intl.NumberFormat('en-US');
 
 interface PaginatorProps {
   count?: number;
   isLoading: boolean;
-  pageIndex?: number;
   pageSize?: number;
-  setPage?: (page: number) => void;
 }
 const Paginator: FC<PaginatorProps> = ({
   count = 0,
   isLoading,
-  pageIndex = 0,
   pageSize = PAGE_SIZE,
-  setPage = () => undefined,
 }) => {
+  const [form, setForm] = useQueryParams(QUERY_PARAMS);
+  const { page: pageIndex } = form;
+  const setPage = (page: number) => setForm({ ...form, page });
   const page = pageIndex + 1;
   // Arguments are `per_page` and `length`. `per_page` changes the number of
   // results per page, `length` changes the number of links displayed.

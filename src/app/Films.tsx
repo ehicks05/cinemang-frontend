@@ -1,5 +1,4 @@
 import React, { useMemo, useState } from 'react';
-import { useQueryParams } from 'use-query-params';
 import { useTitle, useWindowSize } from 'react-use';
 import { Loading } from '../core-components';
 import { Film as IFilm } from '../types';
@@ -7,7 +6,6 @@ import { Film, MediaSkeleton, Paginator } from './components';
 import { useSearchFilms } from '../hooks/useFetchFilms';
 import { getTmdbImage } from '../utils';
 import { DEFAULT_PALETTE, Palette, toPalette } from '../hooks/usePalette';
-import { MOVIE_QUERY_PARAMS } from '@/queryParams';
 
 const Films = ({ films }: { films: IFilm[] }) => {
   const [loading, setLoading] = useState(true);
@@ -30,7 +28,7 @@ const Films = ({ films }: { films: IFilm[] }) => {
       );
       setLoading(false);
     };
-    if (films && films.length !== 0) doIt();
+    if (films.length !== 0) doIt();
   }, [films]);
 
   const { width } = useWindowSize();
@@ -59,31 +57,17 @@ const Films = ({ films }: { films: IFilm[] }) => {
 
 const FilmsWrapper = () => {
   useTitle('Cinemang');
-  const [form, setForm] = useQueryParams(MOVIE_QUERY_PARAMS);
-  const { page } = form;
-  const setPage = (page: number) => setForm({ ...form, page });
-
-  const { data, error, isLoading } = useSearchFilms({ page });
+  const { data, error, isLoading } = useSearchFilms();
 
   if (error) return <Loading error={error} loading={isLoading} />;
   const { films, count } = data || {};
 
   return (
     <>
-      <Paginator
-        count={count}
-        isLoading={isLoading}
-        pageIndex={page}
-        setPage={setPage}
-      />
+      <Paginator count={count} isLoading={isLoading} />
       {isLoading && <Loading loading={isLoading} />}
-      {!isLoading && <Films films={films || []} key={page} />}
-      <Paginator
-        count={count}
-        isLoading={isLoading}
-        pageIndex={page}
-        setPage={setPage}
-      />
+      {!isLoading && <Films films={films || []} />}
+      <Paginator count={count} isLoading={isLoading} />
     </>
   );
 };

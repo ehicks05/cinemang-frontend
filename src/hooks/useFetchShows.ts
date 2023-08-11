@@ -18,10 +18,7 @@ const queryPersonIdsByName = async (name: string) => {
   return (await query).data?.map(o => o.id) || [];
 };
 
-const queryFilms = async (
-  form: DecodedValueMap<typeof SHOW_QUERY_PARAMS>,
-  page: number,
-) => {
+const queryFilms = async (form: DecodedValueMap<typeof SHOW_QUERY_PARAMS>) => {
   const creditPersonIds: number[] =
     form.creditName.length > 2 ? await queryPersonIdsByName(form.creditName) : [];
 
@@ -78,12 +75,12 @@ const queryFilms = async (
   query
     .order(form.sortColumn, { ascending: form.ascending, foreignTable: '' })
     .order('id', { ascending: true })
-    .range(page * PAGE_SIZE, (page + 1) * PAGE_SIZE - 1);
+    .range(form.page * PAGE_SIZE, (form.page + 1) * PAGE_SIZE - 1);
 
   return query;
 };
 
-export const useSearchShows = ({ page }: { page: number }) => {
+export const useSearchShows = () => {
   const [formParams] = useQueryParams(SHOW_QUERY_PARAMS);
 
   // a local, debounced copy of the form
@@ -97,8 +94,8 @@ export const useSearchShows = ({ page }: { page: number }) => {
     [formParams],
   );
 
-  return useQuery(['shows', form, page], async () => {
-    const { data: shows, count } = (await queryFilms(form, page)) as unknown as {
+  return useQuery(['shows', form], async () => {
+    const { data: shows, count } = (await queryFilms(form)) as unknown as {
       data: Show[];
       count: number;
     };

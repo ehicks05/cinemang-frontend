@@ -22,10 +22,7 @@ const queryPersonIdsByName = async (name: string) => {
   return (await query).data?.map(o => o.id) || [];
 };
 
-const queryFilms = async (
-  form: DecodedValueMap<QueryParamConfigMap>,
-  page: number,
-) => {
+const queryFilms = async (form: DecodedValueMap<QueryParamConfigMap>) => {
   const creditPersonIds: number[] =
     form.creditName.length > 2 ? await queryPersonIdsByName(form.creditName) : [];
 
@@ -82,12 +79,12 @@ const queryFilms = async (
   query
     .order(form.sortColumn, { ascending: form.ascending })
     .order('id', { ascending: true })
-    .range(page * PAGE_SIZE, (page + 1) * PAGE_SIZE - 1);
+    .range(form.page * PAGE_SIZE, (form.page + 1) * PAGE_SIZE - 1);
 
   return query;
 };
 
-export const useSearchFilms = ({ page }: { page: number }) => {
+export const useSearchFilms = () => {
   const [formParams] = useQueryParams(MOVIE_QUERY_PARAMS);
 
   // a local, debounced copy of the form
@@ -101,8 +98,8 @@ export const useSearchFilms = ({ page }: { page: number }) => {
     [formParams],
   );
 
-  return useQuery(['films', form, page], async () => {
-    const { data: films, count } = (await queryFilms(form, page)) as unknown as {
+  return useQuery(['films', form], async () => {
+    const { data: films, count } = (await queryFilms(form)) as unknown as {
       data: Film[];
       count: number;
     };
