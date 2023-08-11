@@ -26,25 +26,25 @@ export const updateLanguageCounts = async () => {
   logger.info(`updated language counts`);
 };
 
-export const updateWatchProviderCounts = async () => {
-  const watchProvidersWithCounts = await prisma.watchProvider.findMany({
+export const updateProviderCounts = async () => {
+  const providersWithCounts = await prisma.provider.findMany({
     include: {
       _count: {
         select: {
-          movies: true,
+          medias: true,
         },
       },
     },
   });
 
-  const watchProviders = watchProvidersWithCounts.map(wp => ({
+  const providers = providersWithCounts.map(wp => ({
     ...omit(wp, ['_count']),
-    count: wp._count.movies,
+    count: wp._count.medias,
   }));
 
   await Promise.all(
-    watchProviders.map(async p => {
-      await prisma.watchProvider.update({
+    providers.map(async p => {
+      await prisma.provider.update({
         data: p,
         where: { id: p.id },
       });

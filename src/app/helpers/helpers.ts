@@ -1,19 +1,49 @@
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-nocheck
-import _, { chunk, isNil, keyBy, omit, omitBy } from 'lodash';
-import Bluebird from 'bluebird';
-import { Prisma, PrismaClient } from '@prisma/client';
+import _, {
+  chunk,
+  difference,
+  groupBy,
+  isNil,
+  keyBy,
+  omit,
+  omitBy,
+  uniq,
+} from 'lodash';
+import P from 'bluebird';
+import { GenreType, Prisma, PrismaClient } from '@prisma/client';
 import logger from '../../services/logger';
 import prisma from '../../services/prisma';
-import { getGenres, getLanguages, getWatchProviders } from '../../services/tmdb';
+import {
+  getMovieGenres,
+  getLanguages,
+  getProviders,
+  getShowGenres,
+} from '../../services/tmdb';
+import { MediaResponse } from '../../services/tmdb/types/responses';
 
-export const updateGenres = () =>
+export const updateGenres = async () => {
+  const movieGenres = (await getMovieGenres()).map(o => ({
+    ...o,
+    type: GenreType.MOVIE,
+  }));
+  const showGenres = (await getShowGenres()).map(o => ({
+    ...o,
+    type: GenreType.SHOW,
+  }));
+
+  const genresById = groupBy([...movieGenres, ...showGenres], o => o.id);
+  const genres = Object.values(genresById).map(o =>
+    o.length === 1 ? o[0] : { ...o[0], type: GenreType.BOTH },
+  );
+
   update({
     model: 'genre',
-    fetcher: getGenres,
+    fetcher: () => Promise.resolve(genres),
   });
+};
 
-export const updateLanguages = () =>
+export const updateLanguages = async () =>
   update({
     model: 'language',
     fetcher: getLanguages,
@@ -23,10 +53,10 @@ export const updateLanguages = () =>
     }),
   });
 
-export const updateWatchProviders = () =>
+export const updateProviders = async () =>
   update({
-    model: 'watchProvider',
-    fetcher: getWatchProviders,
+    model: 'provider',
+    fetcher: getProviders,
     remoteMapper: o => ({
       displayPriority: o.display_priorities.US,
       id: o.provider_id,
@@ -35,6 +65,11 @@ export const updateWatchProviders = () =>
     }),
   });
 
+/**
+ * Determine if two records are the same, ignoring nullish fields in either record.
+ * Also ignores `popularity` and `count` fields, and `vote_count` if the difference
+ * is <= 10% of the smaller value
+ */
 export const isEqual = (value: Record<string, any>, other: Record<string, any>) => {
   const a = omitBy(value, isNil);
   const b = omitBy(other, isNil);
@@ -92,7 +127,7 @@ export const update = async ({
   changes.unchanged = localRecords.length - toBeUpdated.length;
 
   if (toBeUpdated.length > 0) {
-    await Bluebird.map(toBeUpdated, async o => {
+    await P.map(toBeUpdated, async o => {
       const args = {
         where: { id: o[idField] },
         data: o,
@@ -126,10 +161,40 @@ export const removeInvalidMovies = async (validIds: number[]) => {
   );
   const invalidIds = existingIds.filter(e => !validIds?.includes(e));
   const chunks = chunk(invalidIds, 10_000);
-  await Bluebird.each(chunks, ids =>
+  await P.each(chunks, ids =>
     prisma.movie.deleteMany({
       where: { id: { in: ids } },
     }),
   );
   logger.info(`removed ${invalidIds.length} invalid records`);
+};
+
+export const creditsToValidPersonIds = (
+  media: MediaResponse[],
+  ignoreList?: number[] = [],
+) => {
+  const personIds = media
+    .flatMap(({ credits: { cast, crew } }) => [...cast, ...crew])
+    .filter(credit => credit.profile_path)
+    .map(credit => credit.id);
+  const deduped = uniq(personIds);
+  return difference(deduped, ignoreList);
+};
+
+/**
+ * Takes a list of medias, maps its credits to personIds, then returns
+ * the subset of ids that are also in the db.
+ */
+export const getExistingPersonIds = async (medias: MediaResponse[]) => {
+  const personIds = creditsToValidPersonIds(medias);
+  const chunks = chunk(personIds, 10_000);
+
+  const results = await P.map(chunks, async ids => {
+    const args = {
+      where: { id: { in: ids } },
+      select: { id: true },
+    };
+    return prisma.person.findMany(args);
+  });
+  return results.flat().map(o => o.id);
 };
