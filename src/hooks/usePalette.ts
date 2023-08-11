@@ -24,7 +24,7 @@ export interface Palette {
 
 export const toPalette = async (url: string) => {
   const img = new Image();
-  img.crossOrigin = 'cinemang.ehicks.net';
+  img.crossOrigin = 'Anonymous';
   img.src = url;
   const p = await Vibrant.from(img).getPalette();
 
