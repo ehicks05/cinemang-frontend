@@ -7,7 +7,7 @@ import { useParams } from 'react-router-dom';
 import { useTitle } from 'react-use';
 import { systemDataAtom } from '../../../atoms';
 import { Loading, OriginalImageLink } from '@/core-components';
-import { Person } from '../../../types';
+import { Credit, Person } from '../../../types';
 import { getTmdbImage } from '../../../utils';
 import { useFetchPerson } from '@/hooks/useFetchPersons';
 import { usePalette } from '@/hooks/usePalette';
@@ -21,7 +21,7 @@ const BIO_LENGTH_CUTOFF = 1280;
 const nf = Intl.NumberFormat('en-US', { maximumFractionDigits: 1 });
 
 const toStats = (person: Person) => ({
-  credits: [...person.cast_credit, ...person.crew_credit].length,
+  credits: person.credits.length,
   knownForDepartment: person.known_for_department,
   popularity: nf.format(person.popularity),
 });
@@ -58,6 +58,16 @@ const SortOptions = ({
   </div>
 );
 
+const toSortValue = (credit: Credit, sort: SortKey) => {
+  if (credit.movie) {
+    return credit.movie[sort];
+  }
+  if (credit.show) {
+    const sortKey = sort === 'released_at' ? 'first_air_date' : sort;
+    return credit.show[sortKey];
+  }
+};
+
 const PersonDetail = ({ person }: { person: Person }) => {
   const [{ genres, languages }] = useAtom(systemDataAtom);
   useTitle(person.name, { restoreOnUnmount: true });
@@ -68,7 +78,16 @@ const PersonDetail = ({ person }: { person: Person }) => {
 
   const [sort, setSort] = useState<SortKey>('released_at');
 
-  const castCredits = orderBy(person.cast_credit, o => o.movie[sort], 'desc');
+  const castCredits = orderBy(
+    person.credits.filter(c => c.type === 'CAST'),
+    o => toSortValue(o, sort),
+    'desc',
+  );
+  const crewCredits = orderBy(
+    person.credits.filter(c => c.type === 'CREW'),
+    o => toSortValue(o, sort),
+    'desc',
+  );
 
   const [truncateBio, setTruncateBio] = useState(true);
   const bio = truncateBio
@@ -120,7 +139,7 @@ const PersonDetail = ({ person }: { person: Person }) => {
         </div>
       </div>
 
-      {person.cast_credit.length !== 0 && (
+      {castCredits.length !== 0 && (
         <>
           <h1 className="flex items-end justify-between text-xl font-bold">
             Cast
@@ -142,29 +161,25 @@ const PersonDetail = ({ person }: { person: Person }) => {
           ))}
         </>
       )}
-      {person.crew_credit.length !== 0 && (
+      {crewCredits.length !== 0 && (
         <>
           <h1 className="flex items-center justify-between text-xl font-bold">
-            crew
+            Crew
             <SortOptions
               darkVibrant={palette.darkMuted}
               setSort={setSort}
               sort={sort}
             />
           </h1>
-          {person.crew_credit
-            .sort((c1, c2) =>
-              c2.movie.released_at.localeCompare(c1.movie.released_at),
-            )
-            .map(c => (
-              <PersonCredit
-                bgColor={palette.darkMuted}
-                credit={c}
-                genres={genres}
-                key={c.credit_id}
-                languages={languages}
-              />
-            ))}
+          {crewCredits.map(c => (
+            <PersonCredit
+              bgColor={palette.darkMuted}
+              credit={c}
+              genres={genres}
+              key={c.credit_id}
+              languages={languages}
+            />
+          ))}
         </>
       )}
     </div>

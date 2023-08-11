@@ -4,22 +4,37 @@ import { Link } from 'react-router-dom';
 import { useWindowSize } from 'react-use';
 import { pick } from 'lodash';
 import * as HoverCard from '@radix-ui/react-hover-card';
-import { CastCredit, CrewCredit, Genre, Language } from '../../../../types';
-import FilmStats from '../../FilmStats';
+import { Credit, Genre, Language } from '../../../../types';
+import FilmStats from '../../MediaStats';
 import { toStats } from '../../utils';
 import HoverFilm from './HoverFilm';
+import HoverShow from './HoverShow';
 
 interface Props {
   bgColor: string;
-  credit: CastCredit | CrewCredit;
+  credit: Credit;
   genres: Genre[];
   languages: Language[];
 }
 
+const getYears = (credit: Credit) => {
+  if (credit.movie) {
+    return format(parseISO(credit.movie.released_at), 'yyyy');
+  }
+  if (credit.show) {
+    const firstYear = format(parseISO(credit.show.first_air_date), 'yyyy');
+    const lastYear = format(parseISO(credit.show.last_air_date), 'yyyy');
+    return firstYear === lastYear ? firstYear : `${firstYear}-${lastYear}`;
+  }
+};
+
 const PersonCredit = ({ bgColor, genres, languages, credit }: Props) => {
   const { width } = useWindowSize();
-  const year = format(parseISO(credit.movie.released_at), 'yyyy');
-
+  const year = getYears(credit);
+  const mediaName = credit.movie ? credit.movie.title : credit.show?.name;
+  const mediaPath = credit.movie
+    ? `/films/${credit.movie_id}`
+    : `/tv/${credit.show_id}`;
   const creditText = (
     <span>
       {'character' in credit
@@ -40,8 +55,8 @@ const PersonCredit = ({ bgColor, genres, languages, credit }: Props) => {
           <div className="flex flex-col items-baseline gap-2 lg:flex-row">
             <span className="flex items-baseline gap-2">
               <HoverCard.Trigger asChild>
-                <Link className="" to={`/films/${credit.movie.id}`}>
-                  <span className="font-bold sm:text-lg">{credit.movie.title}</span>
+                <Link to={mediaPath}>
+                  <span className="font-bold sm:text-lg">{mediaName}</span>
                   <span className="inline text-xs sm:hidden"> {year}</span>
                 </Link>
               </HoverCard.Trigger>
@@ -53,7 +68,7 @@ const PersonCredit = ({ bgColor, genres, languages, credit }: Props) => {
           <FilmStats
             autoWidth={width < 640}
             bgColor={bgColor}
-            data={pick(toStats(genres, languages, credit.movie), [
+            data={pick(toStats(genres, languages, credit.movie || credit.show!), [
               'voteAverage',
               'voteCount',
             ])}
@@ -62,7 +77,9 @@ const PersonCredit = ({ bgColor, genres, languages, credit }: Props) => {
       </div>
       <HoverCard.Portal>
         <HoverCard.Content>
-          <HoverFilm id={credit.movieId} />
+          {credit.movie_id && <HoverFilm id={credit.movie_id} />}
+          {credit.show_id && <HoverShow id={credit.show_id} />}
+
           <HoverCard.Arrow className="text-gray-700" />
         </HoverCard.Content>
       </HoverCard.Portal>

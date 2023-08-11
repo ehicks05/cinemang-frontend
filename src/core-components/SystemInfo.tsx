@@ -7,18 +7,20 @@ import { HiX } from 'react-icons/hi';
 import { supabase } from '../supabase';
 
 const SHORT = 'hh:mm:ss a';
-const DEFAULT = `MMM dd ${SHORT}`;
+const DEFAULT = `yyyy-MM-dd'T'${SHORT}`;
 
 const SystemInfo = () => {
-  const { data: systemInfo } = useQuery(
-    ['systemInfo'],
-    async () => (await supabase.from('system_info').select('*').limit(1)).data?.[0],
+  const { data: syncRunLogs } = useQuery(
+    ['sync_run_log'],
+    async () => (await supabase.from('sync_run_log').select('*')).data,
   );
-  if (!systemInfo) return null;
+  if (!syncRunLogs) return null;
 
-  const syncStartedAt = new Date(systemInfo.loadStartedAt);
-  const syncEndedAt = new Date(systemInfo.loadFinishedAt);
-  const df = syncStartedAt.getDate() === syncEndedAt.getDate() ? SHORT : DEFAULT;
+  const latestRun = syncRunLogs[syncRunLogs.length - 1];
+
+  const createdAt = new Date(latestRun.created_at);
+  const endedAt = latestRun.ended_at ? new Date(latestRun.ended_at) : undefined;
+  const duration = endedAt ? formatDistance(endedAt, createdAt) : undefined;
 
   return (
     <Popover.Root>
@@ -38,23 +40,23 @@ const SystemInfo = () => {
               </thead>
               <tr>
                 <td className="text-left">start</td>
-                <td className="text-right">{format(syncStartedAt, df)}</td>
+                <td className="text-right">{format(createdAt, DEFAULT)}</td>
               </tr>
               <tr>
                 <td className="text-left">end</td>
-                <td className="text-right">{format(syncEndedAt, df)}</td>
+                <td className="text-right">
+                  {endedAt ? format(endedAt, DEFAULT) : 'pending'}
+                </td>
               </tr>
               <tfoot>
                 <tr>
                   <th className="text-left">duration</th>
-                  <th className="text-right">
-                    {formatDistance(syncEndedAt, syncStartedAt)}
-                  </th>
+                  <th className="text-right">{duration || 'pending'}</th>
                 </tr>
               </tfoot>
             </table>
           </div>
-          <Popover.Close className="absolute top-0 right-0" aria-label="Close">
+          <Popover.Close className="absolute right-0 top-0" aria-label="Close">
             <HiX className="rounded-full p-1 text-2xl text-neutral-500 hover:bg-neutral-600" />
           </Popover.Close>
           <Popover.Arrow className="fill-neutral-700" />

@@ -1,7 +1,7 @@
 import React from 'react';
 import { Sk } from '../../core-components';
 
-const FilmSkeleton = () => (
+const MediaSkeleton = () => (
   <div className="bg-gray-800 sm:rounded-lg">
     <div className="flex animate-pulse flex-col gap-4 p-4 sm:rounded-lg">
       <div className="flex gap-4">
@@ -46,4 +46,4 @@ const FilmSkeleton = () => (
   </div>
 );
 
-export default FilmSkeleton;
+export default MediaSkeleton;

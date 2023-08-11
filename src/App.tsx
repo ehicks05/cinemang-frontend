@@ -7,6 +7,8 @@ import { Home } from './app/index';
 import { FilmDetail, PersonDetail } from './app/components';
 import { useFetchSystemData } from './hooks/useFetchSystemData';
 import { systemDataAtom } from './atoms';
+import Shows from './app/Shows';
+import ShowDetail from './app/components/FilmDetail/ShowDetail';
 
 function App() {
   const { data, error, isLoading } = useFetchSystemData();
@@ -21,7 +23,7 @@ function App() {
     data &&
     data.genres.length > 0 &&
     data.languages.length > 0 &&
-    data.watchProviders.length > 0;
+    data.providers.length > 0;
 
   return (
     <div className="flex min-h-screen flex-col bg-gradient-to-tr from-indigo-900 to-green-900 text-gray-50">
@@ -32,7 +34,9 @@ function App() {
         )}
         <Routes>
           <Route element={<Home />} path="/" />
+          <Route element={<Shows />} path="/tv" />
           <Route element={<FilmDetail />} path="/films/:id" />
+          <Route element={<ShowDetail />} path="/tv/:id" />
           <Route element={<PersonDetail />} path="/people/:id" />
         </Routes>
       </div>

@@ -36,7 +36,7 @@ const starColor = (voteCount: number) =>
     ? 'text-yellow-500'
     : 'text-yellow-700';
 
-const FilmStats: FC<Props> = ({
+const MediaStats: FC<Props> = ({
   autoWidth = true,
   bgColor,
   data,
@@ -96,4 +96,4 @@ const FilmStats: FC<Props> = ({
   );
 };
 
-export default FilmStats;
+export default MediaStats;

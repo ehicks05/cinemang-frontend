@@ -5,12 +5,12 @@ import { useAtom } from 'jotai';
 import { useTitle } from 'react-use';
 import { Loading, OriginalImageLink } from '../../../core-components';
 import { usePalette } from '@/hooks/usePalette';
-import FilmStats from '../FilmStats';
-import WatchProviders from '../WatchProviders';
+import FilmStats from '../MediaStats';
+import MediaProviders from '../MediaProviders';
 import { Film as IFilm } from '../../../types';
 import { useFetchFilm } from '@/hooks/useFetchFilms';
-import Trailer from './Trailer';
-import Credits from './Credits';
+import Trailer from '../../../core-components/Trailer';
+import Credits from '../../../core-components/Credits';
 import { systemDataAtom } from '../../../atoms';
 import { getTmdbImage } from '../../../utils';
 import { toStats } from '../utils';
@@ -70,12 +70,12 @@ const FilmDetail = ({ film }: { film: IFilm }) => {
             <div className="text-justify text-sm sm:text-base">{film.overview}</div>
           </div>
 
-          {film.watch_provider.length > 0 && (
-            <WatchProviders selectedIds={film.watch_provider} />
+          {film.providers.length > 0 && (
+            <MediaProviders selectedIds={film.providers} />
           )}
         </div>
       </div>
-      <Credits film={film} palette={palette} />
+      <Credits credits={film.credits} palette={palette} />
     </div>
   );
 };

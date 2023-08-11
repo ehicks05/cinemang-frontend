@@ -7,6 +7,7 @@
     "dev": "vite dev",
     "format": "prettier --write .",
     "generate": "npx supabase gen types typescript --project-id sgermtzfqlzegifqvold --schema cinemang > src/generated/supabase.ts",
+    "generate-local": "npx supabase gen types typescript --local --schema public > src/generated/supabase.ts",
     "lint:format": "prettier --cache --check .",
     "lint": "eslint --cache .",
     "test": "npm-run-all --parallel tsc:check vitest:run lint lint:format",
@@ -34,8 +35,8 @@
     "react": "^18.2.0",
     "react-collapse": "^5.1.1",
     "react-dom": "^18.2.0",
-    "react-icons": "^4.4.0",
-    "react-lite-youtube-embed": "^2.3.1",
+    "react-icons": "^4.10.1",
+    "react-lite-youtube-embed": "^2.3.52",
     "react-router-dom": "^6.4.2",
     "react-use": "^17.4.0",
     "use-query-params": "^2.1.1"

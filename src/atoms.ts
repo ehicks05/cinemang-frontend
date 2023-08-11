@@ -1,12 +1,12 @@
 import { atom } from 'jotai';
-import { Genre, Language, WatchProvider } from './types';
+import { Genre, Language, Provider } from './types';
 
 export const systemDataAtom = atom<{
   genres: Genre[];
   languages: Language[];
-  watchProviders: WatchProvider[];
+  providers: Provider[];
 }>({
   genres: [],
   languages: [],
-  watchProviders: [],
+  providers: [],
 });

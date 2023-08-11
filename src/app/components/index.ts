@@ -1,17 +1,17 @@
 import Film from './Film';
 import FilmDetail from './FilmDetail';
-import FilmSkeleton from './FilmSkeleton';
+import MediaSkeleton from './MediaSkeleton';
 import PersonDetail from './PersonDetail';
 import SearchForm from './SearchForm';
-import WatchProvider from './WatchProviders';
+import MediaProvider from './MediaProviders';
 import Paginator from './Paginator';
 
 export {
   Film,
   FilmDetail,
-  FilmSkeleton,
+  MediaSkeleton,
   PersonDetail,
   SearchForm,
-  WatchProvider,
+  MediaProvider,
   Paginator,
 };

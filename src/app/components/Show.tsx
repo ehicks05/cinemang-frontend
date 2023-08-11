@@ -1,26 +1,24 @@
 import React, { useState } from 'react';
-import { addMinutes, intervalToDuration, parseISO, format } from 'date-fns';
+import { parseISO, format } from 'date-fns';
 import { truncate } from 'lodash';
 import { Link } from 'react-router-dom';
 import { useAtom } from 'jotai';
 import MediaStats from './MediaStats';
 import MediaProviders from './MediaProviders';
-import { Film as IFilm } from '../../types';
+import { Show } from '../../types';
 import { SCALED_IMAGE } from '../../constants';
 import { systemDataAtom } from '../../atoms';
 import { getTmdbImage } from '../../utils';
 import { toStats } from './utils';
 import { Palette } from '@/hooks/usePalette';
 
-const Film = ({ film, palette }: { film: IFilm; palette: Palette }) => {
+const ShowCard = ({ show, palette }: { show: Show; palette: Palette }) => {
   const [{ genres, languages }] = useAtom(systemDataAtom);
 
-  const posterUrl = getTmdbImage({ path: film.poster_path });
-  const year = format(parseISO(film.released_at), 'yyyy');
-  const runtime = intervalToDuration({
-    end: addMinutes(new Date(), Number(film.runtime)),
-    start: new Date(),
-  });
+  const posterUrl = getTmdbImage({ path: show.poster_path });
+  const firstYear = format(parseISO(show.first_air_date), 'yyyy');
+  const lastYear = format(parseISO(show.last_air_date), 'yyyy');
+  const years = firstYear === lastYear ? firstYear : `${firstYear}-${lastYear}`;
 
   const [truncateOverview, setTruncateOverview] = useState(true);
 
@@ -37,30 +35,29 @@ const Film = ({ film, palette }: { film: IFilm; palette: Palette }) => {
         </div>
         <div className="flex flex-col gap-1">
           <div>
-            <Link className="text-lg font-bold" to={`/films/${film.id}`}>
-              {film.title}
+            <Link className="text-lg font-bold" to={`/tv/${show.id}`}>
+              {show.name}
             </Link>
-            <span className="text-xs text-gray-300" title={film.released_at}>
-              <span className="font-semibold"> {year} </span>
-              <span className="whitespace-nowrap">{`${runtime.hours}h ${runtime.minutes}m`}</span>
+            <span className="text-xs text-gray-300">
+              <span className="font-semibold"> {years}</span>
             </span>
           </div>
-          <div>{film.director}</div>
-          <div>{film.cast}</div>
+          <div>{show.created_by_id}</div>
+          <div>{show.cast}</div>
           <div className="flex-grow" />
-          {film.providers && <MediaProviders selectedIds={film.providers} />}
+          {show.providers && <MediaProviders selectedIds={show.providers} />}
         </div>
       </div>
       <div className="flex h-full flex-col justify-start gap-4">
         <MediaStats
           bgColor={palette.darkVibrant}
-          data={toStats(genres, languages, film)}
+          data={toStats(genres, languages, show)}
         />
         <div
           className="text-justify text-sm"
           onClick={() => setTruncateOverview(!truncateOverview)}
         >
-          {truncate(film.overview, {
+          {truncate(show.overview, {
             length: truncateOverview ? 256 : 1024,
             separator: ' ',
           })}
@@ -70,4 +67,4 @@ const Film = ({ film, palette }: { film: IFilm; palette: Palette }) => {
   );
 };
 
-export default Film;
+export default ShowCard;

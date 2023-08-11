@@ -3,13 +3,16 @@ import { useState } from 'react';
 import { UnmountClosed } from 'react-collapse';
 import { FaChevronDown, FaChevronUp } from 'react-icons/fa';
 import { HiSortAscending, HiSortDescending } from 'react-icons/hi';
-import {
-  DecodedValueMap,
-  QueryParamConfigMap,
-  useQueryParams,
-} from 'use-query-params';
+import { useQueryParams } from 'use-query-params';
 import { useAtom } from 'jotai';
-import { DEFAULT_SEARCH_FORM } from '../../constants';
+import { useLocation } from 'react-router-dom';
+import {
+  DEFAULT_MOVIE_SEARCH_FORM,
+  DEFAULT_TV_SEARCH_FORM,
+  MOVIE_QUERY_PARAMS,
+  QUERY_PARAMS,
+  SHOW_QUERY_PARAMS,
+} from '../../queryParams';
 import { systemDataAtom } from '../../atoms';
 import { Button, ComboBox } from '../../core-components';
 import { getTmdbImage } from '../../utils';
@@ -35,247 +38,390 @@ const SearchForm = () => {
   );
 };
 
-const FormFields = () => {
-  const [form, setFormInner] = useQueryParams();
-  const [{ genres, languages, watchProviders }] = useAtom(systemDataAtom);
+const Title = () => {
+  const [form, _setForm] = useQueryParams(MOVIE_QUERY_PARAMS);
 
-  const setForm = (updatedForm: DecodedValueMap<QueryParamConfigMap>) => {
-    if (updatedForm.page === form.page) {
-      updatedForm.page = 0;
-    }
-    setFormInner(updatedForm);
+  const setForm = (update: Record<string, any>) => {
+    _setForm({ ...form, ...update, ...(!update.page && { page: 0 }) });
+  };
+
+  return (
+    <div className="flex gap-2">
+      <div className="flex-grow">
+        <div>Title</div>
+        <div>
+          <input
+            className="w-full bg-gray-700"
+            onChange={e => setForm({ title: e.target.value })}
+            type="text"
+            value={form.title}
+          />
+        </div>
+      </div>
+    </div>
+  );
+};
+
+const Name = () => {
+  const [form, _setForm] = useQueryParams(SHOW_QUERY_PARAMS);
+
+  const setForm = (update: Record<string, any>) => {
+    _setForm({ ...form, ...update, ...(!update.page && { page: 0 }) });
+  };
+
+  return (
+    <div className="flex gap-2">
+      <div className="flex-grow">
+        <div>Title</div>
+        <div>
+          <input
+            className="w-full bg-gray-700"
+            onChange={e => setForm({ name: e.target.value })}
+            type="text"
+            value={form.name}
+          />
+        </div>
+      </div>
+    </div>
+  );
+};
+
+const CreditName = () => {
+  const [form, _setForm] = useQueryParams(QUERY_PARAMS);
+
+  const setForm = (update: Record<string, any>) => {
+    _setForm({ ...form, ...update, ...(!update.page && { page: 0 }) });
+  };
+
+  return (
+    <div className="flex gap-2">
+      <div className="flex-grow">
+        <div>Credits Include</div>
+        <div>
+          <input
+            className="w-full bg-gray-700"
+            onChange={e => setForm({ creditName: e.target.value })}
+            type="text"
+            value={form.creditName}
+          />
+        </div>
+      </div>
+    </div>
+  );
+};
+
+const Providers = () => {
+  const [{ providers }] = useAtom(systemDataAtom);
+  const [form, _setForm] = useQueryParams(QUERY_PARAMS);
+
+  const setForm = (update: Record<string, any>) => {
+    _setForm({ ...form, ...update, ...(!update.page && { page: 0 }) });
   };
 
   const getStreamLabel = (count: number) =>
     count !== 0 ? `(${count} selected)` : '';
 
   return (
-    <div className="grid gap-4 text-sm sm:grid-cols-2 sm:text-sm lg:grid-cols-3 xl:grid-cols-4">
-      <div className="flex gap-2">
-        <div className="flex-grow">
-          <div>Title</div>
-          <div>
-            <input
-              className="w-full bg-gray-700"
-              onChange={e => setForm({ ...form, title: e.target.value })}
-              type="text"
-              value={form.title}
-            />
-          </div>
-        </div>
-      </div>
-      <div className="flex gap-2">
-        <div className="flex-grow">
-          <div>Cast Includes</div>
-          <div>
-            <input
-              className="w-full bg-gray-700"
-              onChange={e => setForm({ ...form, castCreditName: e.target.value })}
-              type="text"
-              value={form.castCreditName}
-            />
-          </div>
-        </div>
-      </div>
-      <div className="flex gap-2">
-        <div className="flex-grow">
-          <div>Crew Includes</div>
-          <div>
-            <input
-              className="w-full bg-gray-700"
-              onChange={e => setForm({ ...form, crewCreditName: e.target.value })}
-              type="text"
-              value={form.crewCreditName}
-            />
-          </div>
-        </div>
-      </div>
-      <div className="flex gap-2">
-        <div className="w-full">
-          <div>Stream {getStreamLabel(form.watchProviders.length)}</div>
-          <div>
-            <ComboBox
-              form={form}
-              formKey="watchProviders"
-              mapper={provider => ({
-                id: provider.id,
-                imageUrl: getTmdbImage({
-                  path: provider.logo_path,
-                  width: 'original',
-                }),
-                label: provider.name,
-              })}
-              onChange={setForm}
-              options={watchProviders
-                .sort((o1, o2) => o1.display_priority - o2.display_priority)
-                .filter(wp => wp.count > 0)}
-              selectedOptionIds={form.watchProviders}
-            />
-          </div>
-        </div>
-      </div>
-      <div className="flex gap-2">
-        <div className="flex-shrink-0">
-          <div className="whitespace-nowrap">Min Votes</div>
-          <div className="flex gap-2">
-            <input
-              className="w-full bg-gray-700"
-              max={form.maxVotes || undefined}
-              min={1}
-              onChange={e => setForm({ ...form, minVotes: Number(e.target.value) })}
-              type="number"
-              value={form.minVotes}
-            />
-            {/* <input
-              type="number"
-              min={form.minVotes || undefined}
-              className="w-full bg-gray-700"
-              value={form.maxVotes}
-              onChange={(e) =>
-                setForm({ ...form, maxVotes: Number(e.target.value) })
-              }
-            /> */}
-          </div>
-        </div>
-        <div className="flex-shrink">
-          <div>Rating</div>
-          <div className="flex gap-2">
-            <input
-              className="w-full bg-gray-700"
-              onChange={e =>
-                setForm({
-                  ...form,
-                  minRating: Number(e.target.value),
-                })
-              }
-              type="number"
-              value={form.minRating}
-            />
-            <input
-              className="w-full bg-gray-700"
-              onChange={e =>
-                setForm({
-                  ...form,
-                  maxRating: Number(e.target.value),
-                })
-              }
-              type="number"
-              value={form.maxRating}
-            />
-          </div>
-        </div>
-      </div>
-      <div>
-        <div>Released</div>
-        <div className="flex flex-col gap-2 sm:flex-row">
-          <input
-            className="w-full bg-gray-700"
-            onChange={e =>
-              setForm({
-                ...form,
-                minReleasedAt: e.target.value,
-              })
-            }
-            type="date"
-            value={form.minReleasedAt}
-          />
-          <input
-            className="w-full bg-gray-700"
-            onChange={e =>
-              setForm({
-                ...form,
-                maxReleasedAt: e.target.value,
-              })
-            }
-            type="date"
-            value={form.maxReleasedAt}
+    <div className="flex gap-2">
+      <div className="w-full">
+        <div>Stream {getStreamLabel(form.providers.length)}</div>
+        <div>
+          <ComboBox
+            mapper={p => ({
+              id: p.id,
+              imageUrl: getTmdbImage({
+                path: p.logo_path,
+                width: 'original',
+              }),
+              label: p.name,
+            })}
+            onChange={value => setForm({ providers: value })}
+            options={providers
+              .sort((o1, o2) => o1.display_priority - o2.display_priority)
+              .filter(p => p.count > 0)}
+            selectedOptionIds={form.providers as number[]}
           />
         </div>
       </div>
+    </div>
+  );
+};
 
+const MinVotes = () => {
+  const { pathname } = useLocation();
+  const queryConfig = pathname === '/tv' ? SHOW_QUERY_PARAMS : MOVIE_QUERY_PARAMS;
+
+  const [form, _setForm] = useQueryParams(queryConfig);
+
+  const setForm = (update: Record<string, any>) => {
+    _setForm({ ...form, ...update, ...(!update.page && { page: 0 }) });
+  };
+
+  return (
+    <div className="flex-shrink-0">
+      <div className="whitespace-nowrap">Min Votes</div>
+      <div className="flex gap-2">
+        <input
+          className="w-full bg-gray-700"
+          max={form.maxVotes || undefined}
+          min={1}
+          onChange={e => setForm({ minVotes: Number(e.target.value) })}
+          type="number"
+          value={form.minVotes}
+        />
+      </div>
+    </div>
+  );
+};
+
+const Rating = () => {
+  const [form, _setForm] = useQueryParams(QUERY_PARAMS);
+
+  const setForm = (update: Record<string, any>) => {
+    _setForm({ ...form, ...update, ...(!update.page && { page: 0 }) });
+  };
+
+  return (
+    <div className="flex-shrink">
+      <div>Rating</div>
+      <div className="flex gap-2">
+        <input
+          className="w-full bg-gray-700"
+          onChange={e => setForm({ minRating: Number(e.target.value) })}
+          type="number"
+          value={form.minRating}
+        />
+        <input
+          className="w-full bg-gray-700"
+          onChange={e => setForm({ maxRating: Number(e.target.value) })}
+          type="number"
+          value={form.maxRating}
+        />
+      </div>
+    </div>
+  );
+};
+
+const Released = () => {
+  const [form, _setForm] = useQueryParams(MOVIE_QUERY_PARAMS);
+
+  const setForm = (update: Record<string, any>) => {
+    _setForm({ ...form, ...update, ...(!update.page && { page: 0 }) });
+  };
+
+  return (
+    <div>
+      <div>Released</div>
       <div className="flex flex-col gap-2 sm:flex-row">
-        <div className="flex w-full flex-col">
-          <div>Language</div>
-          <div>
-            <select
-              className="w-full bg-gray-700"
-              onChange={e => setForm({ ...form, language: e.target.value })}
-              value={form.language}
-            >
-              <option value="">Any</option>
-              {languages
-                .sort((o1, o2) => o2.count - o1.count)
-                .slice(0, 10)
-                .map(language => (
-                  <option key={language.id} value={language.id}>
-                    {language.name}
-                  </option>
-                ))}
-            </select>
-          </div>
-        </div>
-
-        <div className="flex w-full flex-col">
-          <div>Genre</div>
-          <div>
-            <select
-              className="w-full bg-gray-700"
-              onChange={e => setForm({ ...form, genre: e.target.value })}
-              value={form.genre}
-            >
-              <option value="">Any</option>
-              {genres.map(genre => (
-                <option key={genre.id} value={genre.id}>
-                  {genre.name}
-                </option>
-              ))}
-            </select>
-          </div>
-        </div>
+        <input
+          className="w-full bg-gray-700"
+          onChange={e => setForm({ minReleasedAt: e.target.value })}
+          type="date"
+          value={form.minReleasedAt}
+        />
+        <input
+          className="w-full bg-gray-700"
+          onChange={e => setForm({ maxReleasedAt: e.target.value })}
+          type="date"
+          value={form.maxReleasedAt}
+        />
       </div>
+    </div>
+  );
+};
 
+const FirstAirDate = () => {
+  const [form, _setForm] = useQueryParams(SHOW_QUERY_PARAMS);
+
+  const setForm = (update: Record<string, any>) => {
+    _setForm({ ...form, ...update, ...(!update.page && { page: 0 }) });
+  };
+
+  return (
+    <div>
+      <div>First Aired</div>
+      <div className="flex flex-col gap-2 sm:flex-row">
+        <input
+          className="w-full bg-gray-700"
+          onChange={e => setForm({ minFirstAirDate: e.target.value })}
+          type="date"
+          value={form.minFirstAirDate}
+        />
+        <input
+          className="w-full bg-gray-700"
+          onChange={e => setForm({ maxFirstAirDate: e.target.value })}
+          type="date"
+          value={form.maxFirstAirDate}
+        />
+      </div>
+    </div>
+  );
+};
+
+const Language = () => {
+  const [{ languages }] = useAtom(systemDataAtom);
+  const [form, _setForm] = useQueryParams(QUERY_PARAMS);
+
+  const setForm = (update: Record<string, any>) => {
+    _setForm({ ...form, ...update, ...(!update.page && { page: 0 }) });
+  };
+
+  return (
+    <div className="flex w-full flex-col">
+      <div>Language</div>
       <div>
-        <div>Sort</div>
-        <div className="flex">
-          <select
-            className="w-full bg-gray-700"
-            onChange={e => setForm({ ...form, sortColumn: e.target.value })}
-            value={form.sortColumn}
-          >
-            {[
-              { label: 'User Rating', value: 'vote_average' },
-              { label: 'User Votes', value: 'vote_count' },
-              { label: 'Released', value: 'released_at' },
-            ].map(option => (
-              <option key={option.value} value={option.value}>
-                {option.label}
+        <select
+          className="w-full bg-gray-700"
+          onChange={e => setForm({ language: e.target.value })}
+          value={form.language}
+        >
+          <option value="">Any</option>
+          {languages
+            .sort((o1, o2) => o2.count - o1.count)
+            .slice(0, 10)
+            .map(language => (
+              <option key={language.id} value={language.id}>
+                {language.name}
               </option>
             ))}
-          </select>
-          <Button
-            className="border-l-0 border-gray-500 bg-gray-700 px-3 text-white"
-            onClick={() => setForm({ ...form, ascending: !form.ascending })}
-          >
-            {form.ascending ? (
-              <HiSortAscending className="text-xl" />
-            ) : (
-              <HiSortDescending className="text-xl" />
-            )}
-          </Button>
-        </div>
+        </select>
+      </div>
+    </div>
+  );
+};
+
+const Genre = () => {
+  const { pathname } = useLocation();
+  const [{ genres }] = useAtom(systemDataAtom);
+  const mediaGenres = genres.filter(
+    o => o.type !== (pathname === '/tv' ? 'MOVIE' : 'SHOW'),
+  );
+  const [form, _setForm] = useQueryParams(QUERY_PARAMS);
+
+  const setForm = (update: Record<string, any>) => {
+    _setForm({ ...form, ...update, ...(!update.page && { page: 0 }) });
+  };
+
+  return (
+    <div className="flex w-full flex-col">
+      <div>Genre</div>
+      <div>
+        <select
+          className="w-full bg-gray-700"
+          onChange={e => setForm({ genre: e.target.value })}
+          value={form.genre}
+        >
+          <option value="">Any</option>
+          {mediaGenres.map(genre => (
+            <option key={genre.id} value={genre.id}>
+              {genre.name}
+            </option>
+          ))}
+        </select>
+      </div>
+    </div>
+  );
+};
+
+const Sort = () => {
+  const { pathname } = useLocation();
+  const queryConfig = pathname === '/tv' ? SHOW_QUERY_PARAMS : MOVIE_QUERY_PARAMS;
+  const [form, _setForm] = useQueryParams(queryConfig);
+
+  const setForm = (update: Record<string, any>) => {
+    _setForm({ ...form, ...update, ...(!update.page && { page: 0 }) });
+  };
+
+  const OPTIONS = [
+    { label: 'User Rating', value: 'vote_average' },
+    { label: 'User Votes', value: 'vote_count' },
+    'minReleasedAt' in queryConfig
+      ? { label: 'Released', value: 'released_at' }
+      : { label: 'First Aired', value: 'first_air_date' },
+  ];
+
+  return (
+    <div>
+      <div>Sort</div>
+      <div className="flex">
+        <select
+          className="w-full bg-gray-700"
+          onChange={e => setForm({ sortColumn: e.target.value })}
+          value={form.sortColumn}
+        >
+          {OPTIONS.map(option => (
+            <option key={option.value} value={option.value}>
+              {option.label}
+            </option>
+          ))}
+        </select>
+        <Button
+          className="border-l-0 border-gray-500 bg-gray-700 px-3 text-white"
+          onClick={() => setForm({ ascending: !form.ascending })}
+        >
+          {form.ascending ? (
+            <HiSortAscending className="text-xl" />
+          ) : (
+            <HiSortDescending className="text-xl" />
+          )}
+        </Button>
+      </div>
+    </div>
+  );
+};
+
+const ResetButton = () => {
+  const { pathname } = useLocation();
+  const queryConfig = pathname === '/tv' ? SHOW_QUERY_PARAMS : MOVIE_QUERY_PARAMS;
+  const defaults =
+    pathname === 'tv' ? DEFAULT_TV_SEARCH_FORM : DEFAULT_MOVIE_SEARCH_FORM;
+  const [form, _setForm] = useQueryParams(queryConfig);
+
+  const setForm = (update: Record<string, any>) => {
+    _setForm({ ...form, ...update, ...(!update.page && { page: 0 }) });
+  };
+
+  return (
+    <div>
+      {/* Field title placeholder */}
+      <div>&nbsp;</div>
+      <div className="flex">
+        <Button
+          className="border-gray-500 bg-gray-700 px-3 py-2 text-base text-white"
+          onClick={() => setForm({ ...defaults })}
+        >
+          Reset
+        </Button>
+      </div>
+    </div>
+  );
+};
+
+const FormFields = () => {
+  const { pathname } = useLocation();
+  const mode = pathname === '/tv' ? 'tv' : 'movie';
+
+  return (
+    <div className="grid gap-4 text-sm sm:grid-cols-2 sm:text-sm lg:grid-cols-3 xl:grid-cols-4">
+      {mode === 'movie' && <Title />}
+      {mode === 'tv' && <Name />}
+      <CreditName />
+      <Providers />
+      <div className="flex gap-2">
+        <MinVotes />
+        <Rating />
+      </div>
+      {mode === 'movie' && <Released />}
+      {mode === 'tv' && <FirstAirDate />}
+
+      <div className="flex flex-col gap-2 sm:flex-row">
+        <Language />
+        <Genre />
       </div>
 
-      <div>
-        <div>&nbsp;</div>
-        <div className="flex">
-          <Button
-            className="border-gray-500 bg-gray-700 px-3 py-2 text-base text-white"
-            onClick={() => setForm({ ...DEFAULT_SEARCH_FORM })}
-          >
-            Reset
-          </Button>
-        </div>
-      </div>
+      <Sort />
+
+      <ResetButton />
     </div>
   );
 };

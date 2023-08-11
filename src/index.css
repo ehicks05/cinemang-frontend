@@ -24,17 +24,17 @@ body {
   overflow-y: scroll;
 }
 ::-webkit-scrollbar {
-  width: 8px;
+  width: 10px;
 }
 
 ::-webkit-scrollbar-track {
-  background: #f1f1f1;
+  background: #bbb;
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #aaa;
+  background: #777;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #777;
+  background: #666;
 }
