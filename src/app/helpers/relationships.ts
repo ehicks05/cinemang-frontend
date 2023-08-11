@@ -19,7 +19,6 @@ const toCreditCreateInput = (media: MediaResponse) =>
     ...('character' in c && {
       type: CreditType.CAST,
       character: c.character,
-      castId: c.cast_id,
       order: c.order,
     }),
     ...('job' in c && {

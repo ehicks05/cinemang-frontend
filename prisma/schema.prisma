@@ -150,7 +150,6 @@ model Credit {
   personId Int    @map("person_id")
 
   // cast specific
-  castId    Int?    @map("cast_id")
   character String?
   order     Int?
 
