@@ -1,7 +1,6 @@
 import { IMAGE_WIDTH } from './constants';
 
 interface Params {
-  bustCache?: boolean;
   defaultImage?: string;
   path?: string;
   width?: string;

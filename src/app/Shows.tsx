@@ -21,7 +21,7 @@ const Shows = ({ shows }: { shows: Show[] }) => {
       setLoading(true);
       const palettes = await Promise.all(
         shows.map(async show => {
-          const url = getTmdbImage({ bustCache: true, path: show.poster_path });
+          const url = getTmdbImage({ path: show.poster_path });
           const palette = await toPalette(url);
           return { id: show.id, palette };
         }),
