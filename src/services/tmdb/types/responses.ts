@@ -44,6 +44,9 @@ export interface PersonResponse extends Person {
 
 export interface RecentChangesResponse {
   results: RecentChange[];
+  page: number;
+  total_pages: number;
+  total_results: number;
 }
 
 export interface ProviderResponse {
