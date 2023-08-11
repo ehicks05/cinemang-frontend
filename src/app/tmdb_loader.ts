@@ -46,8 +46,6 @@ const loadMovies = async (ids: number[]) => {
     return p && !isEqual(o, p);
   });
 
-  // TODO: either rethrow, or track which movies actually made
-  // it to the db, so we don't get foreign key errors later
   try {
     const createResult = await prisma.movie.createMany({
       data: toCreate,
@@ -108,8 +106,6 @@ const loadShows = async (ids: number[]) => {
     return p && !isEqual(o, p);
   });
 
-  // TODO: either rethrow, or track which movies actually made
-  // it to the db, so we don't get foreign key errors later
   try {
     const createResult = await prisma.show.createMany({
       data: toCreate,
@@ -145,8 +141,6 @@ const loadShows = async (ids: number[]) => {
       .filter(o => mutatedIds.includes(o.id))
       .filter(o => !updateErrorsById[o.id]);
 
-    // as long as seasons+episodes have no relationships, may be easier to just delete + createMany
-    // delete
     const seasons = await prisma.season.findMany({
       where: { showId: { in: mutatedIds } },
     });
@@ -212,9 +206,10 @@ const loadShows = async (ids: number[]) => {
 };
 
 /**
- * Find all ids, chunk them, then serially for each chunk,
- * load them and then pull out the personIds and load them.
- * finally, update relationships (like credits and providers)
+ * 1. Find all ids and chunk them,
+ * 2. For each chunk (serially)
+ *    - load them, then extract and load personIds from the medias
+ *    - update relationships (like credits and providers)
  */
 const updateMediaByType = async (
   media: 'movie' | 'tv',
@@ -229,7 +224,6 @@ const updateMediaByType = async (
   await P.each(chunks, async (ids, i) => {
     try {
       logger.info(`processing chunk ${i + 1}/${chunks.length}`);
-      logger.info(`processed ${personIdsProcessed.length} persons`);
 
       const loadedMedias =
         media === 'movie' ? await loadMovies(ids) : await loadShows(ids);
