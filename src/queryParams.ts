@@ -33,7 +33,7 @@ export const DEFAULT_TV_SEARCH_FORM = {
   ...DEFAULT_SEARCH_FORM,
   maxFirstAirDate: '',
   minFirstAirDate: '',
-  minVotes: 1,
+  minVotes: 300,
   name: '',
   sortColumn: 'first_air_date',
 } as const;
