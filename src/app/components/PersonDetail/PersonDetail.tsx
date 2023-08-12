@@ -79,12 +79,12 @@ const PersonDetail = ({ person }: { person: Person }) => {
   const [sort, setSort] = useState<SortKey>('released_at');
 
   const castCredits = orderBy(
-    person.credits.filter(c => c.type === 'CAST'),
+    person.credits.filter(c => c.character),
     o => toSortValue(o, sort),
     'desc',
   );
   const crewCredits = orderBy(
-    person.credits.filter(c => c.type === 'CREW'),
+    person.credits.filter(c => c.job),
     o => toSortValue(o, sort),
     'desc',
   );

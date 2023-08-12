@@ -11,8 +11,8 @@ interface Props {
 }
 
 const Credits = ({ credits, palette }: Props) => {
-  const cast = credits.filter(c => c.type === 'CAST');
-  const crew = credits.filter(c => c.type === 'CREW');
+  const cast = credits.filter(c => c.character);
+  const crew = credits.filter(c => c.job);
   const groupedCrew = groupBy(crew, c => c.person_id);
 
   return (
