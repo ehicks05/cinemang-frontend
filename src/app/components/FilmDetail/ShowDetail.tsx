@@ -43,7 +43,9 @@ const ShowDetail = ({ show }: { show: Show }) => {
       <div>
         <div className="text-2xl font-semibold sm:text-3xl">{show.name}</div>
         <div className="text-sm text-gray-300">
-          <span>{years}</span>
+          <span>
+            {years} ({show.status})
+          </span>
         </div>
       </div>
       <div className="flex flex-col gap-4 sm:flex-row">

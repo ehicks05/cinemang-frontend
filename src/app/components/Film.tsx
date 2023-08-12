@@ -46,7 +46,11 @@ const Film = ({ film, palette }: { film: IFilm; palette: Palette }) => {
             </span>
           </div>
           <div>{film.director}</div>
-          <div>{film.cast}</div>
+          <div>
+            {film.cast.split(', ').map(name => (
+              <div>{name}</div>
+            ))}
+          </div>
           <div className="flex-grow" />
           {film.providers && <MediaProviders selectedIds={film.providers} />}
         </div>

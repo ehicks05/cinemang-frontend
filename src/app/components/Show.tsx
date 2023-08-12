@@ -43,7 +43,12 @@ const ShowCard = ({ show, palette }: { show: Show; palette: Palette }) => {
             </span>
           </div>
           <div>{show.created_by_id}</div>
-          <div>{show.cast}</div>
+          <div>Status: {show.status}</div>
+          <div>
+            {show.cast.split(', ').map(name => (
+              <div>{name}</div>
+            ))}
+          </div>
           <div className="flex-grow" />
           {show.providers && <MediaProviders selectedIds={show.providers} />}
         </div>
