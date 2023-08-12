@@ -36,11 +36,7 @@ const PersonCredit = ({ bgColor, genres, languages, credit }: Props) => {
     ? `/films/${credit.movie_id}`
     : `/tv/${credit.show_id}`;
   const creditText = (
-    <span>
-      {'character' in credit
-        ? credit.character
-        : `${credit.department} - ${credit.job}`}
-    </span>
+    <span>{credit.character || `${credit.department} - ${credit.job}`}</span>
   );
 
   return (
