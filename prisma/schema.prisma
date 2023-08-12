@@ -132,15 +132,8 @@ model Person {
   @@map("person")
 }
 
-enum CreditType {
-  CAST
-  CREW
-  GUEST_STAR // might be same as CAST
-}
-
 model Credit {
-  creditId String     @id @map("credit_id")
-  type     CreditType
+  creditId String @id @map("credit_id")
 
   movie    Movie? @relation(fields: [movieId], references: [id], onDelete: Cascade)
   movieId  Int?   @map("movie_id")

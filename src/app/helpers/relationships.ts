@@ -1,5 +1,5 @@
 import { Dictionary, differenceBy, keyBy } from 'lodash';
-import { CreditType, Prisma } from '@prisma/client';
+import { Prisma } from '@prisma/client';
 import P from 'bluebird';
 import { getExistingPersonIds, isEqual } from './helpers';
 import logger from '../../services/logger';
@@ -15,14 +15,11 @@ const toCreditCreateInput = (media: MediaResponse) =>
     ...mediaToRelationshipKey(media),
     personId: c.id,
     creditId: c.credit_id,
-    type: CreditType.CAST, // default, should be overriden below
     ...('character' in c && {
-      type: CreditType.CAST,
       character: c.character,
       order: c.order,
     }),
     ...('job' in c && {
-      type: CreditType.CREW,
       department: c.department,
       job: c.job,
     }),
