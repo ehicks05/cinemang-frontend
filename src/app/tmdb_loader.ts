@@ -1,4 +1,11 @@
-import { chunk, differenceBy, intersectionBy, keyBy, partition } from 'lodash';
+import {
+  chunk,
+  differenceBy,
+  intersectionBy,
+  keyBy,
+  partition,
+  uniqBy,
+} from 'lodash';
 import { formatDuration, intervalToDuration, isFirstDayOfMonth } from 'date-fns';
 import { Prisma } from '@prisma/client';
 import P from 'bluebird';
@@ -167,14 +174,27 @@ const loadShows = async (ids: number[]) => {
 
     // create
     await prisma.season.createMany({ data: seasonCreateInputs });
-
-    P.map(
+    await P.map(
       seasonCreateInputs,
       async ({ showId, seasonNumber }) => {
         const season = await getSeason(showId, seasonNumber);
         if (!season) {
           return;
         }
+
+        // fold season credits into show credits
+        const show = mutated.find(o => o.id === showId);
+        if (show) {
+          show.credits.cast = uniqBy(
+            [...show.credits.cast, ...season.credits.cast],
+            toId,
+          );
+          show.credits.crew = uniqBy(
+            [...show.credits.crew, ...season.credits.crew],
+            toId,
+          );
+        }
+
         const toEpisodeCreateInput = (
           o: Episode & { seasonId: number; showId: number },
         ) => ({

@@ -13,9 +13,9 @@ import { logAxiosError } from './utils';
 
 export const getMovie = async (id: number) => {
   try {
-    const subRequests = ['releases', 'credits', 'watch/providers'];
+    const appends = ['releases', 'credits', 'watch/providers'];
     const config = {
-      params: { append_to_response: subRequests.join(',') },
+      params: { append_to_response: appends.join(',') },
     };
     const result = await tmdb.get<MovieResponse>(`/movie/${id}`, config);
     return result.data;
@@ -26,9 +26,9 @@ export const getMovie = async (id: number) => {
 
 export const getShow = async (id: number) => {
   try {
-    const subRequests = ['credits', 'watch/providers', 'content_ratings'];
+    const appends = ['credits', 'watch/providers', 'content_ratings'];
     const config = {
-      params: { append_to_response: subRequests.join(',') },
+      params: { append_to_response: appends.join(',') },
     };
     const result = await tmdb.get<ShowResponse>(`/tv/${id}`, config);
     return result.data;
@@ -39,8 +39,12 @@ export const getShow = async (id: number) => {
 
 export const getSeason = async (showId: number, season: number) => {
   try {
+    const appends = ['credits'];
+    const config = {
+      params: { append_to_response: appends.join(',') },
+    };
     const path = `/tv/${showId}/season/${season}`;
-    const result = await tmdb.get<SeasonResponse>(path);
+    const result = await tmdb.get<SeasonResponse>(path, config);
     return result.data;
   } catch (e) {
     logAxiosError(e as AxiosError);
