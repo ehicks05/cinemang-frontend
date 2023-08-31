@@ -44,7 +44,6 @@ export interface Database {
       }
       credit: {
         Row: {
-          cast_id: number | null
           character: string | null
           credit_id: string
           department: string | null
@@ -53,10 +52,8 @@ export interface Database {
           order: number | null
           person_id: number
           show_id: number | null
-          type: Database["public"]["Enums"]["CreditType"]
         }
         Insert: {
-          cast_id?: number | null
           character?: string | null
           credit_id: string
           department?: string | null
@@ -65,10 +62,8 @@ export interface Database {
           order?: number | null
           person_id: number
           show_id?: number | null
-          type: Database["public"]["Enums"]["CreditType"]
         }
         Update: {
-          cast_id?: number | null
           character?: string | null
           credit_id?: string
           department?: string | null
@@ -77,7 +72,6 @@ export interface Database {
           order?: number | null
           person_id?: number
           show_id?: number | null
-          type?: Database["public"]["Enums"]["CreditType"]
         }
         Relationships: [
           {
@@ -109,7 +103,6 @@ export interface Database {
           overview: string
           runtime: number | null
           season_id: number
-          season_number: number
           show_id: number
           still_path: string | null
           vote_average: number
@@ -123,7 +116,6 @@ export interface Database {
           overview: string
           runtime?: number | null
           season_id: number
-          season_number: number
           show_id: number
           still_path?: string | null
           vote_average: number
@@ -137,7 +129,6 @@ export interface Database {
           overview?: string
           runtime?: number | null
           season_id?: number
-          season_number?: number
           show_id?: number
           still_path?: string | null
           vote_average?: number
@@ -167,7 +158,7 @@ export interface Database {
         Insert: {
           id: number
           name: string
-          type?: Database["public"]["Enums"]["GenreType"]
+          type: Database["public"]["Enums"]["GenreType"]
         }
         Update: {
           id?: number
@@ -517,7 +508,6 @@ export interface Database {
       [_ in never]: never
     }
     Enums: {
-      CreditType: "CAST" | "CREW" | "GUEST_STAR"
       GenreType: "MOVIE" | "SHOW" | "BOTH"
       ShowStatus: "ENDED" | "CANCELED" | "RETURNING_SERIES" | "IN_PRODUCTION"
     }
@@ -526,4 +516,3 @@ export interface Database {
     }
   }
 }
-

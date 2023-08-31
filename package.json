@@ -6,7 +6,7 @@
     "build": "vite build",
     "dev": "vite dev",
     "format": "prettier --write .",
-    "generate": "npx supabase gen types typescript --project-id sgermtzfqlzegifqvold --schema cinemang > src/generated/supabase.ts",
+    "generate": "npx supabase gen types typescript --project-id qzghroxeindgzpfwrffs --schema public > src/generated/supabase.ts",
     "generate-local": "npx supabase gen types typescript --local --schema public > src/generated/supabase.ts",
     "lint:format": "prettier --cache --check .",
     "lint": "eslint --cache .",
