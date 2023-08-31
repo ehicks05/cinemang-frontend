@@ -1,11 +1,9 @@
-import { useState } from 'react';
-
-import { UnmountClosed } from 'react-collapse';
 import { FaChevronDown, FaChevronUp } from 'react-icons/fa';
 import { HiSortAscending, HiSortDescending } from 'react-icons/hi';
 import { useQueryParams } from 'use-query-params';
 import { useAtom } from 'jotai';
 import { useLocation } from 'react-router-dom';
+import { Disclosure, Transition } from '@headlessui/react';
 import {
   DEFAULT_MOVIE_SEARCH_FORM,
   DEFAULT_TV_SEARCH_FORM,
@@ -17,26 +15,37 @@ import { systemDataAtom } from '../../atoms';
 import { Button, ComboBox } from '../../core-components';
 import { getTmdbImage } from '../../utils';
 
-const SearchForm = () => {
-  const [isOpen, setIsOpen] = useState(false);
-  const Icon = isOpen ? FaChevronUp : FaChevronDown;
-  return (
-    <div className="flex w-full flex-col gap-4 bg-gray-800 p-4 sm:rounded-lg">
-      <div
-        className="flex cursor-pointer justify-between gap-32"
-        onClick={() => setIsOpen(!isOpen)}
-      >
-        <span className="select-none text-xl">Search</span>
-        <span>
-          <Icon className="inline" />
-        </span>
+const SearchForm = () => (
+  <Disclosure>
+    {({ open }) => (
+      <div className="flex w-full flex-col gap-4 bg-gray-800 p-4 sm:rounded-lg">
+        <Disclosure.Button as="div" className="w-full">
+          <div className="flex cursor-pointer justify-between gap-32">
+            <span className="select-none text-xl">Search</span>
+            <span>
+              {open ? (
+                <FaChevronUp className="inline" />
+              ) : (
+                <FaChevronDown className="inline" />
+              )}
+            </span>
+          </div>
+        </Disclosure.Button>
+        <Transition
+          className="overflow-hidden transition-all duration-500"
+          enterFrom="transform scale-95 opacity-0 max-h-0"
+          enterTo="transform scale-100 opacity-100 max-h-[1000px]"
+          leaveFrom="transform scale-100 opacity-100 max-h-[1000px]"
+          leaveTo="transform scale-95 opacity-0 max-h-0"
+        >
+          <Disclosure.Panel>
+            <FormFields />
+          </Disclosure.Panel>
+        </Transition>
       </div>
-      <UnmountClosed isOpened={isOpen}>
-        <FormFields />
-      </UnmountClosed>
-    </div>
-  );
-};
+    )}
+  </Disclosure>
+);
 
 const Title = () => {
   const [form, _setForm] = useQueryParams(MOVIE_QUERY_PARAMS);
