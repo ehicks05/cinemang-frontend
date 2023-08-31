@@ -206,7 +206,6 @@ const loadShows = async (ids: number[]) => {
           name: o.name,
           overview: o.overview,
           runtime: o.runtime,
-          seasonNumber: o.season_number,
           voteAverage: o.vote_average,
           voteCount: o.vote_count,
         });
