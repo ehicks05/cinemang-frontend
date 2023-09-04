@@ -101,7 +101,6 @@ model Episode {
   name          String
   overview      String
   runtime       Int?
-  stillPath     String?   @map("still_path")
   voteAverage   Float     @map("vote_average")
   voteCount     Int       @map("vote_count")
 
