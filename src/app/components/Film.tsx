@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { addMinutes, intervalToDuration, parseISO, format } from 'date-fns';
 import { truncate } from 'lodash';
 import { Link } from 'react-router-dom';
@@ -21,56 +21,50 @@ const Film = ({ film, palette }: { film: IFilm; palette: Palette }) => {
     end: addMinutes(new Date(), Number(film.runtime)),
     start: new Date(),
   });
-
-  const [truncateOverview, setTruncateOverview] = useState(true);
+  const overview = truncate(film.overview, { length: 256, separator: ' ' });
 
   return (
-    <div className="flex flex-col gap-4 p-4 sm:rounded-lg" style={palette?.bgStyles}>
-      <div className="flex gap-4">
-        <div className="flex-shrink-0">
-          <img
-            alt="poster"
-            height={SCALED_IMAGE.h}
-            src={posterUrl}
-            width={SCALED_IMAGE.w}
+    <Link to={`/films/${film.id}`}>
+      <div
+        className="flex flex-col gap-4 p-4 sm:rounded-lg"
+        style={palette?.bgStyles}
+      >
+        <div className="flex gap-4">
+          <div className="flex-shrink-0">
+            <img
+              alt="poster"
+              height={SCALED_IMAGE.h}
+              src={posterUrl}
+              width={SCALED_IMAGE.w}
+            />
+          </div>
+          <div className="flex flex-col gap-1">
+            <div>
+              <span className="text-lg font-bold">{film.title}</span>
+              <span className="text-xs text-gray-300" title={film.released_at}>
+                <span className="font-semibold"> {year} </span>
+                <span className="whitespace-nowrap">{`${runtime.hours}h ${runtime.minutes}m`}</span>
+              </span>
+            </div>
+            <div>{film.director}</div>
+            <div>
+              {film.cast.split(', ').map(name => (
+                <div>{name}</div>
+              ))}
+            </div>
+            <div className="flex-grow" />
+            {film.providers && <MediaProviders selectedIds={film.providers} />}
+          </div>
+        </div>
+        <div className="flex h-full flex-col justify-start gap-4">
+          <MediaStats
+            bgColor={palette.darkVibrant}
+            data={toStats(genres, languages, film)}
           />
-        </div>
-        <div className="flex flex-col gap-1">
-          <div>
-            <Link className="text-lg font-bold" to={`/films/${film.id}`}>
-              {film.title}
-            </Link>
-            <span className="text-xs text-gray-300" title={film.released_at}>
-              <span className="font-semibold"> {year} </span>
-              <span className="whitespace-nowrap">{`${runtime.hours}h ${runtime.minutes}m`}</span>
-            </span>
-          </div>
-          <div>{film.director}</div>
-          <div>
-            {film.cast.split(', ').map(name => (
-              <div>{name}</div>
-            ))}
-          </div>
-          <div className="flex-grow" />
-          {film.providers && <MediaProviders selectedIds={film.providers} />}
+          <div className="text-justify text-sm">{overview}</div>
         </div>
       </div>
-      <div className="flex h-full flex-col justify-start gap-4">
-        <MediaStats
-          bgColor={palette.darkVibrant}
-          data={toStats(genres, languages, film)}
-        />
-        <div
-          className="text-justify text-sm"
-          onClick={() => setTruncateOverview(!truncateOverview)}
-        >
-          {truncate(film.overview, {
-            length: truncateOverview ? 256 : 1024,
-            separator: ' ',
-          })}
-        </div>
-      </div>
-    </div>
+    </Link>
   );
 };
 
