@@ -39,59 +39,51 @@ const starColor = (voteCount: number) =>
 const MediaStats: FC<Props> = ({
   autoWidth = true,
   bgColor,
-  data,
   data: { genre, language, voteAverage = 0, voteCount = 0 },
 }) => {
-  const stats = {
-    genre: {
-      color: 'text-blue-400',
-      icon: undefined,
-      label: genre,
-      order: 2,
-      width: 'w-32',
-    },
-    language: {
-      color: 'text-green-500',
-      icon: undefined,
-      label: language,
-      order: 3,
-      width: 'w-32',
-    },
-    voteAverage: {
+  const stats = [
+    {
+      key: 'voteAverage',
+      label: nf.format(voteAverage),
       color: heartColor(voteAverage),
       icon: FaHeart,
-      label: nf.format(voteAverage),
-      order: 0,
       width: 'w-20',
     },
-    voteCount: {
+    {
+      key: 'voteCount',
+      label: toShort(voteCount),
       color: starColor(voteCount),
       icon: FaStar,
-      label: toShort(voteCount),
-      order: 1,
       width: 'w-20',
     },
-  } as const;
+    {
+      key: 'genre',
+      label: genre,
+      color: 'text-blue-400',
+      icon: undefined,
+      width: 'w-32',
+    },
+    {
+      key: 'language',
+      label: language,
+      color: 'text-green-500',
+      icon: undefined,
+      width: 'w-32',
+    },
+  ].filter(o => o.label && !['?', 'English'].includes(o.label));
 
   return (
     <span className={`flex ${autoWidth ? 'flex-wrap' : ''} gap-2`}>
-      {Object.entries(data)
-        .filter(([key, val]) => key !== 'language' || val !== 'English')
-        .map(([key]) => {
-          const stat = stats[key as keyof typeof stats];
-          return stat;
-        })
-        .sort((s1, s2) => s1.order - s2.order)
-        .map(stat => (
-          <Stat
-            bgColor={bgColor}
-            color={stat.color}
-            icon={stat.icon}
-            key={stat.label}
-            label={stat.label || ''}
-            width={autoWidth ? undefined : stat.width}
-          />
-        ))}
+      {stats.map(stat => (
+        <Stat
+          key={stat.key}
+          bgColor={bgColor}
+          color={stat.color}
+          icon={stat.icon}
+          label={stat.label || ''}
+          width={autoWidth ? undefined : stat.width}
+        />
+      ))}
     </span>
   );
 };

@@ -32,13 +32,15 @@ function App() {
         {!isLoading && (error || !systemDataLoaded) && (
           <Loading error={error || 'something went wrong'} loading={false} />
         )}
-        <Routes>
-          <Route element={<Home />} path="/" />
-          <Route element={<Shows />} path="/tv" />
-          <Route element={<FilmDetail />} path="/films/:id" />
-          <Route element={<ShowDetail />} path="/tv/:id" />
-          <Route element={<PersonDetail />} path="/people/:id" />
-        </Routes>
+        {systemDataLoaded && (
+          <Routes>
+            <Route element={<Home />} path="/" />
+            <Route element={<Shows />} path="/tv" />
+            <Route element={<FilmDetail />} path="/films/:id" />
+            <Route element={<ShowDetail />} path="/tv/:id" />
+            <Route element={<PersonDetail />} path="/people/:id" />
+          </Routes>
+        )}
       </div>
       <Footer />
     </div>
