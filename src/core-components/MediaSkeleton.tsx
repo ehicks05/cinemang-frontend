@@ -28,18 +28,16 @@ const MediaSkeleton = () => (
         </div>
       </div>
       <div className="flex flex-col justify-between gap-5">
-        <div className="flex w-full flex-col gap-2">
-          <Sk.Text h="h-3" />
-          <Sk.Text h="h-3" />
-          <Sk.Text h="h-3" />
-          <Sk.Text h="h-3" />
-          <Sk.Text h="h-3" />
-        </div>
         <div className="flex gap-3">
           <Sk.Text h="h-9" />
           <Sk.Text h="h-9" />
           <Sk.Text h="h-9" />
           <Sk.Text h="h-9" />
+        </div>
+        <div className="flex w-full flex-col gap-2">
+          <Sk.Text h="h-3" />
+          <Sk.Text h="h-3" />
+          <Sk.Text h="h-3" />
         </div>
       </div>
     </div>
