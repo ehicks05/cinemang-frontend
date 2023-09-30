@@ -1,6 +1,4 @@
 import React from 'react';
-import { parseISO, format } from 'date-fns';
-import { truncate } from 'lodash';
 import { Link } from 'react-router-dom';
 import { useAtom } from 'jotai';
 import MediaStats from './MediaStats';
@@ -15,16 +13,16 @@ import { Palette } from '@/hooks/usePalette';
 const ShowCard = ({ show, palette }: { show: Show; palette: Palette }) => {
   const [{ genres, languages }] = useAtom(systemDataAtom);
 
+  const fontSize = show.name.length > 24 ? 'text-base' : 'text-lg';
   const posterUrl = getTmdbImage({ path: show.poster_path });
-  const firstYear = format(parseISO(show.first_air_date), 'yyyy');
-  const lastYear = format(parseISO(show.last_air_date), 'yyyy');
+  const firstYear = show.first_air_date.slice(0, 4);
+  const lastYear = show.last_air_date.slice(0, 4);
   const years = firstYear === lastYear ? firstYear : `${firstYear}-${lastYear}`;
-  const overview = truncate(show.overview, { length: 256, separator: ' ' });
 
   return (
     <Link to={`/tv/${show.id}`}>
       <div
-        className="flex flex-col gap-4 p-4 sm:rounded-lg"
+        className="flex h-full flex-col gap-4 p-4 sm:rounded-lg"
         style={palette?.bgStyles}
       >
         <div className="flex gap-4">
@@ -38,7 +36,7 @@ const ShowCard = ({ show, palette }: { show: Show; palette: Palette }) => {
           </div>
           <div className="flex flex-col gap-1">
             <div>
-              <span className="text-lg font-bold">{show.name}</span>
+              <span className={`${fontSize} font-bold`}>{show.name}</span>
               <span className="text-xs text-gray-300">
                 <span className="font-semibold"> {years}</span>
               </span>
@@ -59,7 +57,7 @@ const ShowCard = ({ show, palette }: { show: Show; palette: Palette }) => {
             bgColor={palette.darkVibrant}
             data={toStats(genres, languages, show)}
           />
-          <div className="text-justify text-sm">{overview}</div>
+          <div className="line-clamp-3 text-justify text-sm">{show.overview}</div>
         </div>
       </div>
     </Link>
