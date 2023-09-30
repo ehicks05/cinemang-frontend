@@ -3,7 +3,7 @@ import { parseISO, format } from 'date-fns';
 import { useParams } from 'react-router-dom';
 import { useAtom } from 'jotai';
 import { useTitle } from 'react-use';
-import { FaClock, FaHeart, FaStar } from 'react-icons/fa';
+import { FaClock, FaHeart } from 'react-icons/fa';
 import { HiChevronRight } from 'react-icons/hi2';
 import { Disclosure, Transition } from '@headlessui/react';
 import { sortBy } from 'lodash';
@@ -105,18 +105,6 @@ const Episodes = ({ episodes }: { episodes: Episode[] }) => (
               label={episode.runtime || '?'}
               bgColor="#333"
               color="text-blue-500"
-            />
-            <Stat
-              icon={FaHeart}
-              label={episode.vote_average.toFixed(1)}
-              bgColor="#333"
-              color="text-red-600"
-            />
-            <Stat
-              icon={FaStar}
-              label={episode.vote_count}
-              bgColor="#333"
-              color="text-yellow-500"
             />
           </span>
         </div>
