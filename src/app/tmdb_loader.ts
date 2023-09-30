@@ -206,8 +206,6 @@ const loadShows = async (ids: number[]) => {
           name: o.name,
           overview: o.overview,
           runtime: o.runtime,
-          voteAverage: o.vote_average,
-          voteCount: o.vote_count,
         });
 
         const episodeCreateInputs = season.episodes.map(episode =>

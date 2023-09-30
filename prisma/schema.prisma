@@ -101,8 +101,6 @@ model Episode {
   name          String
   overview      String
   runtime       Int?
-  voteAverage   Float     @map("vote_average")
-  voteCount     Int       @map("vote_count")
 
   season Season @relation(fields: [seasonId], references: [id])
   show   Show   @relation(fields: [showId], references: [id])
