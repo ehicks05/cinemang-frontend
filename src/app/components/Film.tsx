@@ -1,6 +1,4 @@
 import React from 'react';
-import { addMinutes, intervalToDuration, parseISO, format } from 'date-fns';
-import { truncate } from 'lodash';
 import { Link } from 'react-router-dom';
 import { useAtom } from 'jotai';
 import MediaStats from './MediaStats';
@@ -15,18 +13,15 @@ import { Palette } from '@/hooks/usePalette';
 const Film = ({ film, palette }: { film: IFilm; palette: Palette }) => {
   const [{ genres, languages }] = useAtom(systemDataAtom);
 
+  const fontSize = film.title.length > 24 ? 'text-base' : 'text-lg';
   const posterUrl = getTmdbImage({ path: film.poster_path });
-  const year = format(parseISO(film.released_at), 'yyyy');
-  const runtime = intervalToDuration({
-    end: addMinutes(new Date(), Number(film.runtime)),
-    start: new Date(),
-  });
-  const overview = truncate(film.overview, { length: 256, separator: ' ' });
+  const year = film.released_at.slice(0, 4);
+  const runtime = `${Math.floor(film.runtime / 60)}h ${film.runtime % 60}m`;
 
   return (
     <Link to={`/films/${film.id}`}>
       <div
-        className="flex flex-col gap-4 p-4 sm:rounded-lg"
+        className="flex h-full flex-col gap-4 p-4 sm:rounded-lg"
         style={palette?.bgStyles}
       >
         <div className="flex gap-4">
@@ -40,10 +35,10 @@ const Film = ({ film, palette }: { film: IFilm; palette: Palette }) => {
           </div>
           <div className="flex flex-col gap-1">
             <div>
-              <span className="text-lg font-bold">{film.title}</span>
+              <span className={`${fontSize} font-bold`}>{film.title}</span>
               <span className="text-xs text-gray-300" title={film.released_at}>
                 <span className="font-semibold"> {year} </span>
-                <span className="whitespace-nowrap">{`${runtime.hours}h ${runtime.minutes}m`}</span>
+                <span className="whitespace-nowrap">{runtime}</span>
               </span>
             </div>
             <div>{film.director}</div>
@@ -61,7 +56,7 @@ const Film = ({ film, palette }: { film: IFilm; palette: Palette }) => {
             bgColor={palette.darkVibrant}
             data={toStats(genres, languages, film)}
           />
-          <div className="text-justify text-sm">{overview}</div>
+          <div className="line-clamp-3 text-justify text-sm">{film.overview}</div>
         </div>
       </div>
     </Link>

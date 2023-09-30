@@ -70,7 +70,7 @@ const MediaStats: FC<Props> = ({
       icon: undefined,
       width: 'w-32',
     },
-  ].filter(o => o.label && !['?', 'English'].includes(o.label));
+  ].filter(o => o.label && !['?', 'en'].includes(o.label));
 
   return (
     <span className={`flex ${autoWidth ? 'flex-wrap' : ''} gap-2`}>

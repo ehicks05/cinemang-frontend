@@ -18,7 +18,7 @@ export interface IStats {
 
 export const toStats = (genres: Genre[], languages: Language[], media: IStats) => ({
   genre: getGenreName(findGenre(genres, media.genre_id)?.name || '?'),
-  language: findLanguage(languages, media.language_id)?.name || '?',
+  language: media.language_id,
   voteAverage: media.vote_average,
   voteCount: media.vote_count,
 });
