@@ -11,7 +11,9 @@ const queryClient = new QueryClient({
 	defaultOptions: { queries: { staleTime: 1000 * 60 * 60 } },
 });
 
-createRoot(document.getElementById('root')!).render(
+const element = document.getElementById('root') as HTMLElement;
+
+createRoot(element).render(
 	<StrictMode>
 		<BrowserRouter>
 			<QueryParamProvider

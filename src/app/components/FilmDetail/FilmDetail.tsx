@@ -26,11 +26,10 @@ const FilmDetail = ({ film }: { film: IFilm }) => {
 		start: new Date(),
 	});
 
-	const { data, isLoading, error } = usePalette(posterUrl);
+	const { data: palette, isLoading, error } = usePalette(posterUrl);
 
 	if (error) return <Loading error={error} loading={isLoading} />;
-	if (isLoading) return <div className="h-full w-full bg-slate-700" />;
-	const palette = data!;
+	if (isLoading || !palette) return <div className="h-full w-full bg-slate-700" />;
 
 	return (
 		<div
