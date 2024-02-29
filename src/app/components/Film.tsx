@@ -44,7 +44,7 @@ const Film = ({ film, palette }: { film: IFilm; palette: Palette }) => {
             <div>{film.director}</div>
             <div>
               {film.cast.split(', ').map(name => (
-                <div>{name}</div>
+                <div key={name}>{name}</div>
               ))}
             </div>
             <div className="flex-grow" />
