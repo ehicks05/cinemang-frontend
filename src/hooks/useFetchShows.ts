@@ -94,14 +94,14 @@ export const useSearchShows = () => {
     [formParams],
   );
 
-  return useQuery(['shows', form], async () => {
+  return useQuery({queryKey: ['shows', form], queryFn: async () => {
     const { data: shows, count } = (await queryFilms(form)) as unknown as {
       data: Show[];
       count: number;
     };
 
     return { count: count || 0, shows };
-  });
+  }});
 };
 
 const fetchShowQuery = async (id: number) => {
@@ -117,4 +117,4 @@ const fetchShowQuery = async (id: number) => {
 };
 
 export const useFetchShow = (id: number) =>
-  useQuery(['shows', id], async () => fetchShowQuery(id));
+  useQuery({queryKey: ['shows', id], queryFn: async () => fetchShowQuery(id)});

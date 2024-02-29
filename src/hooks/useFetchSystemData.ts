@@ -33,6 +33,5 @@ const fetchData = async () => {
 };
 
 export const useFetchSystemData = () =>
-  useQuery(['systemData'], fetchData, {
-    keepPreviousData: true,
+  useQuery({queryKey: ['systemData'], queryFn: fetchData, 
   });

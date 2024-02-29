@@ -50,7 +50,7 @@ export const toPalette = async (url: string) => {
 };
 
 export const usePalette = (imageUrl: string) => {
-  const query = useQuery(['palette', imageUrl], () => toPalette(imageUrl));
+  const query = useQuery({queryKey: ['palette', imageUrl], queryFn: () => toPalette(imageUrl)});
 
   return query;
 };

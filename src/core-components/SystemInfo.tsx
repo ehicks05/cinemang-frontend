@@ -10,10 +10,10 @@ const SHORT = 'hh:mm:ss a';
 const DEFAULT = `yyyy-MM-dd'T'${SHORT}`;
 
 const SystemInfo = () => {
-  const { data: syncRunLogs } = useQuery(
-    ['sync_run_log'],
-    async () => (await supabase.from('sync_run_log').select('*')).data,
-  );
+  const { data: syncRunLogs } = useQuery({
+    queryKey: ['sync_run_log'],
+    queryFn: async () => (await supabase.from('sync_run_log').select('*')).data,
+  });
   if (!syncRunLogs) return null;
 
   const latestRun = syncRunLogs[syncRunLogs.length - 1];

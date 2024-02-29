@@ -98,13 +98,15 @@ export const useSearchFilms = () => {
     [formParams],
   );
 
-  return useQuery(['films', form], async () => {
-    const { data: films, count } = (await queryFilms(form)) as unknown as {
-      data: Film[];
-      count: number;
-    };
+  return useQuery({
+    queryKey: ['films', form], queryFn: async () => {
+      const { data: films, count } = (await queryFilms(form)) as unknown as {
+        data: Film[];
+        count: number;
+      };
 
-    return { count: count || 0, films };
+      return { count: count || 0, films };
+    }
   });
 };
 
@@ -116,4 +118,4 @@ const fetchFilmQuery = async (id: number) => {
 };
 
 export const useFetchFilm = (id: number) =>
-  useQuery(['films', id], async () => fetchFilmQuery(id));
+  useQuery({queryKey: ['films', id], queryFn: async () => fetchFilmQuery(id)});

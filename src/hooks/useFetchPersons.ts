@@ -11,4 +11,4 @@ const fetchPersonQuery = async (id: number): Promise<Person> => {
 };
 
 export const useFetchPerson = (id: number) =>
-  useQuery(['person', id], async () => fetchPersonQuery(id));
+  useQuery({queryKey: ['person', id], queryFn: async () => fetchPersonQuery(id)});

@@ -17,7 +17,7 @@ type Props =
   | { showId: number; season: number };
 
 export const useFetchTrailers = (input: Props) =>
-  useQuery<Video[]>(['films', input, 'trailers'], async () => {
+  useQuery<Video[]>({queryKey: ['films', input, 'trailers'], queryFn: async () => {
     const result =
       'movieId' in input
         ? await fetchMovieVideos(input.movieId)
@@ -35,4 +35,4 @@ export const useFetchTrailers = (input: Props) =>
       );
 
     return trailers;
-  });
+  }});
