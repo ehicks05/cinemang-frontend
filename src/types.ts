@@ -12,39 +12,39 @@ export type Episode = Database['public']['Tables']['episode']['Row'];
 export type Provider = Database['public']['Tables']['provider']['Row'];
 
 export interface Credit extends TCredit {
-  movie?: Film;
-  show?: TShow;
-  person: TPerson;
+	movie?: Film;
+	show?: TShow;
+	person: TPerson;
 }
 
 export interface Film extends TMovie {
-  credits: Credit[];
-  providers: Provider[];
+	credits: Credit[];
+	providers: Provider[];
 }
 
 export interface Season extends TSeason {
-  episodes: Episode[];
+	episodes: Episode[];
 }
 
 export interface Show extends TShow {
-  credits: Credit[];
-  providers: Provider[];
-  seasons: Season[];
+	credits: Credit[];
+	providers: Provider[];
+	seasons: Season[];
 }
 
 export interface Person extends TPerson {
-  credits: Credit[];
+	credits: Credit[];
 }
 
 export interface Video {
-  id: string;
-  iso_3166_1: string;
-  iso_639_1: string;
-  key: string;
-  name: string;
-  official: boolean;
-  published_at: string;
-  site: string;
-  size: number;
-  type: string;
+	id: string;
+	iso_3166_1: string;
+	iso_639_1: string;
+	key: string;
+	name: string;
+	official: boolean;
+	published_at: string;
+	site: string;
+	size: number;
+	type: string;
 }

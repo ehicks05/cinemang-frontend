@@ -11,14 +11,14 @@ import OriginalImageLink from './OriginalImageLink';
 import Sk from './Skeleton';
 
 export {
-  Footer,
-  Header,
-  Button,
-  ComboBox,
-  Loading,
-  MediaLayout,
-  MediaSkeleton,
-  MediaSkeletons,
-  OriginalImageLink,
-  Sk,
+	Footer,
+	Header,
+	Button,
+	ComboBox,
+	Loading,
+	MediaLayout,
+	MediaSkeleton,
+	MediaSkeletons,
+	OriginalImageLink,
+	Sk,
 };
