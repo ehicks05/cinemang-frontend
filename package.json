@@ -27,7 +27,7 @@
     "yargs": "^17.6.0"
   },
   "devDependencies": {
-    "@ehicks05/eslint-config": "^0.1.5",
+    "@biomejs/biome": "1.5.3",
     "@tsconfig/node16": "^1.0.3",
     "@types/bluebird": "^3.5.38",
     "@types/node": "^16.6.1",
