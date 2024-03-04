@@ -2,7 +2,7 @@ import { useFetchShow } from '@/hooks/useFetchShows';
 import { usePalette } from '@/hooks/usePalette';
 import { useTimeout } from 'react-use';
 import { getTmdbImage } from '../../../../utils';
-import Show from '../../Show';
+import { ShowCard } from '../../ShowCard';
 import HoverLoading from './HoverLoading';
 import { container } from './constants';
 
@@ -28,7 +28,7 @@ const HoverShow = ({ id }: { id: number }) => {
 
 	return (
 		<div className={container}>
-			{show && palette && <Show show={show} palette={palette} />}
+			{show && palette && <ShowCard show={show} palette={palette} />}
 		</div>
 	);
 };

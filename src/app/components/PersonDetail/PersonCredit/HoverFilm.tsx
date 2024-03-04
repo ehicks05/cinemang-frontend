@@ -2,7 +2,7 @@ import { useFetchFilm } from '@/hooks/useFetchFilms';
 import { usePalette } from '@/hooks/usePalette';
 import { useTimeout } from 'react-use';
 import { getTmdbImage } from '../../../../utils';
-import Film from '../../Film';
+import { FilmCard } from '../..';
 import HoverLoading from './HoverLoading';
 import { container } from './constants';
 
@@ -28,7 +28,7 @@ const HoverFilm = ({ id }: { id: number }) => {
 
 	return (
 		<div className={container}>
-			{film && palette && <Film film={film} palette={palette} />}
+			{film && palette && <FilmCard film={film} palette={palette} />}
 		</div>
 	);
 };

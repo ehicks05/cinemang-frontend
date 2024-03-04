@@ -1,8 +1,8 @@
 import * as HoverCard from '@radix-ui/react-hover-card';
+import { Link } from '@tanstack/react-router';
 import { format, parseISO } from 'date-fns';
 import { pick } from 'lodash';
 import React from 'react';
-import { Link } from 'react-router-dom';
 import { useWindowSize } from 'react-use';
 import { Credit, Genre, Language } from '../../../../types';
 import FilmStats from '../../MediaStats';
@@ -31,10 +31,9 @@ const getYears = (credit: Credit) => {
 const PersonCredit = ({ bgColor, genres, languages, credit }: Props) => {
 	const { width } = useWindowSize();
 	const year = getYears(credit);
-	const mediaName = credit.movie ? credit.movie.title : credit.show?.name;
-	const mediaPath = credit.movie
-		? `/films/${credit.movie_id}`
-		: `/tv/${credit.show_id}`;
+	const media = credit.movie ? credit.movie! : credit.show!;
+	const mediaName = 'title' in media ? media.title : media.name;
+
 	const creditText = (
 		<span>{credit.character || `${credit.department} - ${credit.job}`}</span>
 	);
@@ -51,7 +50,10 @@ const PersonCredit = ({ bgColor, genres, languages, credit }: Props) => {
 					<div className="flex flex-col items-baseline gap-2 lg:flex-row">
 						<span className="flex items-baseline gap-2">
 							<HoverCard.Trigger asChild>
-								<Link to={mediaPath}>
+								<Link
+									to={`${credit.movie ? '/films/$id' : '/shows/$id'}`}
+									params={{ id: String(media.id) }}
+								>
 									<span className="font-bold sm:text-lg">{mediaName}</span>
 									<span className="inline text-xs sm:hidden"> {year}</span>
 								</Link>
@@ -64,7 +66,7 @@ const PersonCredit = ({ bgColor, genres, languages, credit }: Props) => {
 					<FilmStats
 						autoWidth={width < 640}
 						bgColor={bgColor}
-						data={pick(toStats(genres, languages, credit.movie || credit.show!), [
+						data={pick(toStats(genres, languages, media), [
 							'voteAverage',
 							'voteCount',
 						])}

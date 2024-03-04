@@ -1,8 +1,5 @@
+import { Link } from '@tanstack/react-router';
 import { FaCat } from 'react-icons/fa';
-import { Link, NavLink } from 'react-router-dom';
-
-const isActiveClass = ({ isActive }: { isActive: boolean }) =>
-	isActive ? 'font-bold' : '';
 
 const Header = () => (
 	<div className="mx-auto flex max-w-screen-lg items-center gap-4">
@@ -15,12 +12,12 @@ const Header = () => (
 			<FaCat className="inline text-green-500" />
 			Mang
 		</Link>
-		<NavLink className={isActiveClass} to="/">
+		<Link  activeProps={{className: 'font-bold'}} to="/">
 			Movies
-		</NavLink>
-		<NavLink className={isActiveClass} to="/tv">
+		</Link>
+		<Link activeProps={{className: 'font-bold'}} to="/shows">
 			TV
-		</NavLink>
+		</Link>
 	</div>
 );
 

@@ -18,7 +18,9 @@ const queryPersonIdsByName = async (name: string) => {
 	return (await query).data?.map((o) => o.id) || [];
 };
 
-const queryFilms = async (form: DecodedValueMap<typeof SHOW_QUERY_PARAMS>) => {
+export const queryShows = async (
+	form: DecodedValueMap<typeof SHOW_QUERY_PARAMS>,
+) => {
 	const creditPersonIds: number[] =
 		form.creditName.length > 2 ? await queryPersonIdsByName(form.creditName) : [];
 
@@ -77,7 +79,11 @@ const queryFilms = async (form: DecodedValueMap<typeof SHOW_QUERY_PARAMS>) => {
 		.order('id', { ascending: true })
 		.range(form.page * PAGE_SIZE, (form.page + 1) * PAGE_SIZE - 1);
 
-	return query;
+	const { data, count } = (await query) as unknown as {
+		data: Show[];
+		count: number;
+	};
+	return { shows: data, count: count || 0 };
 };
 
 export const useSearchShows = () => {
@@ -86,24 +92,11 @@ export const useSearchShows = () => {
 	// a local, debounced copy of the form
 	const [form, setForm] = useState(formParams);
 
-	useDebounce(
-		() => {
-			setForm(formParams);
-		},
-		250,
-		[formParams],
-	);
+	useDebounce(() => setForm(formParams), 250, [formParams]);
 
 	return useQuery({
 		queryKey: ['shows', form],
-		queryFn: async () => {
-			const { data: shows, count } = (await queryFilms(form)) as unknown as {
-				data: Show[];
-				count: number;
-			};
-
-			return { count: count || 0, shows };
-		},
+		queryFn: async () => queryShows(form),
 	});
 };
 

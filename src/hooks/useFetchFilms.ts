@@ -1,5 +1,6 @@
 import { MOVIE_QUERY_PARAMS } from '@/queryParams';
-import { useQuery } from '@tanstack/react-query';
+import { FilmSearch } from '@/routes';
+import { queryOptions, useQuery } from '@tanstack/react-query';
 import { useState } from 'react';
 import { useDebounce } from 'react-use';
 import {
@@ -22,7 +23,7 @@ const queryPersonIdsByName = async (name: string) => {
 	return (await query).data?.map((o) => o.id) || [];
 };
 
-const queryFilms = async (form: DecodedValueMap<QueryParamConfigMap>) => {
+export const queryFilms = async (form: FilmSearch) => {
 	const creditPersonIds: number[] =
 		form.creditName.length > 2 ? await queryPersonIdsByName(form.creditName) : [];
 
@@ -81,11 +82,14 @@ const queryFilms = async (form: DecodedValueMap<QueryParamConfigMap>) => {
 		.order('id', { ascending: true })
 		.range(form.page * PAGE_SIZE, (form.page + 1) * PAGE_SIZE - 1);
 
-	return query;
+	const { data, count } = await query;
+	return { films: data as unknown as Film[], count: count || 0 };
 };
 
 export const useSearchFilms = () => {
-	const [formParams] = useQueryParams(MOVIE_QUERY_PARAMS);
+	// const [formParams] = useQueryParams(MOVIE_QUERY_PARAMS);
+
+	const formParams = {};
 
 	// a local, debounced copy of the form
 	const [form, setForm] = useState(formParams);
@@ -100,18 +104,11 @@ export const useSearchFilms = () => {
 
 	return useQuery({
 		queryKey: ['films', form],
-		queryFn: async () => {
-			const { data: films, count } = (await queryFilms(form)) as unknown as {
-				data: Film[];
-				count: number;
-			};
-
-			return { count: count || 0, films };
-		},
+		queryFn: async () => queryFilms(form),
 	});
 };
 
-const fetchFilmQuery = async (id: number) => {
+export const fetchFilmQuery = async (id: number) => {
 	const select = ['*', PROVIDER_JOIN, CREDIT_PERSON_JOIN].join(',');
 
 	const result = await supabase.from('movie').select(select).eq('id', id).single();

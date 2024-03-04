@@ -1,9 +1,8 @@
 import { Disclosure, Transition } from '@headlessui/react';
+import { getRouteApi, useMatch, useNavigate } from '@tanstack/react-router';
 import { useAtom } from 'jotai';
 import { FaChevronDown, FaChevronUp } from 'react-icons/fa';
 import { HiSortAscending, HiSortDescending } from 'react-icons/hi';
-import { useLocation } from 'react-router-dom';
-import { useQueryParams } from 'use-query-params';
 import { systemDataAtom } from '../../atoms';
 import { Button, ComboBox } from '../../core-components';
 import {
@@ -47,12 +46,8 @@ const SearchForm = () => (
 	</Disclosure>
 );
 
-const Title = () => {
-	const [form, _setForm] = useQueryParams(MOVIE_QUERY_PARAMS);
-
-	const setForm = (update: Record<string, any>) => {
-		_setForm({ ...form, ...update, ...(!update.page && { page: 0 }) });
-	};
+const Title = ({ title }: { title: string }) => {
+	const navigate = useNavigate();
 
 	return (
 		<div className="flex gap-2">
@@ -61,9 +56,14 @@ const Title = () => {
 				<div>
 					<input
 						className="w-full bg-gray-700"
-						onChange={(e) => setForm({ title: e.target.value })}
+						onChange={(e) =>
+							navigate({
+								from: '/',
+								search: (prev) => ({ ...prev, page: 0, title: e.target.value }),
+							})
+						}
 						type="text"
-						value={form.title}
+						value={title}
 					/>
 				</div>
 			</div>
@@ -71,12 +71,8 @@ const Title = () => {
 	);
 };
 
-const Name = () => {
-	const [form, _setForm] = useQueryParams(SHOW_QUERY_PARAMS);
-
-	const setForm = (update: Record<string, any>) => {
-		_setForm({ ...form, ...update, ...(!update.page && { page: 0 }) });
-	};
+const Name = ({ name }: { name: string }) => {
+	const navigate = useNavigate();
 
 	return (
 		<div className="flex gap-2">
@@ -85,9 +81,14 @@ const Name = () => {
 				<div>
 					<input
 						className="w-full bg-gray-700"
-						onChange={(e) => setForm({ name: e.target.value })}
+						onChange={(e) =>
+							navigate({
+								from: '/shows',
+								search: (prev) => ({ ...prev, page: 0, name: e.target.value }),
+							})
+						}
 						type="text"
-						value={form.name}
+						value={name}
 					/>
 				</div>
 			</div>
@@ -95,12 +96,11 @@ const Name = () => {
 	);
 };
 
-const CreditName = () => {
-	const [form, _setForm] = useQueryParams(QUERY_PARAMS);
-
-	const setForm = (update: Record<string, any>) => {
-		_setForm({ ...form, ...update, ...(!update.page && { page: 0 }) });
-	};
+const CreditName = ({
+	from,
+	creditName,
+}: { from: '/' | '/shows'; creditName: string }) => {
+	const navigate = useNavigate();
 
 	return (
 		<div className="flex gap-2">
@@ -109,9 +109,14 @@ const CreditName = () => {
 				<div>
 					<input
 						className="w-full bg-gray-700"
-						onChange={(e) => setForm({ creditName: e.target.value })}
+						onChange={(e) =>
+							navigate({
+								from,
+								search: (prev) => ({ ...prev, page: 0, creditName: e.target.value }),
+							})
+						}
 						type="text"
-						value={form.creditName}
+						value={creditName}
 					/>
 				</div>
 			</div>
@@ -119,13 +124,11 @@ const CreditName = () => {
 	);
 };
 
-const Providers = () => {
+const Providers = ({
+	from,
+	selectedProviders,
+}: { from: '/' | '/shows'; selectedProviders: string[] }) => {
 	const [{ providers }] = useAtom(systemDataAtom);
-	const [form, _setForm] = useQueryParams(QUERY_PARAMS);
-
-	const setForm = (update: Record<string, any>) => {
-		_setForm({ ...form, ...update, ...(!update.page && { page: 0 }) });
-	};
 
 	const getStreamLabel = (count: number) =>
 		count !== 0 ? `(${count} selected)` : '';
@@ -144,7 +147,12 @@ const Providers = () => {
 							}),
 							label: p.name,
 						})}
-						onChange={(value) => setForm({ providers: value })}
+						onChange={(value) =>
+							navigate({
+								from,
+								search: (prev) => ({ ...prev, page: 0, providers: value }),
+							})
+						}
 						options={providers
 							.sort((o1, o2) => o1.display_priority - o2.display_priority)
 							.filter((p) => p.count > 0)}
@@ -156,15 +164,12 @@ const Providers = () => {
 	);
 };
 
-const MinVotes = () => {
-	const { pathname } = useLocation();
-	const queryConfig = pathname === '/tv' ? SHOW_QUERY_PARAMS : MOVIE_QUERY_PARAMS;
-
-	const [form, _setForm] = useQueryParams(queryConfig);
-
-	const setForm = (update: Record<string, any>) => {
-		_setForm({ ...form, ...update, ...(!update.page && { page: 0 }) });
-	};
+const MinVotes = ({
+	from,
+	minVotes,
+	maxVotes,
+}: { from: '/' | '/shows'; minVotes: number; maxVotes: number }) => {
+	const navigate = useNavigate();
 
 	return (
 		<div className="flex-shrink-0">
@@ -172,23 +177,32 @@ const MinVotes = () => {
 			<div className="flex gap-2">
 				<input
 					className="w-full bg-gray-700"
-					max={form.maxVotes || undefined}
+					max={maxVotes || undefined}
 					min={1}
-					onChange={(e) => setForm({ minVotes: Number(e.target.value) })}
+					onChange={(e) =>
+						navigate({
+							from,
+							search: (prev) => ({
+								...prev,
+								page: 0,
+								minVotes: Number(e.target.value),
+							}),
+						})
+					}
 					type="number"
-					value={form.minVotes}
+					value={minVotes}
 				/>
 			</div>
 		</div>
 	);
 };
 
-const Rating = () => {
-	const [form, _setForm] = useQueryParams(QUERY_PARAMS);
-
-	const setForm = (update: Record<string, any>) => {
-		_setForm({ ...form, ...update, ...(!update.page && { page: 0 }) });
-	};
+const Rating = ({
+	from,
+	minRating,
+	maxRating,
+}: { from: '/' | '/shows'; minRating: number; maxRating: number }) => {
+	const navigate = useNavigate();
 
 	return (
 		<div className="flex-shrink">
@@ -196,15 +210,33 @@ const Rating = () => {
 			<div className="flex gap-2">
 				<input
 					className="w-full bg-gray-700"
-					onChange={(e) => setForm({ minRating: Number(e.target.value) })}
+					onChange={(e) =>
+						navigate({
+							from,
+							search: (prev) => ({
+								...prev,
+								page: 0,
+								minRating: Number(e.target.value),
+							}),
+						})
+					}
 					type="number"
-					value={form.minRating}
+					value={minRating}
 				/>
 				<input
 					className="w-full bg-gray-700"
-					onChange={(e) => setForm({ maxRating: Number(e.target.value) })}
+					onChange={(e) =>
+						navigate({
+							from,
+							search: (prev) => ({
+								...prev,
+								page: 0,
+								minRating: Number(e.target.value),
+							}),
+						})
+					}
 					type="number"
-					value={form.maxRating}
+					value={maxRating}
 				/>
 			</div>
 		</div>
@@ -407,32 +439,71 @@ const ResetButton = () => {
 };
 
 const FormFields = () => {
-	const { pathname } = useLocation();
+	const { pathname } = useMatch({ strict: false });
 	const mode = pathname === '/tv' ? 'tv' : 'movie';
 
-	return (
-		<div className="grid gap-4 text-sm sm:grid-cols-2 sm:text-sm lg:grid-cols-3 xl:grid-cols-4">
-			{mode === 'movie' && <Title />}
-			{mode === 'tv' && <Name />}
-			<CreditName />
-			<Providers />
-			<div className="flex gap-2">
-				<MinVotes />
-				<Rating />
+	if (pathname === '/') {
+		const { useSearch } = getRouteApi(pathname);
+		const form = useSearch();
+		return (
+			<div className="grid gap-4 text-sm sm:grid-cols-2 sm:text-sm lg:grid-cols-3 xl:grid-cols-4">
+				{mode === 'movie' && <Title title={form.title} />}
+				<CreditName from={pathname} creditName={form.creditName} />
+				<Providers />
+				<div className="flex gap-2">
+					<MinVotes
+						from={pathname}
+						minVotes={form.minVotes}
+						maxVotes={form.maxVotes}
+					/>
+					<Rating
+						from={pathname}
+						minRating={form.minRating}
+						maxRating={form.maxRating}
+					/>
+				</div>
+				{/* 
+				{mode === 'movie' && <Released />}
+				{mode === 'tv' && <FirstAirDate />}
+	
+				<div className="flex flex-col gap-2 sm:flex-row">
+					<Language />
+					<Genre />
+				</div>
+	
+				<Sort />
+	
+				<ResetButton /> */}
 			</div>
-			{mode === 'movie' && <Released />}
-			{mode === 'tv' && <FirstAirDate />}
-
-			<div className="flex flex-col gap-2 sm:flex-row">
-				<Language />
-				<Genre />
+		);
+	}
+	if (pathname === '/shows') {
+		const { useSearch } = getRouteApi(pathname);
+		const form = useSearch();
+		return (
+			<div className="grid gap-4 text-sm sm:grid-cols-2 sm:text-sm lg:grid-cols-3 xl:grid-cols-4">
+				<Name name={form.name} />
+				{/* 
+				<CreditName />
+				<Providers />
+				<div className="flex gap-2">
+					<MinVotes />
+					<Rating />
+				</div>
+				{mode === 'movie' && <Released />}
+				{mode === 'tv' && <FirstAirDate />}
+	
+				<div className="flex flex-col gap-2 sm:flex-row">
+					<Language />
+					<Genre />
+				</div>
+	
+				<Sort />
+	
+				<ResetButton /> */}
 			</div>
-
-			<Sort />
-
-			<ResetButton />
-		</div>
-	);
+		);
+	}
 };
 
 export default SearchForm;

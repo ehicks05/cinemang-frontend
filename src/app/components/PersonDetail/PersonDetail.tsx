@@ -68,7 +68,7 @@ const toSortValue = (credit: Credit, sort: SortKey) => {
 	}
 };
 
-const PersonDetail = ({ person }: { person: Person }) => {
+export const PersonDetail = ({ person }: { person: Person }) => {
 	const [{ genres, languages }] = useAtom(systemDataAtom);
 	useTitle(person.name, { restoreOnUnmount: true });
 	const profileUrl = getTmdbImage({
@@ -121,7 +121,8 @@ const PersonDetail = ({ person }: { person: Person }) => {
 				<div className="flex flex-col gap-4">
 					<div className="flex flex-col gap-1">
 						<div className="text-2xl font-semibold">{person.name}</div>
-						<div
+						<button
+							type="button"
 							className={`flex ${
 								person.biography.length > BIO_LENGTH_CUTOFF ? 'cursor-pointer' : ''
 							} flex-col gap-2 text-justify`}
@@ -133,7 +134,7 @@ const PersonDetail = ({ person }: { person: Person }) => {
 								.map((b) => (
 									<div key={b}>{b}</div>
 								))}
-						</div>
+						</button>
 					</div>
 					<BirthAndDeath palette={palette} person={person} />
 				</div>
@@ -185,18 +186,3 @@ const PersonDetail = ({ person }: { person: Person }) => {
 		</div>
 	);
 };
-
-const PersonDetailWrapper = () => {
-	const { id } = useParams();
-
-	const { data: person, error, isLoading } = useFetchPerson(Number(id) || 0);
-
-	if (error || isLoading) return <Loading error={error} loading={isLoading} />;
-	if (!person) {
-		return <Loading error="person not found" loading={isLoading} />;
-	}
-
-	return <PersonDetail person={person} />;
-};
-
-export default PersonDetailWrapper;
