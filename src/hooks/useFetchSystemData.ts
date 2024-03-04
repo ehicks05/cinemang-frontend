@@ -22,7 +22,7 @@ const fetchProviders = async () => {
 	return result.data || [];
 };
 
-const fetchData = async () => {
+export const fetchSystemData = async () => {
 	const [genres, languages, providers] = await Promise.all([
 		fetchGenres(),
 		fetchLanguages(),
@@ -33,4 +33,4 @@ const fetchData = async () => {
 };
 
 export const useFetchSystemData = () =>
-	useQuery({ queryKey: ['systemData'], queryFn: fetchData });
+	useQuery({ queryKey: ['systemData'], queryFn: fetchSystemData });

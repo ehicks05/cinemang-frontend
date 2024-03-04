@@ -1,4 +1,3 @@
-import { useFetchShow } from '@/hooks/useFetchShows';
 import { usePalette } from '@/hooks/usePalette';
 import { Disclosure, Transition } from '@headlessui/react';
 import { format, parseISO } from 'date-fns';
@@ -7,7 +6,6 @@ import { sortBy } from 'lodash';
 import React from 'react';
 import { FaClock, FaHeart } from 'react-icons/fa';
 import { HiChevronRight } from 'react-icons/hi2';
-import { useParams } from 'react-router-dom';
 import { useTitle } from 'react-use';
 import { systemDataAtom } from '../../../atoms';
 import { Button, Loading, OriginalImageLink } from '../../../core-components';
@@ -20,7 +18,7 @@ import FilmStats from '../MediaStats';
 import Stat from '../Stat';
 import { toStats } from '../utils';
 
-const ShowDetail = ({ show }: { show: Show }) => {
+export const ShowDetail = ({ show }: { show: Show }) => {
 	useTitle(show.name, { restoreOnUnmount: true });
 	const [{ genres, languages }] = useAtom(systemDataAtom);
 
@@ -181,18 +179,3 @@ const Seasons = ({ seasons }: { seasons: Season[] }) => (
 		))}
 	</div>
 );
-
-const Wrapper = () => {
-	const { id } = useParams();
-
-	const { data: show, error, isLoading } = useFetchShow(Number(id) || 0);
-
-	if (error || isLoading) return <Loading error={error} loading={isLoading} />;
-	if (!show) {
-		return <Loading error="shows are not defined" loading={isLoading} />;
-	}
-
-	return <ShowDetail show={show} />;
-};
-
-export default Wrapper;

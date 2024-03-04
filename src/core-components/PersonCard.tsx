@@ -1,6 +1,6 @@
 import { Palette } from '@/hooks/usePalette';
+import { Link } from '@tanstack/react-router';
 import React from 'react';
-import { Link } from 'react-router-dom';
 import { getTmdbImage } from '../utils';
 
 interface Props {
@@ -39,7 +39,8 @@ const PersonCard = ({
 		<Link
 			className="flex w-full flex-col rounded-lg p-0.5"
 			style={{ backgroundColor: palette.darkMuted }}
-			to={`/people/${personId}`}
+			to={'/people/$id'}
+			params={{ id: String(personId) }}
 		>
 			<img alt="cast" className="rounded-t-lg" src={profile} />
 

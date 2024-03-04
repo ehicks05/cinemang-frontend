@@ -1,26 +1,22 @@
-import { QUERY_PARAMS } from '@/queryParams';
+import { Link as TanLink } from '@tanstack/react-router';
 import { range } from 'lodash';
 import P from 'paginator';
 import React, { FC, ReactNode } from 'react';
 import { IoIosPlay, IoIosSkipForward } from 'react-icons/io';
-import { useQueryParams } from 'use-query-params';
 import { PAGE_SIZE } from '../../constants';
 
 const nf = Intl.NumberFormat('en-US');
 
 interface PaginatorProps {
 	count?: number;
-	isLoading: boolean;
 	pageSize?: number;
+	page: number;
 }
 const Paginator: FC<PaginatorProps> = ({
 	count = 0,
-	isLoading,
 	pageSize = PAGE_SIZE,
+	page: pageIndex,
 }) => {
-	const [form, setForm] = useQueryParams(QUERY_PARAMS);
-	const { page: pageIndex } = form;
-	const setPage = (page: number) => setForm({ ...form, page });
 	const page = pageIndex + 1;
 	// Arguments are `per_page` and `length`. `per_page` changes the number of
 	// results per page, `length` changes the number of links displayed.
@@ -51,50 +47,24 @@ const Paginator: FC<PaginatorProps> = ({
 
 	return (
 		<div className="bg-gray-800 p-4 sm:rounded-lg">
-			<div
-				className={`flex flex-col items-center justify-between gap-4 sm:flex-row ${
-					isLoading ? 'invisible' : ''
-				}`}
-			>
+			<div className="flex flex-col items-center justify-between gap-4 sm:flex-row">
 				<div>{currentlyShowing}</div>
 				<div className="flex -space-x-px">
-					<Link
-						isCompact
-						isDisabled={!has_previous_page}
-						isFirst
-						setPage={() => setPage(0)}
-					>
+					<Link isCompact isDisabled={!has_previous_page} isFirst to={0}>
 						<IoIosSkipForward className="my-auto rotate-180" size={20} />
 					</Link>
-					<Link
-						isCompact
-						isDisabled={!has_previous_page}
-						setPage={() => setPage(previous_page - 1)}
-					>
+					<Link isCompact isDisabled={!has_previous_page} to={previous_page - 1}>
 						<IoIosPlay className="my-auto rotate-180" size={20} />
 					</Link>
 					{links.map((link) => (
-						<Link
-							isActive={link.active}
-							key={link.label}
-							setPage={() => setPage(link.label - 1)}
-						>
+						<Link isActive={link.active} key={link.label} to={link.label - 1}>
 							{link.label}
 						</Link>
 					))}
-					<Link
-						isCompact
-						isDisabled={!has_next_page}
-						setPage={() => setPage(next_page - 1)}
-					>
+					<Link isCompact isDisabled={!has_next_page} to={next_page - 1}>
 						<IoIosPlay className="my-auto" size={20} />
 					</Link>
-					<Link
-						isCompact
-						isDisabled={!has_next_page}
-						isLast
-						setPage={() => setPage(total_pages - 1)}
-					>
+					<Link isCompact isDisabled={!has_next_page} isLast to={total_pages - 1}>
 						<IoIosSkipForward className="my-auto" size={20} />
 					</Link>
 				</div>
@@ -110,19 +80,17 @@ interface LinkProps {
 	isDisabled?: boolean;
 	isFirst?: boolean;
 	isLast?: boolean;
-	setPage: () => void;
+	to: number;
 }
 const Link: FC<LinkProps> = ({
 	isActive,
 	isCompact,
 	isDisabled,
-	setPage,
+	to,
 	isFirst,
 	isLast,
 	children,
 }) => {
-	const onClick = isDisabled ? undefined : () => setPage();
-
 	const defaultStyle =
 		'flex border border-solid border-gray-500 px-2 sm:px-3 sm:py-1';
 	const disabled = isDisabled ? 'opacity-60' : 'cursor-pointer';
@@ -133,12 +101,13 @@ const Link: FC<LinkProps> = ({
 	const padding = isCompact ? 'px-1 sm:px-1.5' : 'px-2 sm:px-3';
 
 	return (
-		<div
+		<TanLink
+			from="/"
+			search={(search) => ({ ...search, page: to })}
 			className={`${defaultStyle} ${disabled} ${notSpecial} ${active} ${first} ${last} ${padding}`}
-			onClick={onClick}
 		>
 			{children}
-		</div>
+		</TanLink>
 	);
 };
 

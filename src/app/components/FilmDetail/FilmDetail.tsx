@@ -1,21 +1,19 @@
-import { useFetchFilm } from '@/hooks/useFetchFilms';
 import { usePalette } from '@/hooks/usePalette';
 import { addMinutes, format, intervalToDuration, parseISO } from 'date-fns';
 import { useAtom } from 'jotai';
 import React from 'react';
-import { useParams } from 'react-router-dom';
 import { useTitle } from 'react-use';
 import { systemDataAtom } from '../../../atoms';
 import { Loading, OriginalImageLink } from '../../../core-components';
 import Credits from '../../../core-components/Credits';
 import Trailer from '../../../core-components/Trailer';
-import { Film as IFilm } from '../../../types';
+import { Film } from '../../../types';
 import { getTmdbImage } from '../../../utils';
 import MediaProviders from '../MediaProviders';
 import FilmStats from '../MediaStats';
 import { toStats } from '../utils';
 
-const FilmDetail = ({ film }: { film: IFilm }) => {
+export const FilmDetail = ({ film }: { film: Film }) => {
 	useTitle(film.title, { restoreOnUnmount: true });
 	const [{ genres, languages }] = useAtom(systemDataAtom);
 
@@ -78,18 +76,3 @@ const FilmDetail = ({ film }: { film: IFilm }) => {
 		</div>
 	);
 };
-
-const FilmDetailWrapper = () => {
-	const { id } = useParams();
-
-	const { data: film, error, isLoading } = useFetchFilm(Number(id) || 0);
-
-	if (error || isLoading) return <Loading error={error} loading={isLoading} />;
-	if (!film) {
-		return <Loading error="films are not defined" loading={isLoading} />;
-	}
-
-	return <FilmDetail film={film} />;
-};
-
-export default FilmDetailWrapper;

@@ -1,8 +1,17 @@
-import Film from './Film';
-import FilmDetail from './FilmDetail';
+import { FilmCard } from './FilmCard';
+import { ShowCard } from './ShowCard';
+import { FilmDetail } from './FilmDetail';
 import MediaProvider from './MediaProviders';
 import Paginator from './Paginator';
-import PersonDetail from './PersonDetail';
+import { PersonDetail } from './PersonDetail';
 import SearchForm from './SearchForm';
 
-export { Film, FilmDetail, PersonDetail, SearchForm, MediaProvider, Paginator };
+export {
+	FilmCard,
+	ShowCard,
+	FilmDetail,
+	PersonDetail,
+	SearchForm,
+	MediaProvider,
+	Paginator,
+};

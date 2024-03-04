@@ -11,6 +11,8 @@ export type TSeason = Database['public']['Tables']['season']['Row'];
 export type Episode = Database['public']['Tables']['episode']['Row'];
 export type Provider = Database['public']['Tables']['provider']['Row'];
 
+export type Media = Film | TShow;
+
 export interface Credit extends TCredit {
 	movie?: Film;
 	show?: TShow;

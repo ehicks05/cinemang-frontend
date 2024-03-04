@@ -1,25 +1,26 @@
 import { Palette } from '@/hooks/usePalette';
+import { Link } from '@tanstack/react-router';
 import { useAtom } from 'jotai';
 import React from 'react';
-import { Link } from 'react-router-dom';
 import { systemDataAtom } from '../../atoms';
 import { SCALED_IMAGE } from '../../constants';
-import { Film as IFilm } from '../../types';
+import { Show } from '../../types';
 import { getTmdbImage } from '../../utils';
 import MediaProviders from './MediaProviders';
 import MediaStats from './MediaStats';
 import { toStats } from './utils';
 
-const Film = ({ film, palette }: { film: IFilm; palette: Palette }) => {
+export const ShowCard = ({ show, palette }: { show: Show; palette: Palette }) => {
 	const [{ genres, languages }] = useAtom(systemDataAtom);
 
-	const fontSize = film.title.length > 24 ? 'text-base' : 'text-lg';
-	const posterUrl = getTmdbImage({ path: film.poster_path });
-	const year = film.released_at.slice(0, 4);
-	const runtime = `${Math.floor(film.runtime / 60)}h ${film.runtime % 60}m`;
+	const fontSize = show.name.length > 24 ? 'text-base' : 'text-lg';
+	const posterUrl = getTmdbImage({ path: show.poster_path });
+	const firstYear = show.first_air_date.slice(0, 4);
+	const lastYear = show.last_air_date.slice(0, 4);
+	const years = firstYear === lastYear ? firstYear : `${firstYear}-${lastYear}`;
 
 	return (
-		<Link to={`/films/${film.id}`}>
+		<Link to="/shows/$id" params={{ id: String(show.id) }}>
 			<div
 				className="flex h-full flex-col gap-4 p-4 sm:rounded-lg"
 				style={palette?.bgStyles}
@@ -35,32 +36,30 @@ const Film = ({ film, palette }: { film: IFilm; palette: Palette }) => {
 					</div>
 					<div className="flex flex-col gap-1">
 						<div>
-							<span className={`${fontSize} font-bold`}>{film.title}</span>
-							<span className="text-xs text-gray-300" title={film.released_at}>
-								<span className="font-semibold"> {year} </span>
-								<span className="whitespace-nowrap">{runtime}</span>
+							<span className={`${fontSize} font-bold`}>{show.name}</span>
+							<span className="text-xs text-gray-300">
+								<span className="font-semibold"> {years}</span>
 							</span>
 						</div>
-						<div>{film.director}</div>
+						<div>{show.created_by_id}</div>
+						<div>Status: {show.status}</div>
 						<div>
-							{film.cast.split(', ').map((name) => (
+							{show.cast.split(', ').map((name) => (
 								<div key={name}>{name}</div>
 							))}
 						</div>
 						<div className="flex-grow" />
-						{film.providers && <MediaProviders selectedIds={film.providers} />}
+						{show.providers && <MediaProviders selectedIds={show.providers} />}
 					</div>
 				</div>
 				<div className="flex h-full flex-col justify-start gap-4">
 					<MediaStats
 						bgColor={palette.darkVibrant}
-						data={toStats(genres, languages, film)}
+						data={toStats(genres, languages, show)}
 					/>
-					<div className="line-clamp-3 text-justify text-sm">{film.overview}</div>
+					<div className="line-clamp-3 text-justify text-sm">{show.overview}</div>
 				</div>
 			</div>
 		</Link>
 	);
 };
-
-export default Film;
