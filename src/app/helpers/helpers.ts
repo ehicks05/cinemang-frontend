@@ -1,5 +1,5 @@
-// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-// @ts-nocheck
+import { GenreType, Prisma, PrismaClient } from '@prisma/client';
+import P from 'bluebird';
 import _, {
   chunk,
   difference,
@@ -10,13 +10,11 @@ import _, {
   omitBy,
   uniq,
 } from 'lodash';
-import P from 'bluebird';
-import { GenreType, Prisma, PrismaClient } from '@prisma/client';
 import logger from '../../services/logger';
 import prisma from '../../services/prisma';
 import {
-  getMovieGenres,
   getLanguages,
+  getMovieGenres,
   getProviders,
   getShowGenres,
 } from '../../services/tmdb';
