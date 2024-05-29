@@ -12,10 +12,10 @@ const Header = () => (
 			<FaCat className="inline text-green-500" />
 			Mang
 		</Link>
-		<Link  activeProps={{className: 'font-bold'}} to="/">
+		<Link activeProps={{ className: 'font-bold' }} to="/">
 			Movies
 		</Link>
-		<Link activeProps={{className: 'font-bold'}} to="/shows">
+		<Link activeProps={{ className: 'font-bold' }} to="/shows">
 			TV
 		</Link>
 	</div>

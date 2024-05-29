@@ -1,8 +1,8 @@
 import { useFetchFilm } from '@/hooks/useFetchFilms';
 import { usePalette } from '@/hooks/usePalette';
 import { useTimeout } from 'react-use';
-import { getTmdbImage } from '../../../../utils';
 import { FilmCard } from '../..';
+import { getTmdbImage } from '../../../../utils';
 import HoverLoading from './HoverLoading';
 import { container } from './constants';
 

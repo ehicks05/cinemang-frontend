@@ -1,9 +1,9 @@
+import { PersonDetail } from '@/app/components';
 import { Loading } from '@/core-components';
+import { fetchPersonQuery } from '@/hooks/useFetchPersons';
 import { useSuspenseQuery } from '@tanstack/react-query';
 import { createFileRoute } from '@tanstack/react-router';
 import { queryClient } from '..';
-import { PersonDetail } from '@/app/components';
-import { fetchPersonQuery } from '@/hooks/useFetchPersons';
 
 const PersonPage = () => {
 	const { id } = Route.useParams();

@@ -1,10 +1,10 @@
 import { FilmCard } from './FilmCard';
-import { ShowCard } from './ShowCard';
 import { FilmDetail } from './FilmDetail';
 import MediaProvider from './MediaProviders';
 import Paginator from './Paginator';
 import { PersonDetail } from './PersonDetail';
 import SearchForm from './SearchForm';
+import { ShowCard } from './ShowCard';
 
 export {
 	FilmCard,
