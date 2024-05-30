@@ -65,17 +65,17 @@ export const getPerson = async (id: number) => {
 };
 
 export const getMovieGenres = async () => {
-	const result = await tmdb.get<GenreResponse>(`/genre/movie/list`);
+	const result = await tmdb.get<GenreResponse>('/genre/movie/list');
 	return result.data.genres;
 };
 
 export const getShowGenres = async () => {
-	const result = await tmdb.get<GenreResponse>(`/genre/tv/list`);
+	const result = await tmdb.get<GenreResponse>('/genre/tv/list');
 	return result.data.genres;
 };
 
 export const getLanguages = async () => {
-	const result = await tmdb.get<Language[]>(`/configuration/languages`);
+	const result = await tmdb.get<Language[]>('/configuration/languages');
 	return result.data;
 };
 
