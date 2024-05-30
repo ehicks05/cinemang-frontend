@@ -1,19 +1,18 @@
 import { useFetchShow } from '@/hooks/useFetchShows';
 import { usePalette } from '@/hooks/usePalette';
-import { Disclosure, Transition } from '@headlessui/react';
+import { Disclosure } from '@headlessui/react';
 import { format, parseISO } from 'date-fns';
 import { useAtom } from 'jotai';
 import { sortBy } from 'lodash';
 import React from 'react';
-import { FaClock, FaHeart } from 'react-icons/fa';
-import { HiChevronRight } from 'react-icons/hi2';
+import { FaHeart } from 'react-icons/fa';
 import { useParams } from 'react-router-dom';
 import { useTitle } from 'react-use';
 import { systemDataAtom } from '../../../atoms';
-import { Button, Loading, OriginalImageLink } from '../../../core-components';
+import { Loading, OriginalImageLink } from '../../../core-components';
 import Credits from '../../../core-components/Credits';
 import Trailer from '../../../core-components/Trailer';
-import { Episode, Season, Show } from '../../../types';
+import { Season, Show } from '../../../types';
 import { getTmdbImage } from '../../../utils';
 import MediaProviders from '../MediaProviders';
 import FilmStats from '../MediaStats';
@@ -85,33 +84,6 @@ const ShowDetail = ({ show }: { show: Show }) => {
 	);
 };
 
-const Episodes = ({ episodes }: { episodes: Episode[] }) => (
-	<div className="flex flex-col gap-4">
-		{sortBy(episodes, (o) => o.episode_number).map((episode) => (
-			<div key={episode.id} className="flex flex-col gap-1 bg-neutral-800 p-2">
-				<div className="flex items-center justify-between gap-2">
-					<span>
-						<span className="text-neutral-400">{episode.episode_number}.</span>{' '}
-						{episode.name}{' '}
-						<span className="text-sm text-neutral-300">{episode.air_date}</span>
-					</span>
-				</div>
-				<div>{episode.overview}</div>
-				<div>
-					<span className="flex gap-2">
-						<Stat
-							icon={FaClock}
-							label={episode.runtime || '?'}
-							bgColor="#333"
-							color="text-blue-500"
-						/>
-					</span>
-				</div>
-			</div>
-		))}
-	</div>
-);
-
 const SeasonCard = ({ season }: { season: Season }) => (
 	<Disclosure>
 		{({ open }) => (
@@ -143,28 +115,14 @@ const SeasonCard = ({ season }: { season: Season }) => (
 								color="text-red-600"
 								width="w-full sm:w-auto"
 							/>
+							<Stat
+								label={`${season.episode_count} Episodes`}
+								bgColor="#333"
+								color="text-red-600"
+								width="w-full sm:w-auto"
+							/>
 						</span>
 					</div>
-				</div>
-				<div className="w-full">
-					<Disclosure.Button as="span" className="w-full">
-						<Button className="flex w-full items-center justify-between gap-2 border-none bg-neutral-800 py-2 sm:w-auto">
-							{season.episodes.filter((o) => o.episode_number > 0).length} Episodes
-							<HiChevronRight className={open ? 'rotate-90 transform' : ''} />
-						</Button>
-					</Disclosure.Button>
-					<Transition
-						enter="transition duration-100 ease-out"
-						enterFrom="transform scale-95 opacity-0"
-						enterTo="transform scale-100 opacity-100"
-						leave="transition duration-75 ease-out"
-						leaveFrom="transform scale-100 opacity-100"
-						leaveTo="transform scale-95 opacity-0"
-					>
-						<Disclosure.Panel>
-							<Episodes episodes={season.episodes} />
-						</Disclosure.Panel>
-					</Transition>
 				</div>
 			</div>
 		)}

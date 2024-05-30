@@ -108,12 +108,9 @@ export const useSearchShows = () => {
 };
 
 const fetchShowQuery = async (id: number) => {
-	const select = [
-		'*',
-		PROVIDER_JOIN,
-		CREDIT_PERSON_JOIN,
-		'seasons: season(*, episodes: episode(*))',
-	].join(',');
+	const select = ['*', PROVIDER_JOIN, CREDIT_PERSON_JOIN, 'seasons: season(*)'].join(
+		',',
+	);
 
 	const result = await supabase.from('show').select(select).eq('id', id).single();
 	return result.data as unknown as Show;

@@ -7,8 +7,7 @@ export type Language = Database['public']['Tables']['language']['Row'];
 export type TPerson = Database['public']['Tables']['person']['Row'];
 export type TMovie = Database['public']['Tables']['movie']['Row'];
 export type TShow = Database['public']['Tables']['show']['Row'];
-export type TSeason = Database['public']['Tables']['season']['Row'];
-export type Episode = Database['public']['Tables']['episode']['Row'];
+export type Season = Database['public']['Tables']['season']['Row'];
 export type Provider = Database['public']['Tables']['provider']['Row'];
 
 export interface Credit extends TCredit {
@@ -20,10 +19,6 @@ export interface Credit extends TCredit {
 export interface Film extends TMovie {
 	credits: Credit[];
 	providers: Provider[];
-}
-
-export interface Season extends TSeason {
-	episodes: Episode[];
 }
 
 export interface Show extends TShow {
