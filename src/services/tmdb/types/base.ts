@@ -42,8 +42,15 @@ export interface Media {
 	vote_count: number;
 }
 
+export interface Collection {
+	id: number;
+	name: string;
+	poster_path?: string;
+	backdrop_path?: string;
+}
+
 export interface Movie extends Media {
-	belongs_to_collection?: any;
+	belongs_to_collection?: Collection;
 	budget: number;
 	imdb_id?: string;
 	original_title: string;
@@ -87,6 +94,13 @@ export interface RecentChange {
 	adult: boolean;
 }
 
+export interface Network {
+	id: number;
+	logo_path?: string;
+	name: string;
+	origin_country: string;
+}
+
 export interface Show extends Media {
 	created_by: Pick<Person, 'id' | 'name' | 'gender' | 'profile_path'>[];
 	episode_run_time: number[];
@@ -94,10 +108,10 @@ export interface Show extends Media {
 	in_production: boolean;
 	languages: string[];
 	last_air_date: string;
-	last_episode_to_air: any;
+	last_episode_to_air: Partial<Episode>;
 	name: string;
-	next_episode_to_air: any;
-	networks: any[];
+	next_episode_to_air: Partial<Episode>;
+	networks: Network[];
 	number_of_episodes: number;
 	number_of_seasons: number;
 	origin_country: string[];
