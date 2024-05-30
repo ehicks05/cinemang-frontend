@@ -36,7 +36,7 @@ export const loadPersons = async (personIds: number[]) => {
 
 	try {
 		const createResult = await prisma.person.createMany({
-			data: toCreate as any,
+			data: toCreate,
 		});
 
 		const updateOne = async (o: Prisma.PersonCreateInput) => {

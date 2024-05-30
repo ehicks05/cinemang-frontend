@@ -5,8 +5,7 @@ const MIN_VOTES = 64;
 
 export const isValid = (show: ShowResponse) =>
 	!!(
-		show.credits &&
-		show.credits.cast
+		show.credits?.cast
 			.slice(0, 3)
 			.map((c) => c.name)
 			.join(', ')?.length &&
@@ -42,8 +41,8 @@ export const parseShow = (data: ShowResponse) => {
 		firstAirDate: new Date(data.first_air_date),
 		languageId: data.original_language,
 		lastAirDate: new Date(data.last_air_date),
-		overview: data.overview!,
-		posterPath: data.poster_path!,
+		overview: data.overview || '',
+		posterPath: data.poster_path || '',
 		voteCount: data.vote_count,
 		voteAverage: data.vote_average,
 	};
