@@ -47,7 +47,7 @@ const SortOptions = ({
 		style={{ borderColor: darkVibrant }}
 	>
 		{SORT_OPTIONS.map((o) => (
-			<button key={o.sort} onClick={() => setSort(o.sort)}>
+			<button type="button" key={o.sort} onClick={() => setSort(o.sort)}>
 				<Stat
 					bgColor={darkVibrant}
 					color={sort === o.sort ? o.color : ''}

@@ -25,7 +25,7 @@ const SystemInfo = () => {
 	return (
 		<Popover.Root>
 			<Popover.Trigger asChild>
-				<button className="IconButton" aria-label="Update dimensions">
+				<button type="button" className="IconButton" aria-label="Update dimensions">
 					<HiOutlineInformationCircle className="text-3xl text-green-500 hover:text-green-400" />
 				</button>
 			</Popover.Trigger>
