@@ -215,7 +215,8 @@ const loadShows = async (ids: number[]) => {
 				const episodeCreateInputs = season.episodes.map((episode) =>
 					toEpisodeCreateInput({ ...episode, seasonId: season.id, showId }),
 				);
-				await prisma.episode.createMany({ data: episodeCreateInputs });
+				// disable episode creation
+				// await prisma.episode.createMany({ data: episodeCreateInputs });
 			},
 			OPTIONS,
 		);
@@ -235,8 +236,9 @@ const loadShows = async (ids: number[]) => {
 const updateMediaByType = async (
 	media: 'movie' | 'tv',
 	personIdsProcessed: number[],
+	isFullMode: boolean,
 ) => {
-	const ids = await discoverMediaIds(media);
+	const ids = await discoverMediaIds(media, isFullMode);
 	logger.info(`found ${ids?.length} ${media} ids to load`);
 
 	let personIdsProcessedLocal = personIdsProcessed;
@@ -280,8 +282,12 @@ const runLoader = async (fullMode: boolean) => {
 		}
 
 		let personIdsProcessed: number[] = [];
-		personIdsProcessed = await updateMediaByType('movie', personIdsProcessed);
-		personIdsProcessed = await updateMediaByType('tv', personIdsProcessed);
+		personIdsProcessed = await updateMediaByType(
+			'movie',
+			personIdsProcessed,
+			fullMode,
+		);
+		personIdsProcessed = await updateMediaByType('tv', personIdsProcessed, fullMode);
 
 		logger.debug(`processed ${personIdsProcessed.length} personIds`);
 		logger.info('updating counts for languages and watch providers');
