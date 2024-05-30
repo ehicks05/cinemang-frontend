@@ -272,7 +272,7 @@ const updateMediaByType = async (
 
 const runLoader = async (fullMode: boolean) => {
 	try {
-		logger.info('updating genres, languages, and watch providers...');
+		logger.info('updating genres, languages, and providers...');
 		await Promise.all([updateGenres(), updateLanguages(), updateProviders()]);
 
 		if (fullMode) {
@@ -321,7 +321,10 @@ const wrapper = async () => {
 			data: { endedAt: new Date() },
 			where: { id: logId },
 		});
-		const duration = intervalToDuration({ start: log.createdAt, end: log.endedAt! });
+		const duration = intervalToDuration({
+			start: log.createdAt,
+			end: log.endedAt || 0,
+		});
 		logger.info(`finished tmdb_loader script in ${formatDuration(duration)}`);
 	} catch (err) {
 		logger.error(err);
