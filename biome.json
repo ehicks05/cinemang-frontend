@@ -19,6 +19,7 @@
 		}
 	},
 	"files": {
+		"include": ["./src/**/*.*"],
 		"ignore": ["./src/app/components/SearchForm.tsx"]
 	}
 }
