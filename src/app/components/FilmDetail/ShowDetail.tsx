@@ -66,6 +66,7 @@ const ShowDetail = ({ show }: { show: Show }) => {
 							<MediaProviders selectedIds={show.providers} />
 						)}
 						<div className="flex flex-col gap-2 rounded-lg bg-neutral-900 p-4">
+							<div>Created By: {show.created_by}</div>
 							<div>Starring: {show.cast}</div>
 							<div className="text-justify text-sm sm:text-base">
 								<div className="overflow-x-auto sm:max-h-24 md:max-h-32 lg:max-h-48">
