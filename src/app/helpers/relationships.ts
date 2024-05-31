@@ -59,6 +59,17 @@ const loadCredits = async (
 	const existingCredits = differenceBy(remoteCredits, creditsToCreate, toCreditId);
 	const creditsToUpdate = existingCredits.filter((o) => {
 		const p = localCreditsById[o.creditId];
+
+		// add potentially missing fields to remote object for equality check
+		o.showId = o.showId || null;
+		o.movieId = o.movieId || null;
+
+		o.character = o.character || null;
+		o.order = o.order ?? null;
+
+		o.department = o.department || null;
+		o.job = o.job || null;
+
 		return p && !isEqual(o, p);
 	});
 
@@ -141,7 +152,14 @@ const loadProviders = async (medias: MediaResponse[], mediaIds: number[]) => {
 	);
 	const mediaProvidersToUpdate = existingMediaProviders.filter((o) => {
 		const key = toComparisonId(o);
-		const p = localMediaProvidersById[key];
+
+		// add potentially missing fields to remote object for equality check
+		o.showId = o.showId || null;
+		o.movieId = o.movieId || null;
+
+		// remove the id field we only store locally
+		const { id, ...p } = localMediaProvidersById[key];
+
 		return p && !isEqual(o, p);
 	});
 

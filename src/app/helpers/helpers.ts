@@ -68,10 +68,7 @@ export const updateProviders = async () =>
  * Also ignores `popularity` and `count` fields, and `vote_count` if the difference
  * is <= 10% of the smaller value
  */
-export const isEqual = (value: Record<string, any>, other: Record<string, any>) => {
-	const a = omitBy(value, isNil);
-	const b = omitBy(other, isNil);
-
+export const isEqual = (a: Record<string, any>, b: Record<string, any>) => {
 	// consider vote_count unequal only once
 	// the difference is over 10%
 	const aCount = a.vote_count || a.voteCount;
