@@ -172,7 +172,9 @@ const loadShows = async (ids: number[]) => {
 
 		const seasonCreateInputs = mutated
 			.flatMap((show) =>
-				show.seasons.map((season) => ({ ...season, showId: show.id })),
+				show.seasons
+					.filter((season) => season.season_number !== 0)
+					.map((season) => ({ ...season, showId: show.id })),
 			)
 			.map(toSeasonCreateInput);
 

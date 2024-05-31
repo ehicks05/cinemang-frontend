@@ -26,7 +26,6 @@ const getIdsForInterval = async (media: 'movie' | 'tv', interval: Interval) => {
 	});
 
 	const path = `/discover/${media}?${params.toString()}`;
-	console.log({ path });
 	const { data } = await tmdb.get(path);
 
 	const ids: number[] = data.results.map((o: { id: number }) => o.id);
