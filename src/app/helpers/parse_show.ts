@@ -37,7 +37,11 @@ export const parseShow = (data: ShowResponse) => {
 		status: data.status,
 		tagline: data.tagline,
 		...{ cast, contentRating, genreId },
-		// createdById: data.created_by[0]?.id,
+		createdBy:
+			data.created_by
+				.slice(0, 3)
+				.map((o) => o.name)
+				.join(', ') || '',
 		firstAirDate: new Date(data.first_air_date),
 		languageId: data.original_language,
 		lastAirDate: new Date(data.last_air_date),

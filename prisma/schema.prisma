@@ -46,7 +46,7 @@ model Show {
   id            Int      @id
   cast          String
   contentRating String?  @map("content_rating")
-  createdById   Int?     @map("created_by_id")
+  createdBy     String?  @map("created_by")
   firstAirDate  DateTime @map("first_air_date") @db.Date
   genreId       Int      @map("genre_id")
   languageId    String   @map("language_id")
@@ -61,7 +61,6 @@ model Show {
   voteCount     Int      @map("vote_count")
 
   credits   Credit[]
-  createdBy Person?         @relation(fields: [createdById], references: [id])
   seasons   Season[]
   episodes  Episode[]
   providers MediaProvider[]
@@ -121,8 +120,7 @@ model Person {
   popularity         Float
   profilePath        String    @map("profile_path")
 
-  createdShows Show[]
-  credits      Credit[]
+  credits Credit[]
 
   @@index([name])
   @@map("person")
