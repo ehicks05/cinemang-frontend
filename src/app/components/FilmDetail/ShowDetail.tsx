@@ -133,7 +133,8 @@ const SeasonCard = ({ season }: { season: Season }) => (
 const Seasons = ({ seasons }: { seasons: Season[] }) => (
 	<div className="flex flex-col gap-4">
 		<div className="text-xl font-bold">
-			{seasons.filter((o) => o.season_number > 0).length} Seasons
+			{seasons.length} Season
+			{seasons.length > 1 && 's'}
 		</div>
 		{sortBy(seasons, (o) => o.season_number).map((season) => (
 			<SeasonCard key={season.id} season={season} />
