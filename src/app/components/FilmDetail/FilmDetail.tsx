@@ -41,7 +41,7 @@ const FilmDetail = ({ film }: { film: IFilm }) => {
 				<div className="text-sm text-gray-300">
 					<span title={film.released_at}>{year}</span>
 					{' • '}
-					<span>{`${runtime.hours}h ${runtime.minutes}m`}</span>
+					<span>{`${runtime.hours || 0}h ${runtime.minutes}m`}</span>
 				</div>
 			</div>
 			<div className="flex flex-col gap-4 sm:flex-row">
