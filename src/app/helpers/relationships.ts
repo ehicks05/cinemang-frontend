@@ -1,12 +1,11 @@
 import { Prisma } from '@prisma/client';
 import P from 'bluebird';
 import { Dictionary, differenceBy, keyBy } from 'lodash';
+import { PRISMA_OPTIONS } from '../../constants';
 import logger from '../../services/logger';
 import prisma from '../../services/prisma';
 import { MediaResponse } from '../../services/tmdb/types/responses';
 import { getExistingPersonIds, isEqual } from './helpers';
-
-const options = { concurrency: 32 };
 
 const toId = (o: { id: number }) => o.id;
 
@@ -87,7 +86,7 @@ const loadCredits = async (
 			}
 		};
 
-		await P.map(creditsToUpdate, updateOne, options);
+		await P.map(creditsToUpdate, updateOne, PRISMA_OPTIONS);
 
 		logger.info('credit', {
 			remote: remoteCredits.length,
@@ -182,7 +181,7 @@ const loadProviders = async (medias: MediaResponse[], mediaIds: number[]) => {
 		}
 	};
 
-	await P.map(mediaProvidersToUpdate, updateOne, options);
+	await P.map(mediaProvidersToUpdate, updateOne, PRISMA_OPTIONS);
 
 	logger.info('mediaProvider', {
 		remote: remoteMediaProviders.length,

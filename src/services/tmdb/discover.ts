@@ -7,9 +7,9 @@ import {
 	lastDayOfYear,
 	subMonths,
 } from 'date-fns';
+import { TMDB_OPTIONS } from './constants';
 import tmdb from './tmdb';
 
-const OPTIONS = { concurrency: 16 };
 const MIN_VOTES = '64';
 const DEFAULT_START_DATE = new Date('1874-01-01');
 
@@ -57,7 +57,7 @@ export const discoverMediaIds = async (
 	const idsByYear = await P.map(
 		intervals,
 		(interval: Interval) => getIdsForInterval(media, interval),
-		OPTIONS,
+		TMDB_OPTIONS,
 	);
 	return idsByYear.flat();
 };

@@ -1,22 +1,22 @@
 import { Prisma } from '@prisma/client';
 import P from 'bluebird';
 import { differenceBy, intersectionBy, keyBy } from 'lodash';
+import { PRISMA_OPTIONS } from '../../constants';
 import logger from '../../services/logger';
 import prisma from '../../services/prisma';
 import { getPerson } from '../../services/tmdb';
+import { TMDB_OPTIONS } from '../../services/tmdb/constants';
 import { PersonResponse } from '../../services/tmdb/types/responses';
 import { isEqual } from './helpers';
 import { parsePerson } from './parse_person';
-
-const options = { concurrency: 32 };
 
 const toId = (o: { id: number }) => o.id;
 
 export const loadPersons = async (personIds: number[]) => {
 	logger.info(`fetching person data for ${personIds.length} ids`);
-	const remote = (await P.map(personIds, (id) => getPerson(id), options)).filter(
-		(o) => o,
-	) as unknown as PersonResponse[];
+	const remote = (
+		await P.map(personIds, (id) => getPerson(id), TMDB_OPTIONS)
+	).filter((o) => o) as unknown as PersonResponse[];
 	const parsed = remote
 		.map(parsePerson)
 		.filter((o) => o) as Prisma.PersonCreateInput[];
@@ -49,7 +49,7 @@ export const loadPersons = async (personIds: number[]) => {
 			}
 		};
 
-		await P.map(toUpdate, updateOne, options);
+		await P.map(toUpdate, updateOne, PRISMA_OPTIONS);
 
 		logger.info('person', {
 			ids: personIds.length,

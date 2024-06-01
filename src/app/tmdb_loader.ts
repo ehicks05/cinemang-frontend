@@ -9,10 +9,12 @@ import {
 	partition,
 	uniqBy,
 } from 'lodash';
+import { PRISMA_OPTIONS } from '../constants';
 import { argv } from '../services/args';
 import logger from '../services/logger';
 import prisma from '../services/prisma';
 import { discoverMediaIds, getMovie, getSeason, getShow } from '../services/tmdb';
+import { TMDB_OPTIONS } from '../services/tmdb/constants';
 import { Episode, SeasonSummary } from '../services/tmdb/types/base';
 import { MovieResponse, ShowResponse } from '../services/tmdb/types/responses';
 import {
@@ -28,13 +30,11 @@ import { parseShow } from './helpers/parse_show';
 import { updateRelationships } from './helpers/relationships';
 import { updateLanguageCounts, updateProviderCounts } from './helpers/update_counts';
 
-const OPTIONS = { concurrency: 32 };
-
 const toId = (o: { id: number }) => o.id;
 
 const loadMovies = async (ids: number[]) => {
 	logger.info('fetching movie data');
-	const remote = (await P.map(ids, getMovie, OPTIONS)).filter(
+	const remote = (await P.map(ids, getMovie, TMDB_OPTIONS)).filter(
 		(o): o is MovieResponse => !!o,
 	);
 
@@ -70,7 +70,7 @@ const loadMovies = async (ids: number[]) => {
 			}
 		};
 
-		const updateResults = await P.map(toUpdate, updateOne, OPTIONS);
+		const updateResults = await P.map(toUpdate, updateOne, PRISMA_OPTIONS);
 		const updated = updateResults.filter((o) => o.result === 'ok');
 		const updateErrors = updateResults.filter((o) => o.result === 'error');
 		const updateErrorsById = keyBy(updateErrors, toId);
@@ -96,7 +96,7 @@ const loadMovies = async (ids: number[]) => {
 
 const loadShows = async (ids: number[]) => {
 	logger.info('fetching show data');
-	const remote = (await P.map(ids, getShow, OPTIONS)).filter(
+	const remote = (await P.map(ids, getShow, TMDB_OPTIONS)).filter(
 		(o): o is ShowResponse => !!o,
 	);
 
@@ -130,7 +130,7 @@ const loadShows = async (ids: number[]) => {
 			}
 		};
 
-		const updateResults = await P.map(toUpdate, updateOne, OPTIONS);
+		const updateResults = await P.map(toUpdate, updateOne, PRISMA_OPTIONS);
 		const updated = updateResults.filter((o) => o.result === 'ok');
 		const updateErrors = updateResults.filter((o) => o.result === 'error');
 		const updateErrorsById = keyBy(updateErrors, toId);
@@ -220,7 +220,7 @@ const loadShows = async (ids: number[]) => {
 				// disable episode creation
 				// await prisma.episode.createMany({ data: episodeCreateInputs });
 			},
-			OPTIONS,
+			TMDB_OPTIONS,
 		);
 
 		return mutated;
