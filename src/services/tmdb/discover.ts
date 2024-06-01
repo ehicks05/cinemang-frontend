@@ -9,7 +9,7 @@ import {
 } from 'date-fns';
 import tmdb from './tmdb';
 
-const OPTIONS = { concurrency: 32 };
+const OPTIONS = { concurrency: 16 };
 const MIN_VOTES = '64';
 const DEFAULT_START_DATE = new Date('1874-01-01');
 
