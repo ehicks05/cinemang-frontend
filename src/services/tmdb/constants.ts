@@ -1,1 +1,1 @@
-export const TMDB_OPTIONS = { concurrency: 16 };
+export const TMDB_OPTIONS = { concurrency: 8 };
