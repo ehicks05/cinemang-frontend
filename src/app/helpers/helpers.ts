@@ -1,15 +1,6 @@
-import { GenreType, Prisma, PrismaClient } from '@prisma/client';
+import { GenreType, Prisma } from '@prisma/client';
 import P from 'bluebird';
-import _, {
-	chunk,
-	difference,
-	groupBy,
-	isNil,
-	keyBy,
-	omit,
-	omitBy,
-	uniq,
-} from 'lodash';
+import _, { chunk, difference, groupBy, keyBy, omit, uniq } from 'lodash';
 import logger from '../../services/logger';
 import prisma from '../../services/prisma';
 import {
