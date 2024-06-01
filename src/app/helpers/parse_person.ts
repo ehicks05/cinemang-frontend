@@ -4,8 +4,8 @@ import { PersonResponse } from '../../services/tmdb/types/responses';
 
 const isValidPerson = (person: PersonResponse) => person.profile_path;
 
-export const parsePerson = (data: PersonResponse) => {
-	if (!isValidPerson(data)) {
+export const parsePerson = (data?: PersonResponse) => {
+	if (!data || !isValidPerson(data)) {
 		return undefined;
 	}
 

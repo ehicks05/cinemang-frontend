@@ -3,6 +3,7 @@ import P from 'bluebird';
 import { formatDuration, intervalToDuration, isFirstDayOfMonth } from 'date-fns';
 import {
 	chunk,
+	difference,
 	differenceBy,
 	intersectionBy,
 	keyBy,
@@ -18,13 +19,13 @@ import { TMDB_OPTIONS } from '../services/tmdb/constants';
 import { Episode, SeasonSummary } from '../services/tmdb/types/base';
 import { MovieResponse, ShowResponse } from '../services/tmdb/types/responses';
 import {
-	creditsToValidPersonIds,
 	isEqual,
+	mediasToPersonIds,
 	updateGenres,
 	updateLanguages,
 	updateProviders,
 } from './helpers/helpers';
-import { loadPersons } from './helpers/load_persons';
+import { createPersons, updatePersons } from './helpers/load_persons';
 import { parseMovie } from './helpers/parse_movie';
 import { parseShow } from './helpers/parse_show';
 import { updateRelationships } from './helpers/relationships';
@@ -237,13 +238,13 @@ const loadShows = async (ids: number[]) => {
  */
 const updateMediaByType = async (
 	media: 'movie' | 'tv',
-	personIdsProcessed: number[],
+	personIdsInDb: number[],
 	isFullMode: boolean,
 ) => {
 	const ids = await discoverMediaIds(media, isFullMode);
 	logger.info(`found ${ids?.length} ${media} ids to load`);
 
-	let personIdsProcessedLocal = personIdsProcessed;
+	let personIdsInDbLocal = personIdsInDb;
 
 	const chunks = chunk(ids, 500);
 	await P.each(chunks, async (ids, i) => {
@@ -254,24 +255,23 @@ const updateMediaByType = async (
 				media === 'movie' ? await loadMovies(ids) : await loadShows(ids);
 			if (!loadedMedias || loadedMedias.length === 0) return;
 
-			const personIds = creditsToValidPersonIds(
-				loadedMedias,
-				personIdsProcessedLocal,
-			);
-			const loadedPersonIds = await loadPersons(personIds);
-			if (!loadedPersonIds || loadedPersonIds.length === 0) return;
+			// personIds extracted from media credits
+			const personIds = mediasToPersonIds(loadedMedias);
+
+			// remove existing personIds
+			const newPersonIds = difference(personIds, personIdsInDbLocal);
+
+			const createdPersonIds = await createPersons(newPersonIds);
 
 			await updateRelationships(loadedMedias);
 
-			personIdsProcessedLocal = personIdsProcessedLocal.concat(
-				loadedPersonIds || [],
-			);
+			personIdsInDbLocal = personIdsInDbLocal.concat(createdPersonIds || []);
 		} catch (e) {
 			logger.error(e);
 		}
 	});
 
-	return personIdsProcessedLocal;
+	return personIdsInDbLocal;
 };
 
 const runLoader = async (fullMode: boolean) => {
@@ -283,15 +283,14 @@ const runLoader = async (fullMode: boolean) => {
 			logger.info('TODO: determine special behavior (if any) for full mode');
 		}
 
-		let personIdsProcessed: number[] = [];
-		personIdsProcessed = await updateMediaByType(
-			'movie',
-			personIdsProcessed,
-			fullMode,
+		let personIdsInDb = (await prisma.person.findMany({ select: { id: true } })).map(
+			(o) => o.id,
 		);
-		personIdsProcessed = await updateMediaByType('tv', personIdsProcessed, fullMode);
+		personIdsInDb = await updateMediaByType('movie', personIdsInDb, fullMode);
+		personIdsInDb = await updateMediaByType('tv', personIdsInDb, fullMode);
 
-		logger.debug(`processed ${personIdsProcessed.length} personIds`);
+		await updatePersons();
+
 		logger.info('updating counts for languages and watch providers');
 		await updateLanguageCounts();
 		await updateProviderCounts();

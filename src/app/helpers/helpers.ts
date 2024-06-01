@@ -155,16 +155,13 @@ export const removeInvalidMovies = async (validIds: number[]) => {
 	logger.info(`removed ${invalidIds.length} invalid records`);
 };
 
-export const creditsToValidPersonIds = (
-	media: MediaResponse[],
-	ignoreList: number[] = [],
-) => {
+export const mediasToPersonIds = (media: MediaResponse[]) => {
 	const personIds = media
 		.flatMap(({ credits: { cast, crew } }) => [...cast, ...crew])
 		.filter((credit) => credit.profile_path)
 		.map((credit) => credit.id);
 	const deduped = uniq(personIds);
-	return difference(deduped, ignoreList);
+	return deduped;
 };
 
 /**
@@ -172,7 +169,7 @@ export const creditsToValidPersonIds = (
  * the subset of ids that are also in the db.
  */
 export const getExistingPersonIds = async (medias: MediaResponse[]) => {
-	const personIds = creditsToValidPersonIds(medias);
+	const personIds = mediasToPersonIds(medias);
 	const chunks = chunk(personIds, 10_000);
 
 	const results = await P.map(chunks, async (ids) => {
