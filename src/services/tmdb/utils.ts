@@ -8,7 +8,7 @@ export const logAxiosError = (error: AxiosError) => {
 		// The request was made and the server responded with a status code
 		// that falls out of the range of 2xx
 		const { data, status, headers } = error.response;
-		if (status === 404) logger.error({ status, url: config.url });
+		if ([404, 429].includes(status)) logger.error({ status, url: config.url });
 		else logger.error({ data, status, config /* headers */ });
 	} else if (error.request) {
 		// The request was made but no response was received
