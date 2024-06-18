@@ -41,7 +41,7 @@ const ShowCard = ({ show, palette }: { show: Show; palette: Palette }) => {
 								<span className="font-semibold"> {years}</span>
 							</span>
 						</div>
-						<div>Status: {show.status}</div>
+						<div>Status: {show.status.replace(' Series', '')}</div>
 						<div>
 							{show.cast.split(', ').map((name) => (
 								<div>{name}</div>
