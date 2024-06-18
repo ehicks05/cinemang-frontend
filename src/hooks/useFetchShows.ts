@@ -50,11 +50,11 @@ const queryFilms = async (form: DecodedValueMap<typeof SHOW_QUERY_PARAMS>) => {
 		query.lte('vote_average', form.maxRating);
 	}
 
-	if (form.minFirstAirDate) {
-		query.gte('first_air_date', form.minFirstAirDate);
+	if (form.minLastAirDate) {
+		query.gte('last_air_date', form.minLastAirDate);
 	}
-	if (form.maxFirstAirDate) {
-		query.lte('first_air_date', form.maxFirstAirDate);
+	if (form.maxLastAirDate) {
+		query.lte('last_air_date', form.maxLastAirDate);
 	}
 
 	if (form.genre) {

@@ -31,11 +31,11 @@ export const DEFAULT_MOVIE_SEARCH_FORM = {
 
 export const DEFAULT_TV_SEARCH_FORM = {
 	...DEFAULT_SEARCH_FORM,
-	maxFirstAirDate: '',
-	minFirstAirDate: '',
+	maxLastAirDate: '',
+	minLastAirDate: '',
 	minVotes: 300,
 	name: '',
-	sortColumn: 'first_air_date',
+	sortColumn: 'last_air_date',
 } as const;
 
 export const QUERY_PARAMS = {
@@ -64,12 +64,12 @@ export const MOVIE_QUERY_PARAMS = {
 
 export const SHOW_QUERY_PARAMS = {
 	...QUERY_PARAMS,
-	maxFirstAirDate: withDefault(StringParam, DEFAULT_TV_SEARCH_FORM.maxFirstAirDate),
-	minFirstAirDate: withDefault(StringParam, DEFAULT_TV_SEARCH_FORM.minFirstAirDate),
+	maxLastAirDate: withDefault(StringParam, DEFAULT_TV_SEARCH_FORM.maxLastAirDate),
+	minLastAirDate: withDefault(StringParam, DEFAULT_TV_SEARCH_FORM.minLastAirDate),
 	minVotes: withDefault(NumberParam, DEFAULT_TV_SEARCH_FORM.minVotes),
 	name: withDefault(StringParam, DEFAULT_TV_SEARCH_FORM.name),
 	sortColumn: withDefault(
-		createEnumParam(['vote_count', 'vote_average', 'first_air_date']),
+		createEnumParam(['vote_count', 'vote_average', 'last_air_date']),
 		DEFAULT_TV_SEARCH_FORM.sortColumn,
 	),
 };

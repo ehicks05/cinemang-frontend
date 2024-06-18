@@ -248,19 +248,19 @@ const FirstAirDate = () => {
 
 	return (
 		<div>
-			<div>First Aired</div>
+			<div>Last Aired</div>
 			<div className="flex flex-col gap-2 sm:flex-row">
 				<input
 					className="w-full bg-gray-700"
 					onChange={(e) => setForm({ minFirstAirDate: e.target.value })}
 					type="date"
-					value={form.minFirstAirDate}
+					value={form.minLastAirDate}
 				/>
 				<input
 					className="w-full bg-gray-700"
 					onChange={(e) => setForm({ maxFirstAirDate: e.target.value })}
 					type="date"
-					value={form.maxFirstAirDate}
+					value={form.maxLastAirDate}
 				/>
 			</div>
 		</div>
@@ -346,7 +346,7 @@ const Sort = () => {
 		{ label: 'User Votes', value: 'vote_count' },
 		'minReleasedAt' in queryConfig
 			? { label: 'Released', value: 'released_at' }
-			: { label: 'First Aired', value: 'first_air_date' },
+			: { label: 'Last Aired', value: 'last_air_date' },
 	];
 
 	return (
