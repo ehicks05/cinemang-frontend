@@ -27,7 +27,7 @@ const MediaProviders: FC<Props> = ({ selectedIds }) => {
 		.filter((p): p is Provider => p !== null && p !== undefined)
 		.filter((p) => p.display_priority <= 22)
 		.sort((p1, p2) => p1.display_priority - p2.display_priority)
-		.slice(0, 4);
+		.slice(0, 3);
 
 	if (filteredProviders.length === 0) return null;
 	return (
