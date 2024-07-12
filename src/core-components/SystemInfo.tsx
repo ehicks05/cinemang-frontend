@@ -10,22 +10,28 @@ const SHORT = 'hh:mm:ss a';
 const DEFAULT = `yyyy-MM-dd'T'${SHORT}`;
 
 const SystemInfo = () => {
-	const { data: syncRunLogs } = useQuery({
+	const { data: syncRunLog } = useQuery({
 		queryKey: ['sync_run_log'],
-		queryFn: async () => (await supabase.from('sync_run_log').select('*')).data,
+		queryFn: async () =>
+			(
+				await supabase
+					.from('sync_run_log')
+					.select('*')
+					.order('created_at', { ascending: false })
+					.limit(1)
+					.single()
+			).data,
 	});
-	if (!syncRunLogs) return null;
+	if (!syncRunLog) return null;
 
-	const latestRun = syncRunLogs[syncRunLogs.length - 1];
-
-	const createdAt = new Date(latestRun.created_at);
-	const endedAt = latestRun.ended_at ? new Date(latestRun.ended_at) : undefined;
+	const createdAt = new Date(syncRunLog.created_at);
+	const endedAt = syncRunLog.ended_at ? new Date(syncRunLog.ended_at) : undefined;
 	const duration = endedAt ? formatDistance(endedAt, createdAt) : undefined;
 
 	return (
 		<Popover.Root>
 			<Popover.Trigger asChild>
-				<button className="IconButton" aria-label="Update dimensions">
+				<button type="button" className="IconButton" aria-label="Update dimensions">
 					<HiOutlineInformationCircle className="text-3xl text-green-500 hover:text-green-400" />
 				</button>
 			</Popover.Trigger>
@@ -38,16 +44,18 @@ const SystemInfo = () => {
 									<th colSpan={2}>Sync Stats</th>
 								</tr>
 							</thead>
-							<tr>
-								<td className="text-left">start</td>
-								<td className="text-right">{format(createdAt, DEFAULT)}</td>
-							</tr>
-							<tr>
-								<td className="text-left">end</td>
-								<td className="text-right">
-									{endedAt ? format(endedAt, DEFAULT) : 'pending'}
-								</td>
-							</tr>
+							<tbody>
+								<tr>
+									<td className="text-left">start</td>
+									<td className="text-right">{format(createdAt, DEFAULT)}</td>
+								</tr>
+								<tr>
+									<td className="text-left">end</td>
+									<td className="text-right">
+										{endedAt ? format(endedAt, DEFAULT) : 'pending'}
+									</td>
+								</tr>
+							</tbody>
 							<tfoot>
 								<tr>
 									<th className="text-left">duration</th>
