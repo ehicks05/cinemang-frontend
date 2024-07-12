@@ -69,7 +69,7 @@ const queryFilms = async (form: DecodedValueMap<QueryParamConfigMap>) => {
 	}
 
 	if (form.providers.length > 0) {
-		query.in('wp.watchProvider_id', form.providers);
+		query.in('wp.provider_id', form.providers);
 	}
 
 	if (creditPersonIds.length > 0) {
