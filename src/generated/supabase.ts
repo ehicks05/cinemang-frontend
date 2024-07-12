@@ -97,54 +97,6 @@ export type Database = {
           },
         ]
       }
-      episode: {
-        Row: {
-          air_date: string | null
-          episode_number: number
-          id: number
-          name: string
-          overview: string
-          runtime: number | null
-          season_id: number
-          show_id: number
-        }
-        Insert: {
-          air_date?: string | null
-          episode_number: number
-          id: number
-          name: string
-          overview: string
-          runtime?: number | null
-          season_id: number
-          show_id: number
-        }
-        Update: {
-          air_date?: string | null
-          episode_number?: number
-          id?: number
-          name?: string
-          overview?: string
-          runtime?: number | null
-          season_id?: number
-          show_id?: number
-        }
-        Relationships: [
-          {
-            foreignKeyName: "episode_season_id_fkey"
-            columns: ["season_id"]
-            isOneToOne: false
-            referencedRelation: "season"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "episode_show_id_fkey"
-            columns: ["show_id"]
-            isOneToOne: false
-            referencedRelation: "show"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
       genre: {
         Row: {
           id: number
