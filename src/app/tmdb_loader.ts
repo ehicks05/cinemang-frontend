@@ -16,7 +16,7 @@ import logger from '../services/logger';
 import prisma from '../services/prisma';
 import { discoverMediaIds, getMovie, getSeason, getShow } from '../services/tmdb';
 import { TMDB_OPTIONS } from '../services/tmdb/constants';
-import { Episode, SeasonSummary } from '../services/tmdb/types/base';
+import { SeasonSummary } from '../services/tmdb/types/base';
 import { MovieResponse, ShowResponse } from '../services/tmdb/types/responses';
 import {
 	isEqual,
@@ -151,12 +151,6 @@ const loadShows = async (ids: number[]) => {
 			.filter((o) => mutatedIds.includes(o.id))
 			.filter((o) => !updateErrorsById[o.id]);
 
-		const seasons = await prisma.season.findMany({
-			where: { showId: { in: mutatedIds } },
-		});
-		await prisma.episode.deleteMany({
-			where: { seasonId: { in: seasons.map((s) => s.id) } },
-		});
 		await prisma.season.deleteMany({ where: { showId: { in: mutatedIds } } });
 
 		const toSeasonCreateInput = (o: SeasonSummary & { showId: number }) => ({
@@ -201,25 +195,6 @@ const loadShows = async (ids: number[]) => {
 						toId,
 					);
 				}
-
-				const toEpisodeCreateInput = (
-					o: Episode & { seasonId: number; showId: number },
-				) => ({
-					id: o.id,
-					seasonId: o.seasonId,
-					showId: o.showId,
-					airDate: o.air_date ? new Date(o.air_date) : undefined,
-					episodeNumber: o.episode_number,
-					name: o.name,
-					overview: o.overview,
-					runtime: o.runtime,
-				});
-
-				const episodeCreateInputs = season.episodes.map((episode) =>
-					toEpisodeCreateInput({ ...episode, seasonId: season.id, showId }),
-				);
-				// disable episode creation
-				// await prisma.episode.createMany({ data: episodeCreateInputs });
 			},
 			TMDB_OPTIONS,
 		);

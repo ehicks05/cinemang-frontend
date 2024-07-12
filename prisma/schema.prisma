@@ -62,7 +62,6 @@ model Show {
 
   credits   Credit[]
   seasons   Season[]
-  episodes  Episode[]
   providers MediaProvider[]
 
   @@index([firstAirDate])
@@ -85,26 +84,9 @@ model Season {
   seasonNumber Int       @map("season_number")
   voteAverage  Float     @map("vote_average")
 
-  episodes Episode[]
-  show     Show      @relation(fields: [showId], references: [id])
+  show Show @relation(fields: [showId], references: [id])
 
   @@map("season")
-}
-
-model Episode {
-  id            Int       @id
-  seasonId      Int       @map("season_id")
-  showId        Int       @map("show_id")
-  airDate       DateTime? @map("air_date") @db.Date
-  episodeNumber Int       @map("episode_number")
-  name          String
-  overview      String
-  runtime       Int?
-
-  season Season @relation(fields: [seasonId], references: [id])
-  show   Show   @relation(fields: [showId], references: [id])
-
-  @@map("episode")
 }
 
 model Person {
@@ -195,6 +177,9 @@ model MediaProvider {
 
   @@unique([movieId, providerId])
   @@unique([showId, providerId])
+  @@index([movieId])
+  @@index([showId])
+  @@index([providerId])
   @@map("media_provider")
 }
 
