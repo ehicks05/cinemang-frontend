@@ -1,6 +1,6 @@
 import { Prisma } from '@prisma/client';
 import P from 'bluebird';
-import { Dictionary, differenceBy, keyBy } from 'lodash';
+import { differenceBy, keyBy } from 'lodash';
 import { PRISMA_OPTIONS } from '../../constants';
 import logger from '../../services/logger';
 import prisma from '../../services/prisma';
@@ -38,11 +38,10 @@ const mediaToWhereClauseKey = (media: MediaResponse) => {
 
 const toCreditId = (o: { creditId: string }) => o.creditId;
 
-const loadCredits = async (
-	medias: MediaResponse[],
-	mediaIds: number[],
-	personIdMap: Dictionary<number>,
-) => {
+const loadCredits = async (medias: MediaResponse[], mediaIds: number[]) => {
+	const personIds = await getExistingPersonIds(medias);
+	const personIdMap = keyBy(personIds, (o) => o);
+
 	const remoteCredits: Prisma.CreditUncheckedCreateInput[] = medias
 		.flatMap(toCreditCreateInput)
 		.filter((o) => personIdMap[o.personId]);
@@ -194,9 +193,7 @@ const loadProviders = async (medias: MediaResponse[], mediaIds: number[]) => {
 export const updateRelationships = async (medias: MediaResponse[]) => {
 	logger.info('updating relationships...');
 	const mediaIds = medias.map(toId);
-	const personIds = await getExistingPersonIds(medias);
-	const personIdMap = keyBy(personIds, (o) => o);
 
-	await loadCredits(medias, mediaIds, personIdMap);
+	await loadCredits(medias, mediaIds);
 	await loadProviders(medias, mediaIds);
 };
