@@ -69,9 +69,14 @@ const loadCredits = async (medias: MediaResponse[], mediaIds: number[]) => {
 		return p && !isEqual(o, p);
 	});
 
+	const creditsToDelete = differenceBy(localCredits, remoteCredits, toCreditId);
+
 	try {
 		const creditCreateResult = await prisma.credit.createMany({
 			data: creditsToCreate,
+		});
+		const creditDeleteResult = await prisma.credit.deleteMany({
+			where: { creditId: { in: creditsToDelete.map((o) => o.creditId) } },
 		});
 
 		const updateOne = async (o: Prisma.CreditUncheckedCreateInput) => {
@@ -89,6 +94,7 @@ const loadCredits = async (medias: MediaResponse[], mediaIds: number[]) => {
 			remote: remoteCredits.length,
 			unchanged: existingCredits.length - creditsToUpdate.length,
 			created: creditCreateResult.count,
+			deleted: creditDeleteResult.count,
 			updated: creditsToUpdate.length,
 		});
 	} catch (e) {
