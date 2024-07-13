@@ -13,22 +13,23 @@ interface Props {
 const Credits = ({ credits, palette }: Props) => {
 	const cast = credits.filter((c) => c.character);
 	const crew = credits.filter((c) => c.job);
+	const groupedCast = groupBy(cast, (c) => c.person_id);
 	const groupedCrew = groupBy(crew, (c) => c.person_id);
 
 	return (
 		<>
 			<h1 className="text-xl font-bold">Cast</h1>
 			<div className="grid grid-cols-2 justify-center gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5">
-				{cast
-					.sort((c1, c2) => (c1.order || 0) - (c2.order || 0))
+				{Object.values(groupedCast)
+					.sort((c1, c2) => (c1[0].order || 0) - (c2[0].order || 0))
 					.map((c) => (
 						<PersonCard
-							character={c.character || ''}
-							key={c.credit_id}
-							name={c.person.name}
+							characters={c.map((c) => c.character || '')}
+							key={c[0].credit_id}
+							name={c[0].person.name}
 							palette={palette}
-							personId={c.person.id}
-							profilePath={c.person.profile_path}
+							personId={c[0].person.id}
+							profilePath={c[0].person.profile_path}
 						/>
 					))}
 			</div>

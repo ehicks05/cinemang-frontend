@@ -4,7 +4,7 @@ import { Link } from 'react-router-dom';
 import { getTmdbImage } from '../utils';
 
 interface Props {
-	character?: string;
+	characters?: string[];
 	jobs?: string[];
 	name: string;
 	palette: Palette;
@@ -23,7 +23,7 @@ const getDefaultProfile = (name: string, color: string) =>
 	`https://via.placeholder.com/300x450/${color}/fff/?text=${toInitials(name)}`;
 
 const PersonCard = ({
-	character,
+	characters,
 	jobs,
 	name,
 	palette,
@@ -45,14 +45,8 @@ const PersonCard = ({
 
 			<div className="flex-grow p-1.5">
 				<div>{name}</div>
-				{character && <div className="text-sm">as {character}</div>}
-				{jobs && (
-					<div>
-						{jobs.map((j) => (
-							<div key={j}>{j}</div>
-						))}
-					</div>
-				)}
+				{characters && <div className="text-sm">as {characters.join(', ')}</div>}
+				{jobs && <div className="text-sm">{jobs.join(', ')}</div>}
 			</div>
 		</Link>
 	);
