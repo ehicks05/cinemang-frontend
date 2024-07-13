@@ -1,4 +1,5 @@
 import { Prisma } from '@prisma/client';
+import axios, { AxiosError } from 'axios';
 import P from 'bluebird';
 import { subDays } from 'date-fns';
 import { intersection } from 'lodash';
@@ -8,13 +9,17 @@ import prisma from '../../services/prisma';
 import { getPerson } from '../../services/tmdb';
 import { getRecentlyChangedIds } from '../../services/tmdb/changes';
 import { TMDB_OPTIONS } from '../../services/tmdb/constants';
+import { PersonResponse } from '../../services/tmdb/types/responses';
 import { parsePerson } from './parse_person';
 
 const toId = (o: { id: number }) => o.id;
 
 export const createPersons = async (personIds: number[]) => {
 	logger.info(`fetching person data for ${personIds.length} ids`);
-	const parsed = (await P.map(personIds, getPerson, TMDB_OPTIONS))
+	const remote = await P.map(personIds, getPerson, TMDB_OPTIONS);
+	const toParse = remote.filter((o): o is PersonResponse => o && !('error' in o));
+
+	const parsed = toParse
 		.map(parsePerson)
 		.filter((o): o is Prisma.PersonCreateInput => !!o);
 
@@ -65,16 +70,32 @@ export const updatePersons = async () => {
 	const personIdsToUpdate = intersection(localPersonIds, recentlyChangedPersonIds);
 	logger.info(`identified ${personIdsToUpdate.length} personIds to update`);
 
-	const parsed = (await P.map(personIdsToUpdate, getPerson, TMDB_OPTIONS))
+	const remote = await P.map(personIdsToUpdate, getPerson, TMDB_OPTIONS);
+
+	const toParse = remote.filter((o): o is PersonResponse => o && !('error' in o));
+	const toDelete = remote.filter(
+		(o): o is { id: number; error: AxiosError } =>
+			o &&
+			'error' in o &&
+			axios.isAxiosError(o.error) &&
+			o.error.response?.status === 404,
+	);
+
+	const parsed = toParse
 		.map(parsePerson)
 		.filter((o): o is Prisma.PersonCreateInput => !!o);
 
 	const results = await P.map(parsed, updateOne, PRISMA_OPTIONS);
+
+	const deleteResult = await prisma.person.deleteMany({
+		where: { id: { in: toDelete.map((o) => o.id) } },
+	});
 
 	logger.info('persons', {
 		localPersonIds: localPersonIds.length,
 		changedPersonIds: recentlyChangedPersonIds.length,
 		updated: results.filter((o) => o.result === 'ok').length,
 		failed: results.filter((o) => o.result === 'error').length,
+		deleted: deleteResult.count,
 	});
 };

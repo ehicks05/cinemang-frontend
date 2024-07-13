@@ -1,4 +1,5 @@
-import { AxiosError } from 'axios';
+import axios, { AxiosError } from 'axios';
+import logger from '../logger';
 import tmdb from './tmdb';
 import { Language } from './types/base';
 import {
@@ -60,7 +61,13 @@ export const getPerson = async (id: number) => {
 		const result = await tmdb.get<PersonResponse>(`/person/${id}`, config);
 		return result.data;
 	} catch (e) {
-		logAxiosError(e as AxiosError);
+		if (axios.isAxiosError(e)) {
+			logAxiosError(e);
+		} else {
+			logger.error(e);
+		}
+
+		return { id, error: e || new Error('something went wrong') };
 	}
 };
 
