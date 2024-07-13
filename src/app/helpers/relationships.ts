@@ -55,18 +55,19 @@ const loadCredits = async (medias: MediaResponse[], mediaIds: number[]) => {
 	const existingCredits = differenceBy(remoteCredits, creditsToCreate, toCreditId);
 	const creditsToUpdate = existingCredits.filter((o) => {
 		const p = localCreditsById[o.creditId];
+		if (!p) return false;
 
 		// add potentially missing fields to remote object for equality check
 		o.showId = o.showId || null;
 		o.movieId = o.movieId || null;
 
 		o.character = o.character || null;
-		o.order = o.order ?? null;
+		o.order = o.order === undefined ? null : o.order;
 
 		o.department = o.department || null;
 		o.job = o.job || null;
 
-		return p && !isEqual(o, p);
+		return !isEqual(o, p);
 	});
 
 	const creditsToDelete = differenceBy(localCredits, remoteCredits, toCreditId);
@@ -82,7 +83,7 @@ const loadCredits = async (medias: MediaResponse[], mediaIds: number[]) => {
 		const updateOne = async (o: Prisma.CreditUncheckedCreateInput) => {
 			try {
 				const where = { creditId: o.creditId };
-				prisma.credit.update({ where, data: o });
+				await prisma.credit.update({ where, data: o });
 			} catch (e) {
 				logger.error(e);
 			}
@@ -178,7 +179,7 @@ const loadProviders = async (medias: MediaResponse[], mediaIds: number[]) => {
 		)?.id;
 		try {
 			const where = { id };
-			prisma.mediaProvider.update({ where, data: o });
+			await prisma.mediaProvider.update({ where, data: o });
 		} catch (e) {
 			logger.error(e);
 		}
