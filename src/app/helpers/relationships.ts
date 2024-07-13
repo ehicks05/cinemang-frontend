@@ -47,9 +47,7 @@ const loadCredits = async (medias: MediaResponse[], mediaIds: number[]) => {
 		.filter((o) => personIdMap[o.personId]);
 	const whereClauseKey = mediaToWhereClauseKey(medias[0]);
 	const localCredits = await prisma.credit.findMany({
-		where: {
-			[whereClauseKey]: { in: mediaIds },
-		},
+		where: { [whereClauseKey]: { in: mediaIds } },
 	});
 	const localCreditsById = keyBy(localCredits, (o) => o.creditId);
 

@@ -32,6 +32,7 @@ import { updateRelationships } from './helpers/relationships';
 import { updateLanguageCounts, updateProviderCounts } from './helpers/update_counts';
 
 const toId = (o: { id: number }) => o.id;
+const toCreditId = (o: { credit_id: string }) => o.credit_id;
 
 const loadMovies = async (ids: number[]) => {
 	logger.info('fetching movie data');
@@ -184,15 +185,16 @@ const loadShows = async (ids: number[]) => {
 				}
 
 				// fold season credits into show credits
+				// todo: consider using the /tv/:id/aggregate_credits endpoint for this
 				const show = mutated.find((o) => o.id === showId);
 				if (show) {
 					show.credits.cast = uniqBy(
 						[...show.credits.cast, ...season.credits.cast],
-						toId,
+						toCreditId,
 					);
 					show.credits.crew = uniqBy(
 						[...show.credits.crew, ...season.credits.crew],
-						toId,
+						toCreditId,
 					);
 				}
 			},
