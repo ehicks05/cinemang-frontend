@@ -1,34 +1,15 @@
-import { GenreType, Prisma } from '@prisma/client';
+import { Prisma } from '@prisma/client';
 import P from 'bluebird';
-import _, { chunk, difference, groupBy, keyBy, omit, uniq } from 'lodash';
+import _, { chunk, keyBy, omit, uniq } from 'lodash';
 import logger from '../../services/logger';
 import prisma from '../../services/prisma';
-import {
-	getLanguages,
-	getMovieGenres,
-	getProviders,
-	getShowGenres,
-} from '../../services/tmdb';
+import { getGenres, getLanguages, getProviders } from '../../services/tmdb';
 import { MediaResponse } from '../../services/tmdb/types/responses';
 
 export const updateGenres = async () => {
-	const movieGenres = (await getMovieGenres()).map((o) => ({
-		...o,
-		type: GenreType.MOVIE,
-	}));
-	const showGenres = (await getShowGenres()).map((o) => ({
-		...o,
-		type: GenreType.SHOW,
-	}));
-
-	const genresById = groupBy([...movieGenres, ...showGenres], (o) => o.id);
-	const genres = Object.values(genresById).map((o) =>
-		o.length === 1 ? o[0] : { ...o[0], type: GenreType.BOTH },
-	);
-
 	update({
 		model: 'genre',
-		fetcher: () => Promise.resolve(genres),
+		fetcher: getGenres,
 	});
 };
 

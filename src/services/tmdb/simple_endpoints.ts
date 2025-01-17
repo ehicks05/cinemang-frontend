@@ -1,4 +1,6 @@
+import { GenreType } from '@prisma/client';
 import axios, { AxiosError } from 'axios';
+import { groupBy } from 'lodash';
 import logger from '../logger';
 import tmdb from './tmdb';
 import { Language } from './types/base';
@@ -71,14 +73,32 @@ export const getPerson = async (id: number) => {
 	}
 };
 
-export const getMovieGenres = async () => {
+const getMovieGenres = async () => {
 	const result = await tmdb.get<GenreResponse>('/genre/movie/list');
 	return result.data.genres;
 };
 
-export const getShowGenres = async () => {
+const getShowGenres = async () => {
 	const result = await tmdb.get<GenreResponse>('/genre/tv/list');
 	return result.data.genres;
+};
+
+export const getGenres = async () => {
+	const movieGenres = (await getMovieGenres()).map((o) => ({
+		...o,
+		type: GenreType.MOVIE,
+	}));
+	const showGenres = (await getShowGenres()).map((o) => ({
+		...o,
+		type: GenreType.SHOW,
+	}));
+
+	const genresById = groupBy([...movieGenres, ...showGenres], (o) => o.id);
+	const genres = Object.values(genresById).map((o) =>
+		o.length === 1 ? o[0] : { ...o[0], type: GenreType.BOTH },
+	);
+
+	return genres;
 };
 
 export const getLanguages = async () => {
