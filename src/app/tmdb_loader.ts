@@ -280,9 +280,26 @@ const runLoader = async (fullMode: boolean) => {
 	}
 };
 
+const reportDbLatency = async () => {
+	// warm
+	await prisma.$executeRaw`select 1`;
+	await prisma.$executeRaw`select 1`;
+	await prisma.$executeRaw`select 1`;
+	// measure
+	const start = Date.now();
+	await prisma.$executeRaw`select 1`;
+	await prisma.$executeRaw`select 1`;
+	await prisma.$executeRaw`select 1`;
+	const end = Date.now();
+	const dur = (end - start) / 3;
+	logger.info(`test query 'select 1' took ${dur} ms`);
+};
+
 // mostly housekeeping
 const wrapper = async () => {
 	try {
+		await reportDbLatency();
+
 		logger.info('starting tmdb_loader script');
 		const { id: logId } = await prisma.syncRunLog.create({ data: {} });
 
