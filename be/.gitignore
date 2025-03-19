@@ -1,0 +1,10 @@
+
+# Project exclude paths
+/node_modules/
+/.idea/
+.env.development
+/dist/
+.env
+temp
+logs/
+file-cache/

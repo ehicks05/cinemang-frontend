@@ -1,0 +1,217 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Movie {
+  id            Int      @id
+  cast          String
+  certification String?
+  director      String
+  genreId       Int      @map("genre_id")
+  imdbId        String   @map("imdb_id")
+  languageId    String   @map("language_id")
+  overview      String
+  popularity    Float
+  posterPath    String   @map("poster_path")
+  releasedAt    DateTime @map("released_at") @db.Date
+  runtime       Int
+  title         String
+  voteAverage   Float    @map("vote_average")
+  voteCount     Int      @map("vote_count")
+
+  credits   Credit[]
+  providers MediaProvider[]
+
+  @@index([languageId])
+  @@index([releasedAt])
+  @@index([title])
+  @@index([voteAverage])
+  @@index([voteCount])
+  @@map("movie")
+}
+
+enum ShowStatus {
+  ENDED
+  CANCELED
+  RETURNING_SERIES
+  IN_PRODUCTION
+}
+
+model Show {
+  id            Int      @id
+  cast          String
+  contentRating String?  @map("content_rating")
+  createdBy     String?  @map("created_by")
+  firstAirDate  DateTime @map("first_air_date") @db.Date
+  genreId       Int      @map("genre_id")
+  languageId    String   @map("language_id")
+  lastAirDate   DateTime @map("last_air_date") @db.Date
+  name          String
+  overview      String
+  popularity    Float
+  posterPath    String   @map("poster_path")
+  status        String
+  tagline       String?
+  voteAverage   Float    @map("vote_average")
+  voteCount     Int      @map("vote_count")
+
+  credits   Credit[]
+  seasons   Season[]
+  providers MediaProvider[]
+
+  @@index([firstAirDate])
+  @@index([languageId])
+  @@index([lastAirDate])
+  @@index([name])
+  @@index([voteAverage])
+  @@index([voteCount])
+  @@map("show")
+}
+
+model Season {
+  id           Int       @id
+  showId       Int       @map("show_id")
+  airDate      DateTime? @map("air_date") @db.Date
+  episodeCount Int       @map("episode_count")
+  name         String
+  overview     String
+  posterPath   String?   @map("poster_path")
+  seasonNumber Int       @map("season_number")
+  voteAverage  Float     @map("vote_average")
+
+  show Show @relation(fields: [showId], references: [id])
+
+  @@map("season")
+}
+
+model Person {
+  id                 Int       @id
+  imdbId             String?   @map("imdb_id")
+  biography          String
+  birthday           DateTime? @db.Date
+  deathday           DateTime? @db.Date
+  gender             Int
+  knownForDepartment String    @map("known_for_department")
+  name               String
+  placeOfBirth       String?   @map("place_of_birth")
+  popularity         Float
+  profilePath        String    @map("profile_path")
+
+  credits Credit[]
+
+  @@index([name])
+  @@map("person")
+}
+
+model Credit {
+  creditId String @id @map("credit_id")
+
+  movie    Movie? @relation(fields: [movieId], references: [id], onDelete: Cascade)
+  movieId  Int?   @map("movie_id")
+  show     Show?  @relation(fields: [showId], references: [id], onDelete: Cascade)
+  showId   Int?   @map("show_id")
+  person   Person @relation(fields: [personId], references: [id], onDelete: Cascade)
+  personId Int    @map("person_id")
+
+  // cast specific
+  character String?
+  order     Int?
+
+  // crew specific
+  department String?
+  job        String?
+
+  @@index([movieId])
+  @@index([showId])
+  @@index([personId])
+  @@map("credit")
+}
+
+enum GenreType {
+  MOVIE
+  SHOW
+  BOTH
+}
+
+model Genre {
+  id   Int       @id
+  name String
+  type GenreType
+
+  @@map("genre")
+}
+
+model Language {
+  id    String @id
+  name  String
+  count Int    @default(0)
+
+  @@map("language")
+}
+
+model Provider {
+  id              Int             @id
+  displayPriority Int             @map("display_priority")
+  name            String
+  logoPath        String          @map("logo_path")
+  count           Int             @default(0)
+  medias          MediaProvider[]
+
+  @@map("provider")
+}
+
+model MediaProvider {
+  id String @id @default(uuid())
+
+  movie      Movie?   @relation(fields: [movieId], references: [id], onDelete: Cascade)
+  movieId    Int?     @map("movie_id")
+  show       Show?    @relation(fields: [showId], references: [id], onDelete: Cascade)
+  showId     Int?     @map("show_id")
+  provider   Provider @relation(fields: [providerId], references: [id], onDelete: Cascade)
+  providerId Int      @map("provider_id")
+
+  @@unique([movieId, providerId])
+  @@unique([showId, providerId])
+  @@index([movieId])
+  @@index([showId])
+  @@index([providerId])
+  @@map("media_provider")
+}
+
+model Company {
+  id            Int     @id
+  description   String
+  headquarters  String
+  homepage      String
+  logoPath      String? @map("logo_path")
+  name          String
+  originCountry String  @map("origin_country")
+  parentCompany String? @map("parent_company")
+
+  @@map("company")
+}
+
+model Network {
+  id            Int     @id
+  headquarters  String
+  homepage      String
+  logoPath      String? @map("logo_path")
+  name          String
+  originCountry String  @map("origin_country")
+  parentCompany String? @map("parent_company")
+
+  @@map("network")
+}
+
+model SyncRunLog {
+  id        String    @id @default(uuid())
+  createdAt DateTime  @default(now()) @map("created_at") @db.Timestamptz
+  endedAt   DateTime? @map("ended_at") @db.Timestamptz
+
+  @@map("sync_run_log")
+}
