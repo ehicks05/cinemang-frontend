@@ -1,82 +1,94 @@
-import { Combobox } from '@headlessui/react';
-import { Fragment, useState } from 'react';
-import { HiCheck, HiChevronDown, HiChevronUp } from 'react-icons/hi';
+'use client';
 
-export interface Option {
+import { Check, ChevronsUpDown } from 'lucide-react';
+import * as React from 'react';
+
+import { Button } from '~/core-components/button';
+import {
+	Command,
+	CommandEmpty,
+	CommandGroup,
+	CommandInput,
+	CommandItem,
+	CommandList,
+} from '~/core-components/command';
+import { Popover, PopoverContent, PopoverTrigger } from '~/core-components/popover';
+import { cn } from '~/utils/cn';
+
+interface Option {
 	id: number;
-	imageUrl: string;
 	label: string;
+	imageUrl: string;
 }
 
-interface Props<T> {
-	mapper: (input: T) => Option;
-	onChange: (value: number[]) => void;
-	options: T[];
-	selectedOptionIds: number[];
+interface Props {
+	options: Option[];
+	selectedOptions: number[];
+	handleChange: (selected: number[]) => void;
 }
 
-// reasoning for the T,:
-// https://github.com/microsoft/TypeScript/issues/15713#issuecomment-499474386
-const ComboBox = <T,>({
-	options,
-	selectedOptionIds,
-	onChange,
-	mapper,
-}: Props<T>) => {
-	const [query, setQuery] = useState('');
+export function ComboBox({ options, selectedOptions, handleChange }: Props) {
+	const [open, setOpen] = React.useState(false);
 
-	const parsedOptions = options.map(mapper);
-
-	const filteredOptions =
-		query === ''
-			? parsedOptions
-			: parsedOptions.filter(({ label }) =>
-					label.toLowerCase().includes(query.toLowerCase()),
-			  );
+	const triggerIcons = selectedOptions
+		.map((selected) => options.find((option) => selected === option.id)?.imageUrl)
+		.map((imageUrl) => (
+			<img key={imageUrl} alt="provider" src={imageUrl} className="h-8 w-8" />
+		));
 
 	return (
-		<div className="relative">
-			<Combobox
-				defaultValue={selectedOptionIds}
-				multiple
-				onChange={(values) => onChange(values)}
-			>
-				<Combobox.Input
-					className="w-full bg-gray-700"
-					onChange={(event) => setQuery(event.target.value)}
-				/>
-				<Combobox.Button className="absolute right-2 top-1.5 flex w-4 flex-col">
-					<HiChevronUp />
-					<HiChevronDown />
-				</Combobox.Button>
-				<Combobox.Options className="absolute flex w-full flex-col bg-gray-700">
-					{filteredOptions.map((option) => (
-						<Combobox.Option as={Fragment} key={option.id} value={option.id}>
-							{({ active, selected }) => (
-								<li
-									className={`flex cursor-pointer items-center justify-between bg-gray-700 p-2 ${
-										active ? 'bg-gray-600' : ''
-									}`}
+		<Popover open={open} onOpenChange={setOpen} modal>
+			<PopoverTrigger asChild>
+				<Button
+					// role="combobox"
+					// variant="ghost"
+					aria-expanded={open}
+					className="w-full justify-between h-10 pl-1 bg-neutral-700 rounded-none border border-neutral-500"
+				>
+					<div className="flex gap-2">{triggerIcons}</div>
+					<ChevronsUpDown className="opacity-50" />
+				</Button>
+			</PopoverTrigger>
+			<PopoverContent className="w-[260px] p-0 bg-neutral-800 text-neutral-200">
+				<Command>
+					<CommandInput placeholder="Search providers..." className="h-9" />
+					<CommandList>
+						<CommandEmpty>No framework found.</CommandEmpty>
+						<CommandGroup>
+							{options.map((option) => (
+								<CommandItem
+									key={option.id}
+									value={option.label}
+									onSelect={(currentValue) => {
+										if (selectedOptions.includes(option.id)) {
+											handleChange(selectedOptions.filter((o) => o !== option.id));
+										} else {
+											handleChange([...selectedOptions, option.id]);
+										}
+										setOpen(false);
+									}}
 								>
-									<div className="flex items-center gap-2">
-										<img
-											alt="logo"
-											className={`h-6 w-6 rounded ${!selected ? 'opacity-50' : ''}`}
-											src={option.imageUrl}
-										/>
-										<span className={selected ? 'font-bold' : ''}>
-											{option.label}
-										</span>
-									</div>
-									{selected && <HiCheck />}
-								</li>
-							)}
-						</Combobox.Option>
-					))}
-				</Combobox.Options>
-			</Combobox>
-		</div>
+									<img
+										className="h-8 w-8"
+										key={option.id}
+										alt="provider"
+										src={option.imageUrl}
+									/>
+									{option.label}
+									<Check
+										className={cn(
+											'ml-auto',
+											selectedOptions.includes(option.id)
+												? 'opacity-100'
+												: 'opacity-0',
+										)}
+									/>
+								</CommandItem>
+							))}
+						</CommandGroup>
+					</CommandList>
+				</Command>
+			</PopoverContent>
+		</Popover>
 	);
-};
-
-export default ComboBox;
+}

@@ -10,11 +10,12 @@
 		"generate": "npx supabase gen types typescript --project-id qzghroxeindgzpfwrffs --schema public > src/types/database.gen.ts"
 	},
 	"dependencies": {
-		"@headlessui/react": "^2.2.0",
 		"@lauriys/react-palette": "1.0.5",
 		"@radix-ui/react-accordion": "^1.2.3",
+		"@radix-ui/react-dialog": "^1.1.6",
 		"@radix-ui/react-hover-card": "^1.1.6",
 		"@radix-ui/react-popover": "^1.1.6",
+		"@radix-ui/react-slot": "^1.1.2",
 		"@radix-ui/react-tooltip": "^1.1.8",
 		"@supabase/supabase-js": "^2.49.1",
 		"@tailwindcss/forms": "^0.5.10",
@@ -26,6 +27,8 @@
 		"@tanstack/zod-adapter": "^1.114.25",
 		"axios": "^1.8.3",
 		"chroma-js": "^3.1.2",
+		"class-variance-authority": "^0.7.1",
+		"cmdk": "^1.1.1",
 		"date-fns": "^4.1.0",
 		"lodash-es": "^4.17.21",
 		"lucide-react": "^0.483.0",

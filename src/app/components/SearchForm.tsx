@@ -38,12 +38,13 @@ type SortColumn = 'vote_average' | 'vote_count' | 'released_at' | 'last_air_date
 const FormFields = () => {
 	const { pathname } = useLocation();
 	const mode = pathname === '/tv' ? 'tv' : 'movie';
-	const from = mode === 'tv' ? '/tv' : '/films';
+	const from = mode === 'tv' ? '/tv/' : '/films/';
+	const navigateFrom = mode === 'tv' ? '/tv' : '/films';
 
 	const { genres, languages, providers } = useSystemData();
 
 	const search = useSearch({ from });
-	const navigate = useNavigate({ from });
+	const navigate = useNavigate({ from: navigateFrom });
 
 	const [form, setForm] = useState<MovieSearchForm | TvSearchForm>(search);
 	const [debouncedForm, setDebouncedForm] = useDebounceValue(form, 500);
@@ -119,16 +120,22 @@ const FormFields = () => {
 					</div>
 					<div>
 						<ComboBox
-							mapper={(p) => ({
-								id: p.id,
-								label: p.name,
-								imageUrl: getTmdbImage({ path: p.logo_path, width: 'original' }),
-							})}
-							onChange={(providers) => handleChange({ providers })}
 							options={providers
+								// sort by selected providers, then by provider priority
 								.sort((o1, o2) => o1.display_priority - o2.display_priority)
-								.filter((p) => p.count > 0)}
-							selectedOptionIds={form.providers as number[]}
+								.sort((o1, o2) => {
+									const o1Selected = form.providers.includes(o1.id) ? 1 : -1;
+									const o2Selected = form.providers.includes(o2.id) ? 1 : -1;
+									return o2Selected - o1Selected;
+								})
+								.filter((p) => p.count > 0)
+								.map((p) => ({
+									id: p.id,
+									label: p.name,
+									imageUrl: getTmdbImage({ path: p.logo_path, width: 'original' }),
+								}))}
+							selectedOptions={form.providers}
+							handleChange={(providers) => handleChange({ providers })}
 						/>
 					</div>
 				</div>
