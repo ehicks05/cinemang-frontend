@@ -1,4 +1,4 @@
-import { Sk } from '.';
+import { Sk } from './Skeleton';
 
 const MediaSkeleton = () => (
 	<div className="bg-gray-800 sm:rounded-lg">

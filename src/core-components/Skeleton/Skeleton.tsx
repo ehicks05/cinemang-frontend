@@ -14,6 +14,4 @@ const Text = ({ h = 'h-4' }: { h?: string }) => (
 	<div className={`${h} w-full rounded-lg bg-gray-700`} />
 );
 
-const Sk = { Image, Text };
-
-export default Sk;
+export const Sk = { Image, Text };
