@@ -1,27 +1,41 @@
 import * as Popover from '@radix-ui/react-popover';
-import { useQuery } from '@tanstack/react-query';
 import { format, formatDistance } from 'date-fns';
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { HiX } from 'react-icons/hi';
 import { HiOutlineInformationCircle } from 'react-icons/hi2';
-import { supabase } from '../supabase';
+import { supabase } from '~/utils/supabase';
 
 const SHORT = 'hh:mm:ss a';
 const DEFAULT = `yyyy-MM-dd'T'${SHORT}`;
 
+interface RunLog {
+	created_at: string;
+	ended_at: string | null;
+	id: string;
+}
+
+const useLog = () => {
+	const [syncRunLog, setSyncRunLog] = useState<RunLog>();
+
+	useEffect(() => {
+		const doIt = async () => {
+			const { data } = await supabase
+				.from('sync_run_log')
+				.select('*')
+				.order('created_at', { ascending: false })
+				.limit(1)
+				.single();
+			if (data) setSyncRunLog(data);
+		};
+
+		doIt();
+	}, []);
+
+	return { syncRunLog };
+};
+
 const SystemInfo = () => {
-	const { data: syncRunLog } = useQuery({
-		queryKey: ['sync_run_log'],
-		queryFn: async () =>
-			(
-				await supabase
-					.from('sync_run_log')
-					.select('*')
-					.order('created_at', { ascending: false })
-					.limit(1)
-					.single()
-			).data,
-	});
+	const { syncRunLog } = useLog();
 	if (!syncRunLog) return null;
 
 	const createdAt = new Date(syncRunLog.created_at);

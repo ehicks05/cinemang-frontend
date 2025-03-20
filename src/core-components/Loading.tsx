@@ -1,8 +1,8 @@
-import { FC } from 'react';
+import type { FC } from 'react';
 import { VscLoading } from 'react-icons/vsc';
 
 interface Props {
-	error?: any;
+	error?: Error | null;
 	loading: boolean;
 	size?: number;
 }

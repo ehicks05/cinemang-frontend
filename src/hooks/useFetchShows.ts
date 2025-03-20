@@ -1,11 +1,8 @@
-import { SHOW_QUERY_PARAMS } from '@/queryParams';
 import { useQuery } from '@tanstack/react-query';
-import { useState } from 'react';
-import { useDebounce } from 'react-use';
-import { DecodedValueMap, useQueryParams } from 'use-query-params';
-import { PAGE_SIZE } from '../constants';
-import { supabase } from '../supabase';
-import { Show } from '../types';
+import { PAGE_SIZE } from '~/constants/constants';
+import type { Show } from '~/types/types';
+import type { TvSearchForm } from '~/utils/searchParams/types';
+import { supabase } from '~/utils/supabase';
 import { CREDIT_PERSON_JOIN, PROVIDER_JOIN } from './constants';
 
 const queryPersonIdsByName = async (name: string) => {
@@ -18,7 +15,7 @@ const queryPersonIdsByName = async (name: string) => {
 	return (await query).data?.map((o) => o.id) || [];
 };
 
-const queryFilms = async (form: DecodedValueMap<typeof SHOW_QUERY_PARAMS>) => {
+export const queryShows = async (form: TvSearchForm) => {
 	const creditPersonIds: number[] =
 		form.creditName.length > 2 ? await queryPersonIdsByName(form.creditName) : [];
 
@@ -72,42 +69,15 @@ const queryFilms = async (form: DecodedValueMap<typeof SHOW_QUERY_PARAMS>) => {
 		query.in('credit.person_id', creditPersonIds || []);
 	}
 
-	query
-		.order(form.sortColumn, { ascending: form.ascending, foreignTable: '' })
+	const result = await query
+		.order(form.sortColumn, { ascending: form.ascending, referencedTable: '' })
 		.order('id', { ascending: true })
 		.range(form.page * PAGE_SIZE, (form.page + 1) * PAGE_SIZE - 1);
 
-	return query;
+	return { shows: result.data as unknown as Show[], count: result.count || 0 };
 };
 
-export const useSearchShows = () => {
-	const [formParams] = useQueryParams(SHOW_QUERY_PARAMS);
-
-	// a local, debounced copy of the form
-	const [form, setForm] = useState(formParams);
-
-	useDebounce(
-		() => {
-			setForm(formParams);
-		},
-		250,
-		[formParams],
-	);
-
-	return useQuery({
-		queryKey: ['shows', form],
-		queryFn: async () => {
-			const { data: shows, count } = (await queryFilms(form)) as unknown as {
-				data: Show[];
-				count: number;
-			};
-
-			return { count: count || 0, shows };
-		},
-	});
-};
-
-const fetchShowQuery = async (id: number) => {
+export const getShowById = async (id: number) => {
 	const select = ['*', PROVIDER_JOIN, CREDIT_PERSON_JOIN, 'seasons: season(*)'].join(
 		',',
 	);
@@ -117,4 +87,4 @@ const fetchShowQuery = async (id: number) => {
 };
 
 export const useFetchShow = (id: number) =>
-	useQuery({ queryKey: ['shows', id], queryFn: async () => fetchShowQuery(id) });
+	useQuery({ queryKey: ['shows', id], queryFn: async () => getShowById(id) });

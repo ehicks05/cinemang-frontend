@@ -1,4 +1,3 @@
-import React from 'react';
 import { Sk } from '.';
 
 const MediaSkeleton = () => (

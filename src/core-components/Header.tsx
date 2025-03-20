@@ -1,26 +1,34 @@
+import { Link } from '@tanstack/react-router';
 import { FaCat } from 'react-icons/fa';
-import { Link, NavLink } from 'react-router-dom';
 
-const isActiveClass = ({ isActive }: { isActive: boolean }) =>
-	isActive ? 'font-bold' : '';
+const activeClass = { className: 'font-bold' };
 
 const Header = () => (
 	<div className="mx-auto flex max-w-screen-lg items-center gap-4">
 		<Link
 			className="flex items-center gap-1 p-4 text-2xl"
 			style={{ fontFamily: 'Urbanist' }}
-			to="/"
+			to="/films"
 		>
 			Cine
 			<FaCat className="inline text-green-500" />
 			Mang
 		</Link>
-		<NavLink className={isActiveClass} to="/">
+
+		<Link
+			to="/films"
+			activeProps={activeClass}
+			activeOptions={{ includeSearch: false }}
+		>
 			Movies
-		</NavLink>
-		<NavLink className={isActiveClass} to="/tv">
+		</Link>
+		<Link
+			to="/tv"
+			activeProps={activeClass}
+			activeOptions={{ includeSearch: false }}
+		>
 			TV
-		</NavLink>
+		</Link>
 	</div>
 );
 

@@ -1,5 +1,5 @@
 import { FaImage } from 'react-icons/fa';
-import { SCALED_IMAGE } from '../constants';
+import { SCALED_IMAGE } from '~/constants/constants';
 
 const Image = () => (
 	<div

@@ -1,4 +1,4 @@
-import React, { FC, ReactNode } from 'react';
+import React, { type FC, type ReactNode } from 'react';
 import { HiOutlineHome } from 'react-icons/hi2';
 import { SiThemoviedatabase } from 'react-icons/si';
 import { VscGithub } from 'react-icons/vsc';

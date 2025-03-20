@@ -1,12 +1,13 @@
 {
-	"$schema": "https://biomejs.dev/schemas/1.5.3/schema.json",
+	"$schema": "https://biomejs.dev/schemas/1.9.4/schema.json",
 	"organizeImports": {
 		"enabled": true
 	},
 	"linter": {
 		"enabled": true,
 		"rules": {
-			"recommended": true
+			"recommended": true,
+			"performance": { "noAccumulatingSpread": "off" }
 		}
 	},
 	"formatter": {
@@ -18,6 +19,7 @@
 		}
 	},
 	"files": {
-		"ignore": ["./src/generated/supabase.ts"]
+		"include": ["./src/**"],
+		"ignore": ["./src/**/*.gen.ts"]
 	}
 }

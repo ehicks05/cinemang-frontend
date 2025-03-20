@@ -1,8 +1,7 @@
-import { groupBy } from 'lodash';
-import React from 'react';
+import { groupBy } from 'lodash-es';
 
-import { Palette } from '@/hooks/usePalette';
-import { Credit } from '../types';
+import type { Credit } from '~/types/types';
+import type { Palette } from '~/utils/palettes/palette';
 import PersonCard from './PersonCard';
 
 interface Props {

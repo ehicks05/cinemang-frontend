@@ -1,5 +1,5 @@
-import { ReactNode } from 'react';
-import { useWindowSize } from 'react-use';
+import type { ReactNode } from 'react';
+import { useWindowSize } from 'usehooks-ts';
 
 const MediaLayout = ({ children }: { children: ReactNode }) => {
 	const { width } = useWindowSize();

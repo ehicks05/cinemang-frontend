@@ -1,5 +1,5 @@
-import { getTmdbImage } from '@/utils';
 import { FaExternalLinkAlt } from 'react-icons/fa';
+import { getTmdbImage } from '~/utils/getTmdbImage';
 
 /**
  * Usage: Nest inside a relative-positioned element, sibling to an img

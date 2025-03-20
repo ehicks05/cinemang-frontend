@@ -1,4 +1,4 @@
-import React, { FC, ReactNode } from 'react';
+import type { FC, ReactNode } from 'react';
 
 interface Props {
 	children: ReactNode;
@@ -9,6 +9,7 @@ interface Props {
 
 const Button: FC<Props> = ({ className, disabled, onClick, children }) => (
 	<button
+		type="button"
 		className={`border bg-black px-2 py-1 text-white
       ${disabled ? 'cursor-default opacity-50' : ''} ${className}`}
 		disabled={disabled}

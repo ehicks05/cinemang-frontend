@@ -1,10 +1,11 @@
-import { range } from 'lodash';
 import MediaLayout from './MediaLayout';
 import MediaSkeleton from './MediaSkeleton';
 
+const zeroTo19 = [...new Array(20)].map((_, i) => i);
+
 const MediaSkeletons = () => (
 	<MediaLayout>
-		{range(0, 20).map((i) => (
+		{zeroTo19.map((i) => (
 			<MediaSkeleton key={i} />
 		))}
 	</MediaLayout>

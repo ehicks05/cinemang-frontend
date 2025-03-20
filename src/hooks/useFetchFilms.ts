@@ -1,15 +1,8 @@
-import { MOVIE_QUERY_PARAMS } from '@/queryParams';
 import { useQuery } from '@tanstack/react-query';
-import { useState } from 'react';
-import { useDebounce } from 'react-use';
-import {
-	DecodedValueMap,
-	QueryParamConfigMap,
-	useQueryParams,
-} from 'use-query-params';
-import { PAGE_SIZE } from '../constants';
-import { supabase } from '../supabase';
-import { Film } from '../types';
+import { PAGE_SIZE } from '~/constants/constants';
+import type { Film } from '~/types/types';
+import type { MovieSearchForm } from '~/utils/searchParams/types';
+import { supabase } from '~/utils/supabase';
 import { CREDIT_PERSON_JOIN, PROVIDER_JOIN } from './constants';
 
 const queryPersonIdsByName = async (name: string) => {
@@ -22,7 +15,7 @@ const queryPersonIdsByName = async (name: string) => {
 	return (await query).data?.map((o) => o.id) || [];
 };
 
-const queryFilms = async (form: DecodedValueMap<QueryParamConfigMap>) => {
+export const queryFilms = async (form: MovieSearchForm) => {
 	const creditPersonIds: number[] =
 		form.creditName.length > 2 ? await queryPersonIdsByName(form.creditName) : [];
 
@@ -76,42 +69,15 @@ const queryFilms = async (form: DecodedValueMap<QueryParamConfigMap>) => {
 		query.in('credit.person_id', creditPersonIds || []);
 	}
 
-	query
+	const result = await query
 		.order(form.sortColumn, { ascending: form.ascending })
 		.order('id', { ascending: true })
 		.range(form.page * PAGE_SIZE, (form.page + 1) * PAGE_SIZE - 1);
 
-	return query;
+	return { films: result.data as unknown as Film[], count: result.count || 0 };
 };
 
-export const useSearchFilms = () => {
-	const [formParams] = useQueryParams(MOVIE_QUERY_PARAMS);
-
-	// a local, debounced copy of the form
-	const [form, setForm] = useState(formParams);
-
-	useDebounce(
-		() => {
-			setForm(formParams);
-		},
-		250,
-		[formParams],
-	);
-
-	return useQuery({
-		queryKey: ['films', form],
-		queryFn: async () => {
-			const { data: films, count } = (await queryFilms(form)) as unknown as {
-				data: Film[];
-				count: number;
-			};
-
-			return { count: count || 0, films };
-		},
-	});
-};
-
-const fetchFilmQuery = async (id: number) => {
+export const getFilmById = async (id: number) => {
 	const select = ['*', PROVIDER_JOIN, CREDIT_PERSON_JOIN].join(',');
 
 	const result = await supabase.from('movie').select(select).eq('id', id).single();
@@ -119,4 +85,4 @@ const fetchFilmQuery = async (id: number) => {
 };
 
 export const useFetchFilm = (id: number) =>
-	useQuery({ queryKey: ['films', id], queryFn: async () => fetchFilmQuery(id) });
+	useQuery({ queryKey: ['films', id], queryFn: async () => getFilmById(id) });
