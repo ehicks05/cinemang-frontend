@@ -1,24 +1,25 @@
 import { addMinutes, format, intervalToDuration, parseISO } from 'date-fns';
 import { useDocumentTitle } from 'usehooks-ts';
-import { OriginalImageLink } from '~/core-components';
-import Credits from '~/core-components/Credits';
-import Trailer from '~/core-components/Trailer/Trailer';
+import { Credits, OriginalImageLink, Trailer } from '~/core-components';
 import { useSystemData } from '~/hooks/useSystemData';
 import type { Film, Video } from '~/types/types';
 import { getTmdbImage } from '~/utils/getTmdbImage';
-import type { Palette } from '~/utils/palettes/palette';
 import { usePalette } from '~/utils/palettes/usePalettes';
-import MediaProviders from './MediaProviders';
+import { MediaProviders } from './MediaProviders';
 import FilmStats from './MediaStats';
 import { toStats } from './utils';
 
-const FilmDetail = ({
-	film,
-	palette,
-	trailer,
-}: { film: Film; palette: Palette; trailer: Video }) => {
+interface Props {
+	film: Film;
+	trailer: Video;
+}
+
+export const FilmDetail = ({ film, trailer }: Props) => {
 	useDocumentTitle(film.title);
 	const { genres, languages } = useSystemData();
+
+	const { isLoading, palette } = usePalette({ path: film.poster_path });
+	if (isLoading || !palette) return '';
 
 	const posterUrl = getTmdbImage({ path: film.poster_path, width: 'w500' });
 	const year = format(parseISO(film.released_at), 'yyyy');
@@ -73,15 +74,4 @@ const FilmDetail = ({
 			<Credits credits={film.credits} palette={palette} />
 		</div>
 	);
-};
-
-export const FilmDetailWrapper = ({
-	film,
-	trailer,
-}: { film: Film; trailer: Video }) => {
-	const { isLoading, palette } = usePalette({ path: film.poster_path });
-
-	if (isLoading || !palette) return '';
-
-	return <FilmDetail film={film} palette={palette} trailer={trailer} />;
 };

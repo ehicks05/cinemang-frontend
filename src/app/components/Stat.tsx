@@ -1,7 +1,6 @@
-import { FC } from 'react';
-import { IconType } from 'react-icons';
+import type { IconType } from 'react-icons';
 
-interface StatProps {
+interface Props {
 	bgColor: string;
 	color: string;
 	icon?: IconType;
@@ -10,14 +9,7 @@ interface StatProps {
 	width?: string;
 }
 
-const Stat: FC<StatProps> = ({
-	bgColor,
-	color,
-	icon: Icon,
-	label,
-	title,
-	width,
-}) => (
+const Stat = ({ bgColor, color, icon: Icon, label, title, width }: Props) => (
 	<div
 		className={`flex ${width} items-center justify-center gap-1 rounded-lg bg-gray-700 px-3 py-2 sm:px-4`}
 		style={{ backgroundColor: bgColor }}

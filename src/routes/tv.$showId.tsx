@@ -1,7 +1,7 @@
 import { ErrorComponent, createFileRoute } from '@tanstack/react-router';
+import { ShowDetailWrapper } from '~/app/components';
 import { fetchTrailer } from '~/core-components/Trailer/useFetchVideos';
 import { getShowById } from '~/hooks/useFetchShows';
-import { ShowDetailWrapper } from '~/temp/app/components';
 
 export const Route = createFileRoute('/tv/$showId')({
 	loader: async ({ params }) => {

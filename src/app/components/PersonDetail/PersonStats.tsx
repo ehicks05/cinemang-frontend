@@ -1,4 +1,3 @@
-import React, { FC } from 'react';
 import { FaFilm, FaMask, FaStar } from 'react-icons/fa';
 import Stat from '../Stat';
 
@@ -12,7 +11,7 @@ interface Props {
 	};
 }
 
-const FilmStats: FC<Props> = ({ bgColor, data, autoWidth = true }) => {
+const FilmStats = ({ bgColor, data, autoWidth = true }: Props) => {
 	const stats = [
 		{
 			color: 'text-yellow-300',

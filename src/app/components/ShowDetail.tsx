@@ -6,7 +6,7 @@ import type { Show, Video } from '~/types/types';
 import { getTmdbImage } from '~/utils/getTmdbImage';
 import type { Palette } from '~/utils/palettes/palette';
 import { usePalette } from '~/utils/palettes/usePalettes';
-import MediaProviders from './MediaProviders';
+import { MediaProviders } from './MediaProviders';
 import FilmStats from './MediaStats';
 import { Seasons } from './Seasons';
 import { toStats } from './utils';

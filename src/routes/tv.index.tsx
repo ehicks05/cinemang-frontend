@@ -1,7 +1,7 @@
 import { Outlet, createFileRoute, stripSearchParams } from '@tanstack/react-router';
 import { zodValidator } from '@tanstack/zod-adapter';
+import { ShowsWrapper } from '~/app/Shows';
 import { queryShows } from '~/hooks/useFetchShows';
-import { ShowsWrapper } from '~/temp/app/Shows';
 import { DEFAULT_TV_SEARCH_FORM } from '~/utils/searchParams/constants';
 import { type TvSearchForm, TvSearchFormSchema } from '~/utils/searchParams/types';
 

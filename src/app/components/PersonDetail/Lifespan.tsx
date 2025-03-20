@@ -1,19 +1,21 @@
-import { Palette } from '@/temp/hooks/usePalette';
 import { intervalToDuration, parseISO } from 'date-fns';
-import { Person } from '../../../../types/types';
+import type { Person } from '~/types/types';
+import type { Palette } from '~/utils/palettes/palette';
 
 interface Props {
 	palette: Palette;
 	person: Person;
 }
 
-const BirthAndDeath = ({ person, palette }: Props) => {
+export const Lifespan = ({ person, palette }: Props) => {
 	const age = intervalToDuration({
 		end: person.deathday ? parseISO(person.deathday) : new Date(),
 		start: person.birthday ? parseISO(person.birthday) : new Date(),
 	});
 
-	return person.birthday || person.deathday ? (
+	if (!person.birthday && !person.deathday) return null;
+
+	return (
 		<div className="border-l-4 pl-2" style={{ borderColor: palette.darkVibrant }}>
 			{person.birthday && (
 				<div>
@@ -33,7 +35,5 @@ const BirthAndDeath = ({ person, palette }: Props) => {
 				</div>
 			)}
 		</div>
-	) : null;
+	);
 };
-
-export default BirthAndDeath;

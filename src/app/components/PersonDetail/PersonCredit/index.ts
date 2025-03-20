@@ -1,3 +1,3 @@
 import PersonCredit from './PersonCredit';
 
-export default PersonCredit;
+export { PersonCredit };

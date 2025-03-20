@@ -5,14 +5,14 @@ import type { IconType } from 'react-icons';
 import { FaCalendar, FaHeart, FaStar } from 'react-icons/fa';
 import { useDocumentTitle } from 'usehooks-ts';
 import { OriginalImageLink } from '~/core-components';
+import { useSystemData } from '~/hooks/useSystemData';
 import type { Credit, Person } from '~/types/types';
 import { getTmdbImage } from '~/utils/getTmdbImage';
 import type { Palette } from '~/utils/palettes/palette';
 import Stat from '../Stat';
-import BirthAndDeath from './BirthAndDeath';
-import PersonCredit from './PersonCredit';
+import { Lifespan } from './Lifespan';
+import { PersonCredit } from './PersonCredit';
 import PersonStats from './PersonStats';
-import { useSystemData } from '~/hooks/useSystemData';
 
 const BIO_LENGTH_CUTOFF = 1280;
 
@@ -131,7 +131,7 @@ export const PersonDetail = ({
 								))}
 						</button>
 					</div>
-					<BirthAndDeath palette={palette} person={person} />
+					<Lifespan palette={palette} person={person} />
 				</div>
 			</div>
 

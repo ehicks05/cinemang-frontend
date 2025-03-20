@@ -1,16 +1,17 @@
 import { useState } from 'react';
 import { useTimeout } from 'usehooks-ts';
-import { useFetchFilm } from '~/hooks/useFetchFilms';
+import { useFetchShow } from '~/hooks/useFetchShows';
 import { getTmdbImage } from '~/utils/getTmdbImage';
 import { usePalette } from '~/utils/palettes/usePalettes';
-import { FilmCard } from '../../FilmCard';
+import { ShowCard } from '../../ShowCard';
 import HoverLoading from './HoverLoading';
 import { container } from './constants';
 
-const HoverFilm = ({ id }: { id: number }) => {
-	const { data: film, error, isLoading } = useFetchFilm(id);
-	const path = getTmdbImage({ path: film?.poster_path });
-	const { palette, loading: isPaletteLoading } = usePalette({ path });
+const HoverShow = ({ id }: { id: number }) => {
+	const { data: show, error, isLoading } = useFetchShow(id);
+
+	const path = getTmdbImage({ path: show?.poster_path });
+	const { palette, isLoading: isPaletteLoading } = usePalette({ path });
 
 	const [isReady, setIsReady] = useState(false);
 	useTimeout(() => setIsReady(true), 1000);
@@ -27,9 +28,9 @@ const HoverFilm = ({ id }: { id: number }) => {
 
 	return (
 		<div className={container}>
-			{film && palette && <FilmCard film={film} palette={palette} />}
+			{show && palette && <ShowCard show={show} palette={palette} />}
 		</div>
 	);
 };
 
-export default HoverFilm;
+export default HoverShow;

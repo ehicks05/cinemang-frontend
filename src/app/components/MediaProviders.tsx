@@ -1,11 +1,10 @@
-import type { FC } from 'react';
 import { useSystemData } from '~/hooks/useSystemData';
 import type { Provider } from '~/types/types';
 import { getTmdbImage } from '~/utils/getTmdbImage';
 
-const MediaProvider: FC<{ provider: Provider }> = ({
+const MediaProvider = ({
 	provider: { name, logo_path },
-}) => (
+}: { provider: Provider }) => (
 	<img
 		className="h-10 w-10 rounded-lg"
 		src={getTmdbImage({ path: logo_path, width: 'original' })}
@@ -18,7 +17,7 @@ interface Props {
 	selectedIds: { id: number }[];
 }
 
-const MediaProviders: FC<Props> = ({ selectedIds }) => {
+export const MediaProviders = ({ selectedIds }: Props) => {
 	const { providers } = useSystemData();
 
 	const filteredProviders = selectedIds
@@ -37,5 +36,3 @@ const MediaProviders: FC<Props> = ({ selectedIds }) => {
 		</div>
 	);
 };
-
-export default MediaProviders;

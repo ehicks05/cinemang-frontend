@@ -1,6 +1,6 @@
 import { ErrorComponent, createFileRoute } from '@tanstack/react-router';
+import { PersonDetail } from '~/app/components';
 import { getPersonById } from '~/hooks/useFetchPersons';
-import { PersonDetail } from '~/temp/app/components';
 import { getTmdbImage } from '~/utils/getTmdbImage';
 import { toPalette } from '~/utils/palettes/palette';
 

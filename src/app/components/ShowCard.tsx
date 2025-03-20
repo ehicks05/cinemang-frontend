@@ -4,7 +4,7 @@ import { useSystemData } from '~/hooks/useSystemData';
 import type { Show } from '~/types/types';
 import { getTmdbImage } from '~/utils/getTmdbImage';
 import type { Palette } from '~/utils/palettes/palette';
-import MediaProviders from './MediaProviders';
+import { MediaProviders } from './MediaProviders';
 import MediaStats from './MediaStats';
 import { toStats } from './utils';
 

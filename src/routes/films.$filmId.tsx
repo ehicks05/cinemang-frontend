@@ -1,7 +1,7 @@
 import { ErrorComponent, createFileRoute } from '@tanstack/react-router';
+import { FilmDetail } from '~/app/components';
 import { fetchTrailer } from '~/core-components/Trailer/useFetchVideos';
 import { getFilmById } from '~/hooks/useFetchFilms';
-import { FilmDetailWrapper } from '~/temp/app/components';
 
 export const Route = createFileRoute('/films/$filmId')({
 	loader: async ({ params }) => {
@@ -17,5 +17,5 @@ export const Route = createFileRoute('/films/$filmId')({
 function RouteComponent() {
 	const { film, trailer } = Route.useLoaderData();
 
-	return <FilmDetailWrapper film={film} trailer={trailer} />;
+	return <FilmDetail film={film} trailer={trailer} />;
 }

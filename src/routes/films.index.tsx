@@ -6,7 +6,7 @@ import {
 	type MovieSearchForm,
 	MovieSearchFormSchema,
 } from '~/utils/searchParams/types';
-import { FilmsWrapper } from '../temp/app/Films';
+import { FilmsWrapper } from '../app/Films';
 
 export const Route = createFileRoute('/films/')({
 	search: {
