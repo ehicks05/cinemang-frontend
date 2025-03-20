@@ -3,7 +3,7 @@ import { FaHeart } from 'react-icons/fa';
 import { OriginalImageLink } from '~/core-components';
 import type { Season } from '~/types/types';
 import { getTmdbImage } from '~/utils/getTmdbImage';
-import Stat from './Stat';
+import { StatChip } from './StatChip';
 
 const SeasonCard = ({ season }: { season: Season }) => (
 	<div className="flex w-full flex-col gap-2 rounded-lg bg-neutral-900 p-4">
@@ -27,14 +27,14 @@ const SeasonCard = ({ season }: { season: Season }) => (
 				</div>
 				<div>{season.overview}</div>
 				<span className="mt-2 flex w-full items-center gap-2">
-					<Stat
+					<StatChip
 						icon={FaHeart}
 						label={season.vote_average || '?.?'}
 						bgColor="#333"
 						color="text-red-600"
 						width="w-full sm:w-auto"
 					/>
-					<Stat
+					<StatChip
 						label={`${season.episode_count} Episodes`}
 						bgColor="#333"
 						color="text-red-600"

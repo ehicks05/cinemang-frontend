@@ -9,7 +9,7 @@ import { useSystemData } from '~/hooks/useSystemData';
 import type { Credit, Person } from '~/types/types';
 import { getTmdbImage } from '~/utils/getTmdbImage';
 import type { Palette } from '~/utils/palettes/palette';
-import Stat from '../Stat';
+import { StatChip } from '../StatChip';
 import { Lifespan } from './Lifespan';
 import { PersonCredit } from './PersonCredit';
 import PersonStats from './PersonStats';
@@ -46,7 +46,7 @@ const SortOptions = ({
 	>
 		{SORT_OPTIONS.map((o) => (
 			<button type="button" key={o.sort} onClick={() => setSort(o.sort)}>
-				<Stat
+				<StatChip
 					bgColor={darkVibrant}
 					color={sort === o.sort ? o.color : ''}
 					icon={o.icon}

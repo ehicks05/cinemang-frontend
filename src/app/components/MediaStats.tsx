@@ -1,5 +1,5 @@
 import { FaHeart, FaStar } from 'react-icons/fa';
-import Stat from './Stat';
+import { StatChip } from './StatChip';
 
 const nf = Intl.NumberFormat('en-US', { maximumFractionDigits: 1 });
 
@@ -74,7 +74,7 @@ const MediaStats = ({
 	return (
 		<span className={`flex ${autoWidth ? 'flex-wrap' : ''} gap-2`}>
 			{stats.map((stat) => (
-				<Stat
+				<StatChip
 					key={stat.key}
 					bgColor={bgColor}
 					color={stat.color}

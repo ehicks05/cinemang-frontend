@@ -9,7 +9,7 @@ interface Props {
 	width?: string;
 }
 
-const Stat = ({ bgColor, color, icon: Icon, label, title, width }: Props) => (
+const StatChip = ({ bgColor, color, icon: Icon, label, title, width }: Props) => (
 	<div
 		className={`flex ${width} items-center justify-center gap-1 rounded-lg bg-gray-700 px-3 py-2 sm:px-4`}
 		style={{ backgroundColor: bgColor }}
@@ -20,4 +20,4 @@ const Stat = ({ bgColor, color, icon: Icon, label, title, width }: Props) => (
 	</div>
 );
 
-export default Stat;
+export { StatChip };

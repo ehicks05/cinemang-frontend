@@ -1,5 +1,5 @@
 import { FaFilm, FaMask, FaStar } from 'react-icons/fa';
-import Stat from '../Stat';
+import { StatChip } from '../StatChip';
 
 interface Props {
 	autoWidth?: boolean;
@@ -39,7 +39,7 @@ const FilmStats = ({ bgColor, data, autoWidth = true }: Props) => {
 	return (
 		<div className="flex flex-wrap gap-2">
 			{stats.map((stat) => (
-				<Stat
+				<StatChip
 					bgColor={bgColor}
 					color={stat.color}
 					icon={stat.icon}
