@@ -10,7 +10,7 @@ import type * as React from 'react';
 import { DefaultCatchBoundary } from '~/components/DefaultCatchBoundary';
 import { NotFound } from '~/components/NotFound';
 import { Footer, Header } from '~/core-components';
-import { fetchSystemData } from '~/hooks/fetchSystemData';
+import { fetchSystemData } from '~/hooks/useSystemData';
 import appCss from '~/styles/app.css?url';
 import { seo } from '~/utils/seo';
 
