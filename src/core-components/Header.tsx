@@ -1,8 +1,6 @@
 import { Link } from '@tanstack/react-router';
 import { FaCat } from 'react-icons/fa';
 
-const activeClass = { className: 'font-bold' };
-
 const Header = () => (
 	<div className="mx-auto flex max-w-screen-lg items-center gap-4">
 		<Link
@@ -17,14 +15,14 @@ const Header = () => (
 
 		<Link
 			to="/films"
-			activeProps={activeClass}
+			activeProps={{ className: 'font-bold' }}
 			activeOptions={{ includeSearch: false }}
 		>
 			Movies
 		</Link>
 		<Link
 			to="/tv"
-			activeProps={activeClass}
+			activeProps={{ className: 'font-bold' }}
 			activeOptions={{ includeSearch: false }}
 		>
 			TV

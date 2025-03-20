@@ -1,4 +1,4 @@
-import { Outlet, createFileRoute, stripSearchParams } from '@tanstack/react-router';
+import { createFileRoute, stripSearchParams } from '@tanstack/react-router';
 import { zodValidator } from '@tanstack/zod-adapter';
 import { ShowsWrapper } from '~/app/Shows';
 import { queryShows } from '~/hooks/useFetchShows';
@@ -19,11 +19,5 @@ export const Route = createFileRoute('/tv/')({
 function RouteComponent() {
 	const { shows, count } = Route.useLoaderData();
 
-	return (
-		<div className="p-2 flex gap-2">
-			<ShowsWrapper shows={shows} count={count} />
-			<hr />
-			<Outlet />
-		</div>
-	);
+	return <ShowsWrapper shows={shows} count={count} />;
 }

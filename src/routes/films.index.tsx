@@ -27,9 +27,5 @@ export const Route = createFileRoute('/films/')({
 function RouteComponent() {
 	const { films, count } = Route.useLoaderData();
 
-	return (
-		<div>
-			<FilmsWrapper films={films} count={count} />
-		</div>
-	);
+	return <FilmsWrapper films={films} count={count} />;
 }
