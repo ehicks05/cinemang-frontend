@@ -6,9 +6,9 @@
 	"main": "src/app.js",
 	"scripts": {
 		"generate": "npx prisma generate",
-		"dev": "set NODE_OPTIONS=--max_old_space_size=480&&set NODE_ENV=development&&tsx watch src/app.ts -s=true",
+		"dev": "set NODE_OPTIONS=--max_old_space_size=480&&set NODE_ENV=development&&vite-node -w src/app.ts -s=true",
 		"build": "tsc && npx prisma generate",
-		"start": "set NODE_OPTIONS=--max_old_space_size=480&&set NODE_ENV=production&&npx tsx ./dist/app.js --syncOnStart"
+		"start": "set NODE_OPTIONS=--max_old_space_size=480&&set NODE_ENV=production&&vite-node ./dist/app.js --syncOnStart"
 	},
 	"author": "",
 	"license": "ISC",
@@ -34,6 +34,8 @@
 		"@types/yargs": "^17.0.33",
 		"prisma": "^6.5.0",
 		"tsx": "^4.19.3",
-		"typescript": "^5.8.2"
+		"typescript": "^5.8.2",
+		"vite": "^6.2.2",
+		"vite-node": "^3.0.9"
 	}
 }
