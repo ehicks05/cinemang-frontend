@@ -1,10 +1,10 @@
-import { Prisma } from '@prisma/client';
+import type { Prisma } from '@prisma/client';
 import P from 'bluebird';
 import _, { chunk, keyBy, omit, uniq } from 'lodash';
 import logger from '../../services/logger';
 import prisma from '../../services/prisma';
 import { getGenres, getLanguages, getProviders } from '../../services/tmdb';
-import { MediaResponse } from '../../services/tmdb/types/responses';
+import type { MediaResponse } from '../../services/tmdb/types/responses';
 
 export const updateGenres = async () => {
 	update({

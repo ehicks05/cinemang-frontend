@@ -1,5 +1,5 @@
-import { CastCredit, CrewCredit } from './appends';
-import { TmdbMovieStatus, TmdbTvStatus } from './enums';
+import type { CastCredit, CrewCredit } from './appends';
+import type { TmdbMovieStatus, TmdbTvStatus } from './enums';
 
 export interface Company {
 	description: string;

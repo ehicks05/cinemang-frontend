@@ -1,4 +1,4 @@
-import {
+import type {
 	AppendedContentRating,
 	AppendedImage,
 	AppendedImages,
@@ -7,7 +7,15 @@ import {
 	CastCredit,
 	CrewCredit,
 } from './appends';
-import { Genre, Movie, Person, Provider, RecentChange, Season, Show } from './base';
+import type {
+	Genre,
+	Movie,
+	Person,
+	Provider,
+	RecentChange,
+	Season,
+	Show,
+} from './base';
 
 /**
  * These types account for the way some api responses are packaged

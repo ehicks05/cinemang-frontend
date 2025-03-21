@@ -1,8 +1,8 @@
-import { Interval, format } from 'date-fns';
+import { type Interval, format } from 'date-fns';
 import { intersection } from 'lodash';
 import { discoverMediaIds } from './discover';
 import tmdb from './tmdb';
-import { RecentChangesResponse } from './types/responses';
+import type { RecentChangesResponse } from './types/responses';
 
 export type Resource = 'movie' | 'tv' | 'person';
 

@@ -1,6 +1,6 @@
-import { Prisma } from '@prisma/client';
+import type { Prisma } from '@prisma/client';
 import { pick } from 'lodash';
-import { PersonResponse } from '../../services/tmdb/types/responses';
+import type { PersonResponse } from '../../services/tmdb/types/responses';
 
 const isValidPerson = (person: PersonResponse) => person.profile_path;
 

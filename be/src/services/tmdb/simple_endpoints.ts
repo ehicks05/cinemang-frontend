@@ -1,10 +1,10 @@
 import { GenreType } from '@prisma/client';
-import axios, { AxiosError } from 'axios';
+import axios, { type AxiosError } from 'axios';
 import { groupBy } from 'lodash';
 import logger from '../logger';
 import tmdb from './tmdb';
-import { Language } from './types/base';
-import {
+import type { Language } from './types/base';
+import type {
 	GenreResponse,
 	MovieResponse,
 	PersonResponse,

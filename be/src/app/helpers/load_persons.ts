@@ -1,5 +1,5 @@
-import { Prisma } from '@prisma/client';
-import axios, { AxiosError } from 'axios';
+import type { Prisma } from '@prisma/client';
+import axios, { type AxiosError } from 'axios';
 import P from 'bluebird';
 import { subDays } from 'date-fns';
 import { intersection } from 'lodash';
@@ -9,7 +9,7 @@ import prisma from '../../services/prisma';
 import { getPerson } from '../../services/tmdb';
 import { getRecentlyChangedIds } from '../../services/tmdb/changes';
 import { TMDB_OPTIONS } from '../../services/tmdb/constants';
-import { PersonResponse } from '../../services/tmdb/types/responses';
+import type { PersonResponse } from '../../services/tmdb/types/responses';
 import { parsePerson } from './parse_person';
 
 const toId = (o: { id: number }) => o.id;

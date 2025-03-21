@@ -1,4 +1,4 @@
-import { AxiosError } from 'axios';
+import type { AxiosError } from 'axios';
 import { pick } from 'lodash';
 import logger from '../logger';
 

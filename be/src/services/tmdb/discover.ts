@@ -1,6 +1,6 @@
 import P from 'bluebird';
 import {
-	Interval,
+	type Interval,
 	addMonths,
 	eachYearOfInterval,
 	format,

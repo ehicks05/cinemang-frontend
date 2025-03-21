@@ -1,4 +1,4 @@
-import { Prisma } from '@prisma/client';
+import type { Prisma } from '@prisma/client';
 import P from 'bluebird';
 import { formatDuration, intervalToDuration, isFirstDayOfMonth } from 'date-fns';
 import {
@@ -16,8 +16,8 @@ import logger from '../services/logger';
 import prisma from '../services/prisma';
 import { discoverMediaIds, getMovie, getSeason, getShow } from '../services/tmdb';
 import { TMDB_OPTIONS } from '../services/tmdb/constants';
-import { SeasonSummary } from '../services/tmdb/types/base';
-import { MovieResponse, ShowResponse } from '../services/tmdb/types/responses';
+import type { SeasonSummary } from '../services/tmdb/types/base';
+import type { MovieResponse, ShowResponse } from '../services/tmdb/types/responses';
 import {
 	isEqual,
 	mediasToPersonIds,

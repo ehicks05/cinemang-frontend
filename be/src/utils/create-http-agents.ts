@@ -1,4 +1,4 @@
-import Agent from 'agentkeepalive';
+import { HttpAgent, HttpsAgent } from 'agentkeepalive';
 
 const DEFAULTS = {
 	maxSockets: 100,
@@ -8,9 +8,9 @@ const DEFAULTS = {
 };
 
 export function createHttpAgent() {
-	return new Agent(DEFAULTS);
+	return new HttpAgent(DEFAULTS);
 }
 
 export function createHttpsAgent() {
-	return new Agent.HttpsAgent(DEFAULTS);
+	return new HttpsAgent(DEFAULTS);
 }
