@@ -30,7 +30,7 @@ export const FilmDetail = ({ film, trailer }: Props) => {
 
 	return (
 		<div
-			className="m-auto flex max-w-screen-lg flex-col gap-4 p-4 sm:rounded-lg"
+			className="m-auto flex max-w-5xl flex-col gap-4 p-4 sm:rounded-lg"
 			style={palette.bgStyles}
 		>
 			<div>
@@ -42,7 +42,7 @@ export const FilmDetail = ({ film, trailer }: Props) => {
 				</div>
 			</div>
 			<div className="flex flex-col gap-4 sm:flex-row">
-				<div className="flex-shrink-0">
+				<div className="shrink-0">
 					<div className="relative">
 						<img
 							alt="poster"

@@ -28,7 +28,7 @@ const ShowDetail = ({
 
 	return (
 		<div
-			className="m-auto flex max-w-screen-lg flex-col gap-4 p-4 sm:rounded-lg"
+			className="m-auto flex max-w-5xl flex-col gap-4 p-4 sm:rounded-lg"
 			style={palette.bgStyles}
 		>
 			<div>
@@ -53,7 +53,7 @@ const ShowDetail = ({
 					</div>
 				</div>
 				<div className="flex w-full flex-col gap-4 sm:w-3/5">
-					<div className="flex flex-grow flex-col gap-4">
+					<div className="flex grow flex-col gap-4">
 						{trailer && <Trailer trailer={trailer} />}
 						{show.providers.length > 0 && (
 							<MediaProviders selectedIds={show.providers} />

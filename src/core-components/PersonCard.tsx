@@ -43,7 +43,7 @@ const PersonCard = ({
 		>
 			<img alt="cast" className="rounded-t-lg" src={profile} />
 
-			<div className="flex-grow p-1.5">
+			<div className="grow p-1.5">
 				<div>{name}</div>
 				{characters && <div className="text-sm">as {characters.join(', ')}</div>}
 				{jobs && <div className="text-sm">{jobs.join(', ')}</div>}

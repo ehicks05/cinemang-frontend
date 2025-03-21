@@ -38,7 +38,7 @@ export function ComboBox({ options, selectedOptions, handleChange }: Props) {
 				key={imageUrl}
 				alt="provider"
 				src={imageUrl}
-				className="h-8 w-8 rounded"
+				className="h-8 w-8 rounded-sm"
 			/>
 		));
 

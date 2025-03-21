@@ -3,7 +3,7 @@ import { SCALED_IMAGE } from '~/constants/constants';
 
 const Image = () => (
 	<div
-		className="flex items-center justify-center rounded bg-gray-700"
+		className="flex items-center justify-center rounded-sm bg-gray-700"
 		style={{ height: SCALED_IMAGE.h, width: SCALED_IMAGE.w }}
 	>
 		<FaImage className="h-16 w-16 text-gray-400" />

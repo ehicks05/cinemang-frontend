@@ -41,7 +41,7 @@ const PersonCredit = ({ bgColor, genres, languages, credit }: Props) => {
 	return (
 		<HoverCard.Root openDelay={100}>
 			<div
-				className="flex flex-col justify-between gap-2 rounded border p-2 sm:flex-row sm:items-center"
+				className="flex flex-col justify-between gap-2 rounded-sm border p-2 sm:flex-row sm:items-center"
 				key={credit.credit_id}
 				style={{ borderColor: bgColor }}
 			>

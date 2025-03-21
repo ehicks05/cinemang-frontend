@@ -13,7 +13,7 @@ const Loading: FC<Props> = ({ loading, error, size = 128 }) => {
 	}
 	if (loading) {
 		return (
-			<div className="flex flex-grow items-center justify-center">
+			<div className="flex grow items-center justify-center">
 				<VscLoading
 					className="animate-spin opacity-25"
 					color="#15eda1"

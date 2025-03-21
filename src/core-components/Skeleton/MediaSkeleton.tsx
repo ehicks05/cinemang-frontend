@@ -4,7 +4,7 @@ const MediaSkeleton = () => (
 	<div className="bg-gray-800 sm:rounded-lg">
 		<div className="flex animate-pulse flex-col gap-4 p-4 sm:rounded-lg">
 			<div className="flex gap-4">
-				<div className="flex-shrink-0">
+				<div className="shrink-0">
 					<Sk.Image />
 				</div>
 				<div className="flex w-full flex-col gap-4">
@@ -18,7 +18,7 @@ const MediaSkeleton = () => (
 						<Sk.Text />
 					</div>
 					<div />
-					<div className="flex-grow" />
+					<div className="grow" />
 					<div className="flex w-3/4 gap-2">
 						<Sk.Text h="h-10" />
 						<Sk.Text h="h-10" />

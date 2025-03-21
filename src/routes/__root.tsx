@@ -96,9 +96,9 @@ function RootDocument({ children }: { children: React.ReactNode }) {
 				<HeadContent />
 			</head>
 			<body>
-				<div className="flex min-h-screen flex-col bg-gradient-to-tr from-indigo-900 to-green-900 text-gray-50">
+				<div className="flex min-h-screen flex-col bg-linear-to-tr from-indigo-900 to-green-900 text-gray-50">
 					<Header />
-					<div className="flex h-full flex-grow flex-col pb-4 sm:px-4">
+					<div className="flex h-full grow flex-col pb-4 sm:px-4">
 						{children}
 						<Footer />
 					</div>

@@ -23,7 +23,7 @@ export const FilmCard = ({ film, palette }: { film: IFilm; palette: Palette }) =
 				style={palette?.bgStyles}
 			>
 				<div className="flex gap-4">
-					<div className="flex-shrink-0">
+					<div className="shrink-0">
 						<img
 							alt="poster"
 							height={SCALED_IMAGE.h}
@@ -45,7 +45,7 @@ export const FilmCard = ({ film, palette }: { film: IFilm; palette: Palette }) =
 								<div key={name}>{name}</div>
 							))}
 						</div>
-						<div className="flex-grow" />
+						<div className="grow" />
 						{film.providers && <MediaProviders selectedIds={film.providers} />}
 					</div>
 				</div>

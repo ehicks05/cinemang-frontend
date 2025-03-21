@@ -24,7 +24,7 @@ export const ShowCard = ({ show, palette }: { show: Show; palette: Palette }) =>
 				style={palette?.bgStyles}
 			>
 				<div className="flex gap-4">
-					<div className="flex-shrink-0">
+					<div className="shrink-0">
 						<img
 							alt="poster"
 							height={SCALED_IMAGE.h}
@@ -45,7 +45,7 @@ export const ShowCard = ({ show, palette }: { show: Show; palette: Palette }) =>
 								<div key={name}>{name}</div>
 							))}
 						</div>
-						<div className="flex-grow" />
+						<div className="grow" />
 						{show.providers && <MediaProviders selectedIds={show.providers} />}
 					</div>
 				</div>

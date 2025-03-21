@@ -51,7 +51,7 @@ const SystemInfo = () => {
 			</Popover.Trigger>
 			<Popover.Portal>
 				<Popover.Content sideOffset={5} className="z-20">
-					<div className="z-50 w-60 rounded bg-neutral-700 p-2 text-neutral-200 shadow-2xl">
+					<div className="z-50 w-60 rounded-sm bg-neutral-700 p-2 text-neutral-200 shadow-2xl">
 						<table className="w-full text-sm">
 							<thead>
 								<tr>

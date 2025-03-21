@@ -68,7 +68,7 @@ const FormFields = () => {
 		<div className="grid gap-4 text-sm sm:grid-cols-2 sm:text-sm lg:grid-cols-3 xl:grid-cols-4">
 			{mode === 'movie' && (
 				<div className="flex gap-2">
-					<div className="flex-grow">
+					<div className="grow">
 						<div>Title</div>
 						<div>
 							<input
@@ -83,7 +83,7 @@ const FormFields = () => {
 			)}
 			{mode === 'tv' && (
 				<div className="flex gap-2">
-					<div className="flex-grow">
+					<div className="grow">
 						<div>Title</div>
 						<div>
 							<input
@@ -97,7 +97,7 @@ const FormFields = () => {
 				</div>
 			)}
 			<div className="flex gap-2">
-				<div className="flex-grow">
+				<div className="grow">
 					<div>Credits Include</div>
 					<div>
 						<input
@@ -142,7 +142,7 @@ const FormFields = () => {
 			</div>
 
 			<div className="flex gap-2">
-				<div className="flex-shrink-0">
+				<div className="shrink-0">
 					<div className="whitespace-nowrap">Min Votes</div>
 					<div className="flex gap-2">
 						<input
@@ -156,7 +156,7 @@ const FormFields = () => {
 					</div>
 				</div>
 
-				<div className="flex-shrink">
+				<div className="shrink">
 					<div>Rating</div>
 					<div className="flex gap-2">
 						<input

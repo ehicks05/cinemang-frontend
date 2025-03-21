@@ -8,7 +8,7 @@ import { StatChip } from './StatChip';
 const SeasonCard = ({ season }: { season: Season }) => (
 	<div className="flex w-full flex-col gap-2 rounded-lg bg-neutral-900 p-4">
 		<div className="flex w-full flex-col gap-2 rounded-lg bg-neutral-900 sm:flex-row">
-			<div className="relative w-full flex-shrink-0 sm:w-40">
+			<div className="relative w-full shrink-0 sm:w-40">
 				<img
 					alt="poster"
 					className="w-full rounded-lg"

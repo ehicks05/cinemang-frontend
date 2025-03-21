@@ -41,7 +41,7 @@ const SortOptions = ({
 	sort: SortKey;
 }) => (
 	<div
-		className="flex w-fit gap-2 self-end rounded p-2"
+		className="flex w-fit gap-2 self-end rounded-sm p-2"
 		style={{ borderColor: darkVibrant }}
 	>
 		{SORT_OPTIONS.map((o) => (
@@ -97,11 +97,11 @@ export const PersonDetail = ({
 
 	return (
 		<div
-			className="m-auto flex max-w-screen-lg flex-col gap-4 p-4 sm:rounded-lg"
+			className="m-auto flex max-w-(--breakpoint-lg) flex-col gap-4 p-4 sm:rounded-lg"
 			style={palette.bgStyles}
 		>
 			<div className="flex flex-col gap-4 sm:flex-row">
-				<div className="flex flex-shrink-0 flex-col gap-4">
+				<div className="flex shrink-0 flex-col gap-4">
 					<div className="relative">
 						<img
 							alt="poster"
