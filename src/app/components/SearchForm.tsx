@@ -279,14 +279,10 @@ const FormFields = () => {
 						))}
 					</select>
 					<Button
-						className="border-l-0 border-neutral-500 bg-neutral-700 px-3 text-white"
+						className="border-1 border-l-0 rounded-none border-neutral-500 bg-neutral-700 px-3 py-5 text-white"
 						onClick={() => handleChange({ ascending: !form.ascending }, true)}
 					>
-						{form.ascending ? (
-							<HiSortAscending className="text-xl" />
-						) : (
-							<HiSortDescending className="text-xl" />
-						)}
+						{form.ascending ? <HiSortAscending /> : <HiSortDescending />}
 					</Button>
 				</div>
 			</div>
@@ -296,7 +292,7 @@ const FormFields = () => {
 				<div>&nbsp;</div>
 				<div className="flex">
 					<Button
-						className="border-neutral-500 bg-neutral-700 px-3 py-2 text-base text-white"
+						className="border-neutral-500 border rounded-none bg-neutral-700 px-3 py-5 text-base text-white"
 						onClick={() =>
 							handleChange({
 								...(from === '/tv'
