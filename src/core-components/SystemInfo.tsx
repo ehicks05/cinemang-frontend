@@ -46,32 +46,22 @@ const SystemInfo = () => {
 			<PopoverTrigger>
 				<HiOutlineInformationCircle className="text-3xl text-emerald-500 hover:text-emerald-400" />
 			</PopoverTrigger>
-			<PopoverContent className="z-20 w-60 rounded-sm bg-neutral-700 p-2 text-neutral-200 shadow-2xl border-none">
-				<table className="w-full text-sm">
-					<thead>
-						<tr>
-							<th colSpan={2}>Sync Stats</th>
-						</tr>
-					</thead>
-					<tbody>
-						<tr>
-							<td className="text-left">start</td>
-							<td className="text-right">{format(createdAt, DEFAULT)}</td>
-						</tr>
-						<tr>
-							<td className="text-left">end</td>
-							<td className="text-right">
-								{endedAt ? format(endedAt, DEFAULT) : 'pending'}
-							</td>
-						</tr>
-					</tbody>
-					<tfoot>
-						<tr>
-							<th className="text-left">duration</th>
-							<th className="text-right">{duration || 'pending'}</th>
-						</tr>
-					</tfoot>
-				</table>
+			<PopoverContent className="w-48 p-2 rounded-sm bg-neutral-700 text-neutral-200 shadow-2xl border-none">
+				<div className="flex flex-col gap-4 text-sm">
+					<div className="font-bold">Sync Stats</div>
+					<div className="flex flex-col">
+						<div>Start</div>
+						<div>{format(createdAt, DEFAULT)}</div>
+					</div>
+					<div className="flex flex-col">
+						<div>End</div>
+						<div>{endedAt ? format(endedAt, DEFAULT) : 'pending'}</div>
+					</div>
+					<div className="flex flex-col">
+						<div>Duration</div>
+						<div>{duration || 'pending'}</div>
+					</div>
+				</div>
 			</PopoverContent>
 		</Popover>
 	);
