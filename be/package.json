@@ -6,9 +6,9 @@
 	"main": "src/app.js",
 	"scripts": {
 		"generate": "npx prisma generate",
-		"dev": "set NODE_OPTIONS=--max_old_space_size=480&&set NODE_ENV=development&&vite-node -w src/app.ts -s=true",
-		"build": "tsc && npx prisma generate",
-		"start": "set NODE_OPTIONS=--max_old_space_size=480&&set NODE_ENV=production&&vite-node ./dist/app.js --syncOnStart"
+		"dev": "set NODE_OPTIONS=--max_old_space_size=480&&set NODE_ENV=development&&tsx --watch src/app.ts -s=true",
+		"build": "set NPM_CONFIG_PRODUCTION=false&&tsc && tsc-alias && npx prisma generate",
+		"start": "set NODE_OPTIONS=--max_old_space_size=480&&set NODE_ENV=production&&tsx ./dist/app.js --syncOnStart"
 	},
 	"author": "",
 	"license": "ISC",
@@ -22,8 +22,7 @@
 		"lodash-es": "^4.17.21",
 		"log4js": "^6.9.1",
 		"node-schedule": "^2.1.1",
-		"yargs": "^17.7.2",
-		"vite-node": "^3.0.9"
+		"yargs": "^17.7.2"
 	},
 	"devDependencies": {
 		"@biomejs/biome": "1.9.4",
@@ -34,8 +33,8 @@
 		"@types/node-schedule": "^2.1.7",
 		"@types/yargs": "^17.0.33",
 		"prisma": "^6.5.0",
+		"tsc-alias": "^1.8.11",
 		"tsx": "^4.19.3",
-		"typescript": "^5.8.2",
-		"vite": "^6.2.2"
+		"typescript": "^5.8.2"
 	}
 }
