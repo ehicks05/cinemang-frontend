@@ -1,7 +1,7 @@
-# cinemang-frontend
+# cinemang
 
 ## Overview
-This repo is the frontend for Cinemang, a movie-finder app. 
+Cinemang is a movie-finder app. 
 
 It is powered by a Supabase instance that is populated with data from TMDB via this import script: https://github.com/ehicks05/cinemang-backend. The Supabase instance provides a REST-ish API and acts as the backend service.
 
