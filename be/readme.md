@@ -1,5 +1,10 @@
 # cinemang-backend
 
+## temp notes
+
+to tell dokku to build from `./be` instead of `/`:
+dokku builder:set cinemang-backend build-dir be
+
 ## Overview
 
 This repo contains data importing logic for https://github.com/ehicks05/cinemang-frontend. On a high level, what it does is:
