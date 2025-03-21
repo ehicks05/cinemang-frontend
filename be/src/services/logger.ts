@@ -1,6 +1,6 @@
-import { configure, getLogger } from 'log4js';
+import log4js from 'log4js';
 
-configure({
+log4js.configure({
 	appenders: {
 		everythingFile: {
 			type: 'file',
@@ -21,7 +21,7 @@ configure({
 	},
 });
 
-const logger = getLogger();
+const logger = log4js.getLogger();
 logger.level = 'info';
 
 export default logger;

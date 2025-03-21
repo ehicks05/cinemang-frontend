@@ -8,7 +8,7 @@
 		"generate": "npx prisma generate",
 		"dev": "set NODE_OPTIONS=--max_old_space_size=480&&set NODE_ENV=development&&tsx watch src/app.ts -s=true",
 		"build": "tsc && npx prisma generate",
-		"start": "set NODE_OPTIONS=--max_old_space_size=480&&set NODE_ENV=production&&node ./dist/app.js --syncOnStart"
+		"start": "set NODE_OPTIONS=--max_old_space_size=480&&set NODE_ENV=production&&npx tsx ./dist/app.js --syncOnStart"
 	},
 	"author": "",
 	"license": "ISC",
