@@ -1,6 +1,6 @@
 import { GenreType } from '@prisma/client';
 import axios, { type AxiosError } from 'axios';
-import { groupBy } from 'lodash';
+import { groupBy } from 'lodash-es';
 import logger from '~/services/logger.js';
 import tmdb from './tmdb.js';
 import type { Language } from './types/base.js';

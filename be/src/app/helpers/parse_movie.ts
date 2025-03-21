@@ -1,5 +1,5 @@
 import type { Prisma } from '@prisma/client';
-import { pick } from 'lodash';
+import { pick } from 'lodash-es';
 import type { MovieResponse } from '~/services/tmdb/types/responses.js';
 
 const parseTopNCredits = (credits: MovieResponse['credits']['cast'], n = 3) =>

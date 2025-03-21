@@ -1,4 +1,4 @@
-import { omit } from 'lodash';
+import { omit } from 'lodash-es';
 import logger from '~/services/logger.js';
 import prisma from '~/services/prisma.js';
 

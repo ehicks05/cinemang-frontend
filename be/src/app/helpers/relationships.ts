@@ -1,6 +1,6 @@
 import type { Prisma } from '@prisma/client';
 import P from 'bluebird';
-import { differenceBy, keyBy } from 'lodash';
+import { differenceBy, keyBy } from 'lodash-es';
 import { PRISMA_OPTIONS } from '~/constants.js';
 import logger from '~/services/logger.js';
 import prisma from '~/services/prisma.js';

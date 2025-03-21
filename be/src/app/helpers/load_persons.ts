@@ -2,7 +2,7 @@ import type { Prisma } from '@prisma/client';
 import axios, { type AxiosError } from 'axios';
 import P from 'bluebird';
 import { subDays } from 'date-fns';
-import { intersection } from 'lodash';
+import { intersection } from 'lodash-es';
 import logger from '~/services/logger.js';
 import prisma from '~/services/prisma.js';
 import { getRecentlyChangedIds } from '~/services/tmdb/changes.js';

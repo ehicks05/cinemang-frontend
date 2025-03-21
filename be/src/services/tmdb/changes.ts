@@ -1,5 +1,5 @@
 import { type Interval, format } from 'date-fns';
-import { intersection } from 'lodash';
+import { intersection } from 'lodash-es';
 import { discoverMediaIds } from './discover.js';
 import tmdb from './tmdb.js';
 import type { RecentChangesResponse } from './types/responses.js';

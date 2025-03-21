@@ -1,5 +1,5 @@
 import type { AxiosError } from 'axios';
-import { pick } from 'lodash';
+import { pick } from 'lodash-es';
 import logger from '~/services/logger.js';
 
 export const logAxiosError = (error: AxiosError) => {

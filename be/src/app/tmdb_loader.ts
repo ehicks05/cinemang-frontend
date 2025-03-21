@@ -9,7 +9,7 @@ import {
 	keyBy,
 	partition,
 	uniqBy,
-} from 'lodash';
+} from 'lodash-es';
 import { PRISMA_OPTIONS } from '~/constants.js';
 import { argv } from '~/services/args.js';
 import logger from '~/services/logger.js';
