@@ -1,9 +1,9 @@
 import { GenreType } from '@prisma/client';
 import axios, { type AxiosError } from 'axios';
 import { groupBy } from 'lodash';
-import logger from '../logger';
-import tmdb from './tmdb';
-import type { Language } from './types/base';
+import logger from '~/services/logger.js';
+import tmdb from './tmdb.js';
+import type { Language } from './types/base.js';
 import type {
 	GenreResponse,
 	MovieResponse,
@@ -11,8 +11,8 @@ import type {
 	ProviderResponse,
 	SeasonResponse,
 	ShowResponse,
-} from './types/responses';
-import { logAxiosError } from './utils';
+} from './types/responses.js';
+import { logAxiosError } from './utils.js';
 
 export const getMovie = async (id: number) => {
 	try {

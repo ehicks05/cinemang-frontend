@@ -1,10 +1,10 @@
 import type { Prisma } from '@prisma/client';
 import P from 'bluebird';
-import _, { chunk, keyBy, omit, uniq } from 'lodash';
-import logger from '../../services/logger';
-import prisma from '../../services/prisma';
-import { getGenres, getLanguages, getProviders } from '../../services/tmdb';
-import type { MediaResponse } from '../../services/tmdb/types/responses';
+import { isEqual as _isEqual, chunk, keyBy, omit, uniq } from 'lodash-es';
+import logger from '~/services/logger.js';
+import prisma from '~/services/prisma.js';
+import { getGenres, getLanguages, getProviders } from '~/services/tmdb/index.js';
+import type { MediaResponse } from '~/services/tmdb/types/responses.js';
 
 export const updateGenres = async () => {
 	update({
@@ -51,7 +51,7 @@ export const isEqual = (a: Record<string, any>, b: Record<string, any>) => {
 
 	// TODO: omitting 'count' is hacky
 	const omittedFields = ['popularity', 'count', ...omitVoteCount];
-	return _.isEqual(omit(a, omittedFields), omit(b, omittedFields));
+	return _isEqual(omit(a, omittedFields), omit(b, omittedFields));
 };
 
 interface Params {

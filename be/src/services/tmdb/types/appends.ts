@@ -1,4 +1,4 @@
-import type { Person, Provider } from './base';
+import type { Person, Provider } from './base.js';
 
 /**
  * Variations of the base types that generally omit a few fields

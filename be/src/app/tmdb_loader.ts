@@ -10,26 +10,37 @@ import {
 	partition,
 	uniqBy,
 } from 'lodash';
-import { PRISMA_OPTIONS } from '../constants';
-import { argv } from '../services/args';
-import logger from '../services/logger';
-import prisma from '../services/prisma';
-import { discoverMediaIds, getMovie, getSeason, getShow } from '../services/tmdb';
-import { TMDB_OPTIONS } from '../services/tmdb/constants';
-import type { SeasonSummary } from '../services/tmdb/types/base';
-import type { MovieResponse, ShowResponse } from '../services/tmdb/types/responses';
+import { PRISMA_OPTIONS } from '~/constants.js';
+import { argv } from '~/services/args.js';
+import logger from '~/services/logger.js';
+import prisma from '~/services/prisma.js';
+import { TMDB_OPTIONS } from '~/services/tmdb/constants.js';
+import {
+	discoverMediaIds,
+	getMovie,
+	getSeason,
+	getShow,
+} from '~/services/tmdb/index.js';
+import type { SeasonSummary } from '~/services/tmdb/types/base.js';
+import type {
+	MovieResponse,
+	ShowResponse,
+} from '~/services/tmdb/types/responses.js';
 import {
 	isEqual,
 	mediasToPersonIds,
 	updateGenres,
 	updateLanguages,
 	updateProviders,
-} from './helpers/helpers';
-import { createPersons, updatePersons } from './helpers/load_persons';
-import { parseMovie } from './helpers/parse_movie';
-import { parseShow } from './helpers/parse_show';
-import { updateRelationships } from './helpers/relationships';
-import { updateLanguageCounts, updateProviderCounts } from './helpers/update_counts';
+} from './helpers/helpers.js';
+import { createPersons, updatePersons } from './helpers/load_persons.js';
+import { parseMovie } from './helpers/parse_movie.js';
+import { parseShow } from './helpers/parse_show.js';
+import { updateRelationships } from './helpers/relationships.js';
+import {
+	updateLanguageCounts,
+	updateProviderCounts,
+} from './helpers/update_counts.js';
 
 const toId = (o: { id: number }) => o.id;
 const toCreditId = (o: { credit_id: string }) => o.credit_id;

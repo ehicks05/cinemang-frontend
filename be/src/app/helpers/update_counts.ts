@@ -1,6 +1,6 @@
 import { omit } from 'lodash';
-import logger from '../../services/logger';
-import prisma from '../../services/prisma';
+import logger from '~/services/logger.js';
+import prisma from '~/services/prisma.js';
 
 export const updateLanguageCounts = async () => {
 	const [languages, languageCounts] = await Promise.all([

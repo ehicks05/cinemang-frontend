@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { createHttpAgent, createHttpsAgent } from './create-http-agents';
+import { createHttpAgent, createHttpsAgent } from './create-http-agents.js';
 
 export function configureHttp(): void {
 	axios.defaults.httpAgent = createHttpAgent();

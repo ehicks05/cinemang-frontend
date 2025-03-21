@@ -6,7 +6,7 @@ import type {
 	AppendedRelease,
 	CastCredit,
 	CrewCredit,
-} from './appends';
+} from './appends.js';
 import type {
 	Genre,
 	Movie,
@@ -15,7 +15,7 @@ import type {
 	RecentChange,
 	Season,
 	Show,
-} from './base';
+} from './base.js';
 
 /**
  * These types account for the way some api responses are packaged

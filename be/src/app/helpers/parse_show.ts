@@ -1,5 +1,5 @@
 import type { Prisma } from '@prisma/client';
-import type { ShowResponse } from '../../services/tmdb/types/responses';
+import type { ShowResponse } from '~/services/tmdb/types/responses.js';
 
 const MIN_VOTES = 64;
 

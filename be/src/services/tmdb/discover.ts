@@ -7,8 +7,8 @@ import {
 	lastDayOfYear,
 	subMonths,
 } from 'date-fns';
-import { TMDB_OPTIONS } from './constants';
-import tmdb from './tmdb';
+import { TMDB_OPTIONS } from './constants.js';
+import tmdb from './tmdb.js';
 
 const MIN_VOTES = '64';
 const DEFAULT_START_DATE = new Date('1874-01-01');

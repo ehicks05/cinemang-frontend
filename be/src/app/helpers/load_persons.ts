@@ -3,14 +3,14 @@ import axios, { type AxiosError } from 'axios';
 import P from 'bluebird';
 import { subDays } from 'date-fns';
 import { intersection } from 'lodash';
-import { PRISMA_OPTIONS } from '../../constants';
-import logger from '../../services/logger';
-import prisma from '../../services/prisma';
-import { getPerson } from '../../services/tmdb';
-import { getRecentlyChangedIds } from '../../services/tmdb/changes';
-import { TMDB_OPTIONS } from '../../services/tmdb/constants';
-import type { PersonResponse } from '../../services/tmdb/types/responses';
-import { parsePerson } from './parse_person';
+import logger from '~/services/logger.js';
+import prisma from '~/services/prisma.js';
+import { getRecentlyChangedIds } from '~/services/tmdb/changes.js';
+import { TMDB_OPTIONS } from '~/services/tmdb/constants.js';
+import { getPerson } from '~/services/tmdb/index.js';
+import type { PersonResponse } from '~/services/tmdb/types/responses.js';
+import { PRISMA_OPTIONS } from '../../constants.js';
+import { parsePerson } from './parse_person.js';
 
 const toId = (o: { id: number }) => o.id;
 

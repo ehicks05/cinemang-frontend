@@ -1,9 +1,9 @@
 import 'dotenv/config';
 
-import updateDbTask from './app/tmdb_loader';
-import { argv } from './services/args';
-import logger from './services/logger';
-import { scheduleUpdateTask } from './tasks';
+import updateDbTask from './app/tmdb_loader.js';
+import { argv } from './services/args.js';
+import logger from './services/logger.js';
+import { scheduleUpdateTask } from './tasks.js';
 
 const init = async () => {
 	if (argv.syncOnStart) {

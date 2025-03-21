@@ -1,5 +1,5 @@
 import axios from 'axios';
-import _ from 'lodash';
+import { range } from 'lodash-es';
 import P from 'bluebird';
 
 const statuses = new Set();
@@ -21,7 +21,7 @@ const querySeries = async (id: number) => {
 };
 
 const run = async () => {
-  const ids = _.range(0, 1024);
+  const ids = range(0, 1024);
   await P.map(ids, querySeries, { concurrency: 5 });
 };
 

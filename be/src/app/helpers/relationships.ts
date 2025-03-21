@@ -1,11 +1,11 @@
 import type { Prisma } from '@prisma/client';
 import P from 'bluebird';
 import { differenceBy, keyBy } from 'lodash';
-import { PRISMA_OPTIONS } from '../../constants';
-import logger from '../../services/logger';
-import prisma from '../../services/prisma';
-import type { MediaResponse } from '../../services/tmdb/types/responses';
-import { getExistingPersonIds, isEqual } from './helpers';
+import { PRISMA_OPTIONS } from '~/constants.js';
+import logger from '~/services/logger.js';
+import prisma from '~/services/prisma.js';
+import type { MediaResponse } from '~/services/tmdb/types/responses.js';
+import { getExistingPersonIds, isEqual } from './helpers.js';
 
 const toId = (o: { id: number }) => o.id;
 

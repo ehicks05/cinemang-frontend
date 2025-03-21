@@ -1,6 +1,6 @@
 import type { AxiosError } from 'axios';
 import { pick } from 'lodash';
-import logger from '../logger';
+import logger from '~/services/logger.js';
 
 export const logAxiosError = (error: AxiosError) => {
 	const config = pick(error.config, ['baseURL', 'url', 'params']);
