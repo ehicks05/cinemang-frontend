@@ -31,9 +31,15 @@ export function ComboBox({ options, selectedOptions, handleChange }: Props) {
 	const [open, setOpen] = React.useState(false);
 
 	const triggerIcons = selectedOptions
+		.slice(0, 6)
 		.map((selected) => options.find((option) => selected === option.id)?.imageUrl)
 		.map((imageUrl) => (
-			<img key={imageUrl} alt="provider" src={imageUrl} className="h-8 w-8" />
+			<img
+				key={imageUrl}
+				alt="provider"
+				src={imageUrl}
+				className="h-8 w-8 rounded"
+			/>
 		));
 
 	return (
