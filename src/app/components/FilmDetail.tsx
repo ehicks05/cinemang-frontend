@@ -35,7 +35,7 @@ export const FilmDetail = ({ film, trailer }: Props) => {
 		>
 			<div>
 				<div className="text-2xl font-semibold sm:text-3xl">{film.title}</div>
-				<div className="text-sm text-gray-300">
+				<div className="text-sm text-neutral-300">
 					<span title={film.released_at}>{year}</span>
 					{' • '}
 					<span>{`${runtime.hours || 0}h ${runtime.minutes}m`}</span>

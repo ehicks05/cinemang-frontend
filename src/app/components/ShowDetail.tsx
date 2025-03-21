@@ -33,7 +33,7 @@ const ShowDetail = ({
 		>
 			<div>
 				<div className="text-2xl font-semibold sm:text-3xl">{show.name}</div>
-				<div className="text-sm text-gray-300">
+				<div className="text-sm text-neutral-300">
 					<span>
 						{years} ({show.status})
 					</span>

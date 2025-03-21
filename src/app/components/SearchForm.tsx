@@ -21,7 +21,7 @@ const SearchForm = () => (
 	<Accordion type="single" collapsible>
 		<AccordionItem
 			value="foo"
-			className="flex w-full flex-col gap-4 bg-gray-800 p-4 border-none sm:rounded-lg"
+			className="flex w-full flex-col gap-4 bg-neutral-800 p-4 border-none sm:rounded-lg"
 		>
 			<AccordionTrigger className="p-0 text-lg hover:no-underline">
 				Search
@@ -73,7 +73,7 @@ const FormFields = () => {
 						<div>
 							<input
 								type="text"
-								className="w-full bg-gray-700"
+								className="w-full bg-neutral-700"
 								onChange={(e) => handleChange({ title: e.target.value })}
 								value={'title' in form ? form.title : ''}
 							/>
@@ -88,7 +88,7 @@ const FormFields = () => {
 						<div>
 							<input
 								type="text"
-								className="w-full bg-gray-700"
+								className="w-full bg-neutral-700"
 								onChange={(e) => handleChange({ name: e.target.value })}
 								value={'name' in form ? form.name : ''}
 							/>
@@ -102,7 +102,7 @@ const FormFields = () => {
 					<div>
 						<input
 							type="text"
-							className="w-full bg-gray-700"
+							className="w-full bg-neutral-700"
 							onChange={(e) => handleChange({ creditName: e.target.value })}
 							value={form.creditName}
 						/>
@@ -147,7 +147,7 @@ const FormFields = () => {
 					<div className="flex gap-2">
 						<input
 							type="number"
-							className="w-full bg-gray-700"
+							className="w-full bg-neutral-700"
 							max={form.maxVotes || undefined}
 							min={1}
 							onChange={(e) => handleChange({ minVotes: Number(e.target.value) })}
@@ -161,13 +161,13 @@ const FormFields = () => {
 					<div className="flex gap-2">
 						<input
 							type="number"
-							className="w-full bg-gray-700"
+							className="w-full bg-neutral-700"
 							onChange={(e) => handleChange({ minRating: Number(e.target.value) })}
 							value={form.minRating}
 						/>
 						<input
 							type="number"
-							className="w-full bg-gray-700"
+							className="w-full bg-neutral-700"
 							onChange={(e) => handleChange({ maxRating: Number(e.target.value) })}
 							value={form.maxRating}
 						/>
@@ -180,13 +180,13 @@ const FormFields = () => {
 					<div className="flex flex-col gap-2 sm:flex-row">
 						<input
 							type="date"
-							className="w-full bg-gray-700"
+							className="w-full bg-neutral-700"
 							onChange={(e) => handleChange({ minReleasedAt: e.target.value })}
 							value={'minReleasedAt' in form ? form.minReleasedAt : 0}
 						/>
 						<input
 							type="date"
-							className="w-full bg-gray-700"
+							className="w-full bg-neutral-700"
 							onChange={(e) => handleChange({ maxReleasedAt: e.target.value })}
 							value={'maxReleasedAt' in form ? form.maxReleasedAt : 0}
 						/>
@@ -199,13 +199,13 @@ const FormFields = () => {
 					<div className="flex flex-col gap-2 sm:flex-row">
 						<input
 							type="date"
-							className="w-full bg-gray-700"
+							className="w-full bg-neutral-700"
 							onChange={(e) => handleChange({ minLastAirDate: e.target.value })}
 							value={'minLastAirDate' in form ? form.minLastAirDate : 0}
 						/>
 						<input
 							type="date"
-							className="w-full bg-gray-700"
+							className="w-full bg-neutral-700"
 							onChange={(e) => handleChange({ maxLastAirDate: e.target.value })}
 							value={'maxLastAirDate' in form ? form.maxLastAirDate : 0}
 						/>
@@ -218,7 +218,7 @@ const FormFields = () => {
 					<div>Language</div>
 					<div>
 						<select
-							className="w-full bg-gray-700"
+							className="w-full bg-neutral-700"
 							onChange={(e) => handleChange({ language: e.target.value })}
 							value={form.language}
 						>
@@ -239,7 +239,7 @@ const FormFields = () => {
 					<div>Genre</div>
 					<div>
 						<select
-							className="w-full bg-gray-700"
+							className="w-full bg-neutral-700"
 							onChange={(e) => handleChange({ genre: Number(e.target.value) })}
 							value={form.genre}
 						>
@@ -260,7 +260,7 @@ const FormFields = () => {
 				<div>Sort</div>
 				<div className="flex">
 					<select
-						className="w-full bg-gray-700"
+						className="w-full bg-neutral-700"
 						onChange={(e) =>
 							handleChange({ sortColumn: e.target.value as SortColumn }, true)
 						}
@@ -279,7 +279,7 @@ const FormFields = () => {
 						))}
 					</select>
 					<Button
-						className="border-l-0 border-gray-500 bg-gray-700 px-3 text-white"
+						className="border-l-0 border-neutral-500 bg-neutral-700 px-3 text-white"
 						onClick={() => handleChange({ ascending: !form.ascending }, true)}
 					>
 						{form.ascending ? (
@@ -296,7 +296,7 @@ const FormFields = () => {
 				<div>&nbsp;</div>
 				<div className="flex">
 					<Button
-						className="border-gray-500 bg-gray-700 px-3 py-2 text-base text-white"
+						className="border-neutral-500 bg-neutral-700 px-3 py-2 text-base text-white"
 						onClick={() =>
 							handleChange({
 								...(from === '/tv'

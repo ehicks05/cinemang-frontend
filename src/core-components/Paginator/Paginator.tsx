@@ -41,7 +41,7 @@ export const Paginator = ({ count = 0, isLoading, pageSize = PAGE_SIZE }: Props)
 	)} of ${nf.format(count)}`;
 
 	return (
-		<div className="bg-gray-800 p-4 sm:rounded-lg">
+		<div className="bg-neutral-800 p-4 sm:rounded-lg">
 			<div
 				className={`flex flex-col items-center justify-between gap-4 sm:flex-row ${
 					isLoading ? 'invisible' : ''

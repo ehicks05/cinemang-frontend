@@ -1,7 +1,7 @@
 import { Sk } from './Skeleton';
 
 const MediaSkeleton = () => (
-	<div className="bg-gray-800 sm:rounded-lg">
+	<div className="bg-neutral-800 sm:rounded-lg">
 		<div className="flex animate-pulse flex-col gap-4 p-4 sm:rounded-lg">
 			<div className="flex gap-4">
 				<div className="shrink-0">

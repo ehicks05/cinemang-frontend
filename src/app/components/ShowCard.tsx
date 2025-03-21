@@ -35,7 +35,7 @@ export const ShowCard = ({ show, palette }: { show: Show; palette: Palette }) =>
 					<div className="flex flex-col gap-1">
 						<div>
 							<span className={`${fontSize} font-bold`}>{show.name}</span>
-							<span className="text-xs text-gray-300">
+							<span className="text-xs text-neutral-300">
 								<span className="font-semibold"> {years}</span>
 							</span>
 						</div>

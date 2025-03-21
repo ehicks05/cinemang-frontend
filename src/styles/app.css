@@ -3,43 +3,6 @@
 @plugin '@tailwindcss/forms';
 
 @theme {
-  --color-green-50: #f3fefa;
-  --color-green-100: #e8fdf6;
-  --color-green-200: #c5fbe8;
-  --color-green-300: #a1f8d9;
-  --color-green-400: #5bf2bd;
-  --color-green-500: #15eda1;
-  --color-green-600: #13d591;
-  --color-green-700: #10b279;
-  --color-green-800: #0d8e61;
-  --color-green-900: #0a744f;
-
-  --color-gray-50: #fafafa;
-  --color-gray-100: #f5f5f5;
-  --color-gray-200: #e5e5e5;
-  --color-gray-300: #d4d4d4;
-  --color-gray-400: #a3a3a3;
-  --color-gray-500: #737373;
-  --color-gray-600: #525252;
-  --color-gray-700: #404040;
-  --color-gray-800: #262626;
-  --color-gray-900: #171717;
-  --color-gray-950: #0a0a0a;
-
-  --color-blue-gray-50: #f8fafc;
-  --color-blue-gray-100: #f1f5f9;
-  --color-blue-gray-200: #e2e8f0;
-  --color-blue-gray-300: #cbd5e1;
-  --color-blue-gray-400: #94a3b8;
-  --color-blue-gray-500: #64748b;
-  --color-blue-gray-600: #475569;
-  --color-blue-gray-700: #334155;
-  --color-blue-gray-800: #1e293b;
-  --color-blue-gray-900: #0f172a;
-  --color-blue-gray-950: #020617;
-
-  --breakpoint-3xl: 2000px;
-
   --animate-accordion-down: accordion-down 0.2s ease-out;
   --animate-accordion-up: accordion-up 0.2s ease-out;
 
@@ -75,7 +38,7 @@
   ::before,
   ::backdrop,
   ::file-selector-button {
-    border-color: var(--color-gray-200, currentColor);
+    border-color: var(--color-neutral-200, currentColor);
   }
 }
 

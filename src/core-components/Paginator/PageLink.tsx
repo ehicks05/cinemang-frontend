@@ -20,10 +20,11 @@ export const PageLink = ({
 	const { pathname } = useLocation();
 	const from = pathname === '/tv' ? '/tv' : '/films';
 
-	const defaults = 'flex items-center justify-center w-9 h-9 border border-gray-600';
+	const defaults =
+		'flex items-center justify-center w-9 h-9 border border-neutral-600';
 	const disabled = isDisabled ? 'opacity-60' : '';
-	const active = isActive ? 'z-10 border-green-700 bg-green-900' : '';
-	const notSpecial = !isDisabled && !isActive ? 'hover:bg-gray-700' : '';
+	const active = isActive ? 'z-10 border-emerald-700 bg-emerald-900' : '';
+	const notSpecial = !isDisabled && !isActive ? 'hover:bg-neutral-700' : '';
 
 	return (
 		<Link

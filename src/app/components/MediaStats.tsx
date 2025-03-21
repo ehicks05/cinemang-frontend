@@ -65,7 +65,7 @@ const MediaStats = ({
 		{
 			key: 'language',
 			label: language,
-			color: 'text-green-500',
+			color: 'text-emerald-500',
 			icon: undefined,
 			width: 'w-32',
 		},

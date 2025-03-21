@@ -34,7 +34,7 @@ export const FilmCard = ({ film, palette }: { film: IFilm; palette: Palette }) =
 					<div className="flex flex-col gap-1">
 						<div>
 							<span className={`${fontSize} font-bold`}>{film.title}</span>
-							<span className="text-xs text-gray-300" title={film.released_at}>
+							<span className="text-xs text-neutral-300" title={film.released_at}>
 								<span className="font-semibold"> {year} </span>
 								<span className="whitespace-nowrap">{runtime}</span>
 							</span>

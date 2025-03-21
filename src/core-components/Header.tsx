@@ -9,7 +9,7 @@ const Header = () => (
 			to="/films"
 		>
 			Cine
-			<FaCat className="inline text-green-500" />
+			<FaCat className="inline text-emerald-500" />
 			Mang
 		</Link>
 

@@ -24,7 +24,7 @@ const Footer = () => (
 		<SystemInfo />
 		{LINKS.map(({ url, icon: Icon }) => (
 			<Link href={url} key={url}>
-				<Icon className="text-3xl text-green-500 hover:text-green-400" />
+				<Icon className="text-3xl text-emerald-500 hover:text-emerald-400" />
 			</Link>
 		))}
 	</footer>
